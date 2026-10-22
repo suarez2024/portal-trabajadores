@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Trabajador</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, Arial, sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            padding: 20px;
+        }
+
+        header {
+            max-width: 800px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            color: #27ae60;
+        }
+
+        .logout {
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .card {
+            max-width: 800px;
+            margin: 0 auto 20px;
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+        }
+
+        h2 {
+            font-size: 1rem;
+            margin-bottom: 14px;
+            color: #333;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: .8rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #555;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: .9rem;
+        }
+
+        button.primary {
+            background: #27ae60;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button.primary:hover {
+            background: #1e8449;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .85rem;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f7f9fc;
+            font-size: .75rem;
+            text-transform: uppercase;
+            color: #666;
+        }
+
+        .totales {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .total-box {
+            flex: 1;
+            background: #e8f8ef;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .total-box .num {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e8449;
+        }
+
+        .total-box .lbl {
+            font-size: .75rem;
+            color: #666;
+        }
+
+        .del {
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: .75rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Portal Trabajador</h1>
+        <button class="logout" onclick="logout()">Salir</button>
+    </header>
+
+    <div class="card">
+        <h2>Registrar jornada</h2>
+        <div class="form-row">
+            <div><label>Fecha</label><input type="date" id="fecha"></div>
+            <div><label>Entrada</label><input type="time" id="entrada" value="08:00"></div>
+            <div><label>Salida</label><input type="time" id="salida" value="18:00"></div>
+            <div><label>Minutos lunch</label><input type="number" id="lunch" value="60" min="0"></div>
+        </div>
+        <div class="form-row">
+            <div style="grid-column:1/-1"><label>Notas (opcional)</label><input type="text" id="notas"
+                    placeholder="Ej. Día normal"></div>
+        </div>
+        <button class="primary" onclick="guardarJornada()">Guardar jornada</button>
+    </div>
+
+    <div class="totales" id="totales"></div>
+
+    <div class="card">
+        <h2>Mis jornadas</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Entrada</th>
+                    <th>Salida</th>
+                    <th>Lunch</th>
+                    <th>Horas</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="tabla"></tbody>
+        </table>
+    </div>
+
+    <script type="module">
+        import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+        const SUPABASE_URL = 'https://qcqhxtoffjnhvbqltrnu.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjcWh4dG9mZmpuaHZicWx0cm51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2NDkzMzcsImV4cCI6MjEwODIyNTMzN30.0uyZM_wUrIktt0JlqbO9lXipes6yHrj6sSAA3a6pvBM';
+        const supabase = createClient(
+            'https://qcqhxtoffjnhvbqltrnu.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjcWh4dG9mZmpuaHZicWx0cm51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2NDkzMzcsImV4cCI6MjEwODIyNTMzN30.0uyZM_wUrIktt0JlqbO9lXipes6yHrj6sSAA3a6pvBM.'
+        );
+
+        const usuario = JSON.parse(localStorage.getItem('usuario') || 'null');
+        if (!usuario || usuario.rol !== 'trabajador') {
+            window.location.href = 'index.html';
+        }
+
+        function logout() {localStorage.removeItem('usuario'); window.location.href = 'index.html';}
+        window.logout = logout;
+
+        function calcularHoras(entrada, salida, lunch) {
+            const [eh, em] = entrada.split(':').map(Number);
+            const [sh, sm] = salida.split(':').map(Number);
+            const minEntrada = eh * 60 + em;
+            const minSalida = sh * 60 + sm;
+            let total = minSalida - minEntrada;
+            if (total < 0) total += 24 * 60; // turno nocturno
+            const efectivos = total - (lunch || 0);
+            return Math.max(0, efectivos / 60);
+        }
+
+        async function cargar() {
+            const {data: jornadas} = await supabase
+                .from('jornadas')
+                .select('*')
+                .eq('trabajador_id', usuario.id)
+                .order('fecha', {ascending: false});
+
+            const tbody = document.getElementById('tabla');
+            tbody.innerHTML = (jornadas || []).map(j => `
+    <tr>
+      <td>${j.fecha}</td>
+      <td>${j.hora_entrada.slice(0, 5)}</td>
+      <td>${j.hora_salida.slice(0, 5)}</td>
+      <td>${j.minutos_lunch} min</td>
+      <td>${Number(j.horas_calculadas).toFixed(2)} h</td>
+      <td><button class="del" onclick="borrar('${j.id}')">×</button></td>
+    </tr>
+  `).join('') || '<tr><td colspan="6" style="text-align:center;color:#999">Sin jornadas</td></tr>';
+
+            const totalHoras = (jornadas || []).reduce((s, j) => s + Number(j.horas_calculadas), 0);
+            const totalPago = totalHoras * Number(usuario.tarifa_hora);
+
+            document.getElementById('totales').innerHTML = `
+    <div class="total-box"><div class="num">${totalHoras.toFixed(2)} h</div><div class="lbl">Total horas</div></div>
+    <div class="total-box"><div class="num">$${totalPago.toFixed(2)}</div><div class="lbl">Total a cobrar ($${usuario.tarifa_hora}/h)</div></div>
+  `;
+        }
+
+        async function guardarJornada() {
+            const fecha = document.getElementById('fecha').value;
+            const entrada = document.getElementById('entrada').value;
+            const salida = document.getElementById('salida').value;
+            const lunch = parseInt(document.getElementById('lunch').value) || 0;
+            const notas = document.getElementById('notas').value;
+
+            if (!fecha || !entrada || !salida) {alert('Completa fecha, entrada y salida'); return;}
+
+            const horas = calcularHoras(entrada, salida, lunch);
+
+            const {error} = await supabase.from('jornadas').insert([{
+                trabajador_id: usuario.id,
+                fecha,
+                hora_entrada: entrada,
+                hora_salida: salida,
+                minutos_lunch: lunch,
+                horas_calculadas: horas,
+                notas
+            }]);
+
+            if (error) {alert('Error: ' + error.message); return;}
+            document.getElementById('notas').value = '';
+            cargar();
+        }
+
+        window.guardarJornada = guardarJornada;
+        window.borrar = async (id) => {
+            if (!confirm('¿Borrar esta jornada?')) return;
+            await supabase.from('jornadas').delete().eq('id', id);
+            cargar();
+        };
+
+        // Fecha de hoy por defecto
+        document.getElementById('fecha').valueAsDate = new Date();
+        cargar();
+    </script>
+</body>
+
+</html>

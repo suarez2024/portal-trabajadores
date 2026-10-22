@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Cliente</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, Arial, sans-serif;
+    }
+
+    body {
+      background: #f0f2f5;
+      padding: 20px;
+    }
+
+    header {
+      max-width: 800px;
+      margin: 0 auto 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 1.2rem;
+      color: #1e3c72;
+    }
+
+    .logout {
+      background: #e74c3c;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .card {
+      max-width: 800px;
+      margin: 0 auto 20px;
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+    }
+
+    h2 {
+      font-size: 1rem;
+      margin-bottom: 14px;
+      color: #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .9rem;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background: #f7f9fc;
+      font-size: .75rem;
+      text-transform: uppercase;
+      color: #666;
+    }
+
+    .total {
+      background: #e8f0fe;
+      padding: 16px;
+      border-radius: 8px;
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .total .num {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #1e3c72;
+    }
+
+    .total .lbl {
+      font-size: .8rem;
+      color: #666;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Portal Cliente</h1>
+    <button class="logout" onclick="logout()">Salir</button>
+  </header>
+
+  <div class="card">
+    <h2>Mis trabajadores</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Trabajador</th>
+          <th>Horas totales</th>
+          <th>Tarifa/hora</th>
+          <th>Monto a pagar</th>
+        </tr>
+      </thead>
+      <tbody id="tabla"></tbody>
+    </table>
+    <div class="total" id="totalGeneral"></div>
+  </div>
+
+  <script type="module">
+    import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const SUPABASE_URL = 'https://qcqhxtoffjnhvbqltrnu.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjcWh4dG9mZmpuaHZicWx0cm51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2NDkzMzcsImV4cCI6MjEwODIyNTMzN30.0uyZM_wUrIktt0JlqbO9lXipes6yHrj6sSAA3a6pvBM';
+    const supabase = createClient(
+            'https://qcqhxtoffjnhvbqltrnu.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjcWh4dG9mZmpuaHZicWx0cm51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2NDkzMzcsImV4cCI6MjEwODIyNTMzN30.0uyZM_wUrIktt0JlqbO9lXipes6yHrj6sSAA3a6pvBM.'
+    );
+
+    const usuario = JSON.parse(localStorage.getItem('usuario') || 'null');
+    if (!usuario || usuario.rol !== 'cliente') {
+      window.location.href = 'index.html';
+    }
+
+    function logout() {localStorage.removeItem('usuario'); window.location.href = 'index.html';}
+    window.logout = logout;
+
+    async function cargar() {
+      // Traer trabajadores de este cliente
+      const {data: trabajadores} = await supabase
+        .from('trabajadores')
+        .select('*')
+        .eq('cliente_id', usuario.id);
+
+      const tbody = document.getElementById('tabla');
+      let granTotal = 0;
+      let filas = '';
+
+      for (const t of (trabajadores || [])) {
+        const {data: jornadas} = await supabase
+          .from('jornadas')
+          .select('horas_calculadas')
+          .eq('trabajador_id', t.id);
+
+        const horas = (jornadas || []).reduce((s, j) => s + Number(j.horas_calculadas || 0), 0);
+        const monto = horas * Number(t.tarifa_hora);
+        granTotal += monto;
+
+        filas += `<tr>
+      <td>${t.nombre}</td>
+      <td>${horas.toFixed(2)} h</td>
+      <td>$${Number(t.tarifa_hora).toFixed(2)}</td>
+      <td>$${monto.toFixed(2)}</td>
+    </tr>`;
+      }
+
+      tbody.innerHTML = filas || '<tr><td colspan="4" style="text-align:center;color:#999">Sin trabajadores asignados</td></tr>';
+      document.getElementById('totalGeneral').innerHTML = `
+    <div class="num">$${granTotal.toFixed(2)}</div>
+    <div class="lbl">Total a pagar este período</div>
+  `;
+    }
+
+    cargar();
+  </script>
+</body>
+
+</html>

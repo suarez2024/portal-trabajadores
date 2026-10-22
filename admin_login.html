@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Acceso</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:system-ui,Arial,sans-serif; }
+  body { background:#1e3c72; display:flex; align-items:center; justify-content:center; min-height:100vh; }
+  .box { background:#fff; padding:40px; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,.2); width:340px; }
+  h1 { font-size:1.3rem; margin-bottom:20px; color:#6c3483; }
+  label { display:block; font-size:.85rem; margin:12px 0 4px; font-weight:600; }
+  input { width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; }
+  button { width:100%; padding:12px; margin-top:20px; background:#6c3483; color:#fff; border:none; border-radius:6px; font-weight:600; cursor:pointer; }
+  button:hover { background:#512a63; }
+  .error { color:#e74c3c; font-size:.8rem; margin-top:10px; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>Administrador</h1>
+  <label>Usuario</label>
+  <input type="text" id="user">
+  <label>Contraseña</label>
+  <input type="password" id="pass">
+  <button onclick="login()">Entrar</button>
+  <div class="error" id="error"></div>
+</div>
+
+<script>
+// Credenciales hardcodeadas (no están en la base de datos)
+const ADMIN_USER = 'Admin';
+const ADMIN_PASS = 'Admin2026';
+
+function login() {
+  const u = document.getElementById('user').value.trim();
+  const p = document.getElementById('pass').value;
+  if (u === ADMIN_USER && p === ADMIN_PASS) {
+    localStorage.setItem('usuario', JSON.stringify({ rol: 'admin', nombre: 'Admin' }));
+    window.location.href = 'admin.html';
+  } else {
+    document.getElementById('error').textContent = 'Credenciales incorrectas';
+  }
+}
+window.login = login;
+</script>
+</body>
+</html>

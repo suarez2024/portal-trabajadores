@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, Arial, sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .box {
+            background: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, .1);
+            width: 340px;
+        }
+
+        h1 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #1e3c72;
+        }
+
+        label {
+            display: block;
+            font-size: .85rem;
+            margin: 12px 0 4px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: #1e3c72;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #152b55;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: .8rem;
+            margin-top: 10px;
+        }
+
+        .admin-link {
+            text-align: center;
+            margin-top: 16px;
+            font-size: .75rem;
+        }
+
+        .admin-link a {
+            color: #888;
+            text-decoration: none;
+        }
+
+        .admin-link a:hover {
+            color: #1e3c72;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <h1>Portal de Trabajadores</h1>
+        <label>Email</label>
+        <input type="email" id="email" placeholder="tu@email.com">
+        <label>Contraseña</label>
+        <input type="password" id="password">
+        <button onclick="login()">Entrar</button>
+        <div class="error" id="error"></div>
+        <div class="admin-link"><a href="admin-login.html">Acceso administrador</a></div>
+    </div>
+
+    <script type="module">
+        import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+        const supabase = createClient(
+            'https://qcqhxtoffjnhvbqltrnu.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjcWh4dG9mZmpuaHZicWx0cm51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2NDkzMzcsImV4cCI6MjEwODIyNTMzN30.0uyZM_wUrIktt0JlqbO9lXipes6yHrj6sSAA3a6pvBM.'
+        );
+
+        async function login() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorEl = document.getElementById('error');
+            errorEl.textContent = '';
+
+            // Buscar en trabajadores
+            const {data: trabajador} = await supabase
+                .from('trabajadores').select('*')
+                .eq('email', email).eq('password', password).maybeSingle();
+
+            if (trabajador) {
+                localStorage.setItem('usuario', JSON.stringify({...trabajador, rol: 'trabajador'}));
+                window.location.href = 'trabajador.html';
+                return;
+            }
+
+            // Buscar en clientes
+            const {data: cliente} = await supabase
+                .from('clientes').select('*')
+                .eq('email', email).eq('password', password).maybeSingle();
+
+            if (cliente) {
+                localStorage.setItem('usuario', JSON.stringify({...cliente, rol: 'cliente'}));
+                window.location.href = 'cliente.html';
+                return;
+            }
+
+            errorEl.textContent = 'Credenciales incorrectas';
+        }
+        window.login = login;
+    </script>
+</body>
+
+</html>
