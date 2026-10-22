@@ -1006,6 +1006,25 @@ tbody tr {
   color: var(--accent);
 }
 
+.badge.warn {
+  background: rgba(255, 176, 32, .14);
+  color: var(--amber);
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+.row-actions .btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 6px;
+}
+
 .badge i {
   width: 6px;
   height: 6px;
@@ -1148,6 +1167,25 @@ dialog[open] {
   color: var(--ink-soft);
   font-size: .78rem;
   border: 1px solid rgba(255, 176, 32, .22);
+}
+
+.session-choice {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 14px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(10, 132, 255, .08);
+  border: 1px solid rgba(10, 132, 255, .18);
+  color: var(--ink-soft);
+  font-size: .8rem;
+}
+
+.session-choice-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .hint svg {

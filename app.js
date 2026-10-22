@@ -7,7 +7,21 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const LEGACY_ADMIN_USER = 'Admin';
 const LEGACY_ADMIN_PASS = 'Admin2026';
-const SESSION_KEY = 'usuario';
+const SESSION_PREFIX = 'portal_sesion_';
+const SESSION_ROLES = ['admin', 'cliente', 'trabajador'];
+const LEGACY_SESSION_KEY = 'usuario';
+
+function sessionKey(role) {
+  return `${SESSION_PREFIX}${role}`;
+}
+
+function parseSession(raw) {
+  try {
+    return JSON.parse(raw || 'null');
+  } catch {
+    return null;
+  }
+}
 
 export class AuthError extends Error {
   constructor(message = 'Tu sesión expiró. Vuelve a entrar.') {
@@ -23,6 +37,13 @@ export function authError(message) {
 function rpcError(data) {
   if (data?.code === 'auth') return authError(data.error);
   return new Error(data?.error || 'No se pudo completar la operación.');
+}
+
+function missingFeatureError(error) {
+  if (error?.code === 'PGRST202' || /could not find the function/i.test(error?.message || '')) {
+    return new Error('Falta aplicar la actualización de Supabase. Ejecutá supabase/hardening.sql y recargá la página.');
+  }
+  return null;
 }
 
 export function escapeHtml(value) {
@@ -97,35 +118,62 @@ function sanitizeSession(session) {
   return { ...session, usuario };
 }
 
-export function getSession() {
+function migrateLegacySession() {
   try {
-    return sanitizeSession(JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'));
+    const raw = localStorage.getItem(LEGACY_SESSION_KEY);
+    if (!raw) return;
+    const legacy = parseSession(raw);
+    if (legacy?.rol && SESSION_ROLES.includes(legacy.rol) && !localStorage.getItem(sessionKey(legacy.rol))) {
+      localStorage.setItem(sessionKey(legacy.rol), JSON.stringify(sanitizeSession(legacy)));
+    }
+    localStorage.removeItem(LEGACY_SESSION_KEY);
   } catch {
-    return null;
+    localStorage.removeItem(LEGACY_SESSION_KEY);
   }
 }
 
-export function setSession(session) {
-  localStorage.setItem(SESSION_KEY, JSON.stringify(sanitizeSession(session)));
+migrateLegacySession();
+
+export function getSession(role) {
+  if (role) {
+    return sanitizeSession(parseSession(localStorage.getItem(sessionKey(role))));
+  }
+  for (const candidate of SESSION_ROLES) {
+    const session = getSession(candidate);
+    if (session) return session;
+  }
+  return null;
 }
 
-export function clearSession() {
-  localStorage.removeItem(SESSION_KEY);
+export function setSession(session) {
+  const safe = sanitizeSession(session);
+  if (!safe?.rol) return;
+  localStorage.setItem(sessionKey(safe.rol), JSON.stringify(safe));
+  localStorage.removeItem(LEGACY_SESSION_KEY);
+}
+
+export function clearSession(role) {
+  if (role) {
+    localStorage.removeItem(sessionKey(role));
+    return;
+  }
+  SESSION_ROLES.forEach(candidate => localStorage.removeItem(sessionKey(candidate)));
+  localStorage.removeItem(LEGACY_SESSION_KEY);
 }
 
 export function requireRole(role, redirect, requireToken = false) {
-  const session = getSession();
+  const session = getSession(role);
   if (!session || session.rol !== role || (requireToken && !session.token)) {
-    clearSession();
+    clearSession(role);
     location.replace(redirect);
     return null;
   }
   return session;
 }
 
-export function handleAuthFailure(error, redirect) {
+export function handleAuthFailure(error, redirect, role) {
   if (error?.name === 'AuthError') {
-    clearSession();
+    clearSession(role);
     location.replace(redirect);
     return true;
   }
@@ -153,6 +201,9 @@ const ICONS = {
   logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   trash: '<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/>',
+  pencil: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+  archive: '<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v12h14V8"/><path d="M10 12h4"/>',
+  restore: '<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>',
   check: '<path d="M20 6 9 17l-5-5"/>',
   alert: '<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>',
   search: '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
@@ -233,6 +284,9 @@ function normalizeTrabajadores(rows = []) {
     return {
       ...trabajador,
       tarifa_hora: Number(trabajador.tarifa_hora) || 0,
+      archivado: trabajador.archivado === true,
+      archivado_en: trabajador.archivado_en ?? null,
+      historico: trabajador.historico === true,
       cliente_nombre: row.cliente_nombre ?? clientes?.empresa ?? '—'
     };
   });
@@ -326,7 +380,7 @@ export const api = {
     if (trabajadores.error) throw new Error(friendlyError(trabajadores.error));
     const trabajador = trabajadores.data?.[0];
     if (trabajador) {
-      if (trabajador.activo === false) {
+      if (trabajador.activo === false || trabajador.archivado === true) {
         return { ok: false, error: 'Tu cuenta está desactivada. Contacta al administrador.' };
       }
       const session = { rol: 'trabajador', usuario: sanitizeUser(trabajador) };
@@ -377,8 +431,8 @@ export const api = {
     return { ok: false, error: 'Credenciales incorrectas.' };
   },
 
-  async logout() {
-    const session = getSession();
+  async logout(role) {
+    const session = role ? getSession(role) : getSession();
     if (this.secure && session?.token) {
       try {
         await supabase.rpc('portal_logout', { p_token: session.token });
@@ -386,7 +440,7 @@ export const api = {
         /* noop */
       }
     }
-    clearSession();
+    clearSession(role);
   },
 
   async adminData(session) {
@@ -435,8 +489,9 @@ export const api = {
       .eq('id', session.usuario.id)
       .maybeSingle();
     if (trabajador.error) throw new Error(friendlyError(trabajador.error));
-    if (!trabajador.data) throw authError('Tu cuenta ya no existe.');
-    if (trabajador.data.activo === false) throw authError('Tu cuenta está desactivada.');
+    const worker = trabajador.data;
+    if (!worker) throw authError('Tu cuenta ya no existe.');
+    if (worker.activo === false || worker.archivado === true) throw authError('Tu cuenta está desactivada.');
 
     const jornadas = await supabase
       .from('jornadas')
@@ -446,9 +501,15 @@ export const api = {
       .order('creado_en', { ascending: false });
     if (jornadas.error) throw new Error(friendlyError(jornadas.error));
 
+    const rows = (jornadas.data || []).map(j => ({
+      ...j,
+      tarifa_hora: j.tarifa_hora ?? worker.tarifa_hora,
+      cliente_id: j.cliente_id ?? worker.cliente_id
+    }));
+
     return {
-      usuario: sanitizeUser(trabajador.data),
-      jornadas: normalizeJornadas(jornadas.data || [])
+      usuario: sanitizeUser(worker),
+      jornadas: normalizeJornadas(rows)
     };
   },
 
@@ -491,10 +552,20 @@ export const api = {
       jornadasData = jornadas.data || [];
     }
 
+    const workersById = new Map((trabajadores.data || []).map(t => [t.id, t]));
+    const rows = jornadasData.map(j => {
+      const worker = workersById.get(j.trabajador_id);
+      return {
+        ...j,
+        tarifa_hora: j.tarifa_hora ?? worker?.tarifa_hora,
+        cliente_id: j.cliente_id ?? worker?.cliente_id
+      };
+    });
+
     return {
       usuario: sanitizeUser(cliente.data),
       trabajadores: normalizeTrabajadores(trabajadores.data || []),
-      jornadas: normalizeJornadas(jornadasData)
+      jornadas: normalizeJornadas(rows)
     };
   },
 
@@ -572,6 +643,132 @@ export const api = {
     }
     const { error } = await supabase.from('trabajadores').update({ activo }).eq('id', id);
     if (error) throw new Error(friendlyError(error));
+  },
+
+  async updateCliente(payload, session) {
+    if (this.secure) {
+      const { data, error } = await supabase.rpc('portal_admin_actualizar_cliente', {
+        p_token: session.token,
+        p_cliente_id: payload.id,
+        p_nombre: payload.nombre,
+        p_empresa: payload.empresa,
+        p_email: payload.email,
+        p_password: payload.password || null
+      });
+      if (error) throw missingFeatureError(error) || new Error(friendlyError(error));
+      if (!data?.ok) throw rpcError(data);
+      return normalizeClientes([data.cliente])[0];
+    }
+
+    const email = String(payload.email || '').trim().toLowerCase();
+    await assertUniqueEmail(email, 'clientes', payload.id);
+    const update = {
+      nombre: payload.nombre,
+      empresa: payload.empresa,
+      email
+    };
+    if (payload.password) {
+      if (String(payload.password).length < 6) {
+        throw new Error('La contraseña debe tener al menos 6 caracteres.');
+      }
+      update.password = payload.password;
+    }
+    const { data, error } = await supabase
+      .from('clientes')
+      .update(update)
+      .eq('id', payload.id)
+      .select()
+      .single();
+    if (error) throw new Error(friendlyError(error));
+    return normalizeClientes([data])[0];
+  },
+
+  async updateTrabajador(payload, session) {
+    if (this.secure) {
+      const { data, error } = await supabase.rpc('portal_admin_actualizar_trabajador', {
+        p_token: session.token,
+        p_trabajador_id: payload.id,
+        p_nombre: payload.nombre,
+        p_email: payload.email,
+        p_tarifa: payload.tarifa_hora,
+        p_cliente_id: payload.cliente_id,
+        p_password: payload.password || null
+      });
+      if (error) throw missingFeatureError(error) || new Error(friendlyError(error));
+      if (!data?.ok) throw rpcError(data);
+      return normalizeTrabajadores([data.trabajador])[0];
+    }
+
+    const email = String(payload.email || '').trim().toLowerCase();
+    await assertUniqueEmail(email, 'trabajadores', payload.id);
+    const update = {
+      nombre: payload.nombre,
+      email,
+      tarifa_hora: payload.tarifa_hora,
+      cliente_id: payload.cliente_id
+    };
+    if (payload.password) {
+      if (String(payload.password).length < 6) {
+        throw new Error('La contraseña debe tener al menos 6 caracteres.');
+      }
+      update.password = payload.password;
+    }
+    const { data, error } = await supabase
+      .from('trabajadores')
+      .update(update)
+      .eq('id', payload.id)
+      .select('*, clientes(empresa)')
+      .single();
+    if (error) throw new Error(friendlyError(error));
+    return normalizeTrabajadores([data])[0];
+  },
+
+  async deleteCliente(id, session) {
+    if (this.secure) {
+      const { data, error } = await supabase.rpc('portal_admin_borrar_cliente', {
+        p_token: session.token,
+        p_cliente_id: id
+      });
+      if (error) throw missingFeatureError(error) || new Error(friendlyError(error));
+      if (!data?.ok) throw rpcError(data);
+      return;
+    }
+
+    const workers = await supabase
+      .from('trabajadores')
+      .select('id', { count: 'exact', head: true })
+      .eq('cliente_id', id);
+    if (workers.error) throw new Error(friendlyError(workers.error));
+    const count = workers.count || 0;
+    if (count > 0) {
+      throw new Error(`No se puede eliminar: tiene ${count} ${count === 1 ? 'trabajador' : 'trabajadores'}. Reasígnalos a otro cliente primero.`);
+    }
+    const { error } = await supabase.from('clientes').delete().eq('id', id);
+    if (error) throw new Error(friendlyError(error));
+  },
+
+  async archiveTrabajador(id, session) {
+    if (!this.secure) {
+      throw new Error('Aplicá la migración de Supabase para archivar trabajadores.');
+    }
+    const { data, error } = await supabase.rpc('portal_admin_archivar_trabajador', {
+      p_token: session.token,
+      p_trabajador_id: id
+    });
+    if (error) throw missingFeatureError(error) || new Error(friendlyError(error));
+    if (!data?.ok) throw rpcError(data);
+  },
+
+  async restoreTrabajador(id, session) {
+    if (!this.secure) {
+      throw new Error('Aplicá la migración de Supabase para restaurar trabajadores.');
+    }
+    const { data, error } = await supabase.rpc('portal_admin_restaurar_trabajador', {
+      p_token: session.token,
+      p_trabajador_id: id
+    });
+    if (error) throw missingFeatureError(error) || new Error(friendlyError(error));
+    if (!data?.ok) throw rpcError(data);
   },
 
   async createJornada(payload, session) {

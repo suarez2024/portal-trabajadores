@@ -39,6 +39,14 @@
                         <p>Entra con tu cuenta de trabajador o cliente.</p>
                     </header>
 
+                    <div class="session-choice hidden" id="session-choice">
+                        <span>Tienes más de una sesión abierta en este navegador.</span>
+                        <div class="session-choice-actions">
+                            <button class="btn btn-sm" id="continue-worker" type="button">Continuar como trabajador</button>
+                            <button class="btn btn-sm" id="continue-client" type="button">Continuar como cliente</button>
+                        </div>
+                    </div>
+
                     <form id="login-form" novalidate>
                         <div class="field">
                             <label for="email">Email</label>
@@ -78,9 +86,18 @@
 
         await bootstrap();
 
-        const existing = getSession();
-        if (existing?.rol === 'trabajador') location.replace('trabajador.html');
-        if (existing?.rol === 'cliente') location.replace('cliente.html');
+        const workerSession = getSession('trabajador');
+        const clientSession = getSession('cliente');
+
+        if (workerSession && clientSession) {
+            document.getElementById('session-choice').classList.remove('hidden');
+            document.getElementById('continue-worker').addEventListener('click', () => location.replace('trabajador.html'));
+            document.getElementById('continue-client').addEventListener('click', () => location.replace('cliente.html'));
+        } else if (workerSession) {
+            location.replace('trabajador.html');
+        } else if (clientSession) {
+            location.replace('cliente.html');
+        }
 
         const form = document.getElementById('login-form');
         const email = document.getElementById('email');

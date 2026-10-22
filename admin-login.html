@@ -80,7 +80,7 @@
 
         await bootstrap();
 
-        if (getSession()?.rol === 'admin') location.replace('admin.html');
+        if (getSession('admin')) location.replace('admin.html');
 
         const form = document.getElementById('admin-form');
         const usuario = document.getElementById('usuario');

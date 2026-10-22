@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#e9edf6">
-    <title>Mi empresa Â· Portal de Trabajadores</title>
+    <title>Mi empresa · Portal de Trabajadores</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -31,12 +31,12 @@
             <article class="stat" style="--i:0">
                 <div class="label"><span class="icon-chip"><span class="icon" data-icon="users" data-size="16"></span></span> Trabajadores</div>
                 <div class="value" id="stat-trabajadores">0</div>
-                <div class="sub" id="stat-trabajadores-sub">â€”</div>
+                <div class="sub" id="stat-trabajadores-sub">—</div>
             </article>
             <article class="stat" style="--i:1">
                 <div class="label"><span class="icon-chip green"><span class="icon" data-icon="clock" data-size="16"></span></span> Horas totales</div>
                 <div class="value" id="stat-horas">0.00 h</div>
-                <div class="sub" id="stat-horas-sub">â€”</div>
+                <div class="sub" id="stat-horas-sub">—</div>
             </article>
             <article class="stat" style="--i:2">
                 <div class="label"><span class="icon-chip green"><span class="icon" data-icon="wallet" data-size="16"></span></span> Total a pagar</div>
@@ -44,9 +44,9 @@
                 <div class="sub">por las horas registradas</div>
             </article>
             <article class="stat" style="--i:3">
-                <div class="label"><span class="icon-chip purple"><span class="icon" data-icon="calendar" data-size="16"></span></span> PerÃ­odo</div>
-                <div class="value" id="stat-periodo">â€”</div>
-                <div class="sub">Ãºltima jornada registrada</div>
+                <div class="label"><span class="icon-chip purple"><span class="icon" data-icon="calendar" data-size="16"></span></span> Período</div>
+                <div class="value" id="stat-periodo">—</div>
+                <div class="sub">última jornada registrada</div>
             </article>
         </div>
 
@@ -54,7 +54,7 @@
             <div class="card-head">
                 <div>
                     <h2>Tus trabajadores</h2>
-                    <p id="workers-count">â€”</p>
+                    <p id="workers-count">—</p>
                 </div>
                 <button class="btn btn-sm" id="refresh-btn" type="button">
                     <span class="icon" data-icon="refresh" data-size="16"></span> Actualizar
@@ -94,7 +94,7 @@
             </div>
             <div class="dialog-content">
                 <h3 id="detail-title">Trabajador</h3>
-                <p class="muted" id="detail-sub" style="font-size:.82rem;margin-top:4px">â€”</p>
+                <p class="muted" id="detail-sub" style="font-size:.82rem;margin-top:4px">—</p>
                 <div class="detail-list" id="detail-list"></div>
                 <div class="total-strip">
                     <span class="lbl">Total a pagar</span>
@@ -136,24 +136,34 @@
             function render() {
                 buildGroups();
                 const totalHoras = jornadas.reduce((sum, j) => sum + j.horas_calculadas, 0);
-                const total = trabajadores.reduce((sum, t) => sum + (groups.get(t.id) || []).reduce((s, j) => s + j.horas_calculadas * t.tarifa_hora, 0), 0);
-                const activos = trabajadores.filter(t => t.activo !== false).length;
+                const total = jornadas.reduce((sum, j) => sum + j.horas_calculadas * (Number(j.tarifa_hora) || 0), 0);
+                const actuales = trabajadores.filter(t => !t.historico);
+                const historicos = trabajadores.filter(t => t.historico);
+                const activos = actuales.filter(t => !t.archivado && t.activo !== false).length;
+                const inactivos = actuales.filter(t => !t.archivado && t.activo === false).length;
+                const archivados = actuales.filter(t => t.archivado).length;
                 const ultima = jornadas.reduce((latest, j) => !latest || String(j.fecha) > String(latest) ? j.fecha : latest, null);
 
                 document.getElementById('company-name').textContent = usuario.empresa || 'Mi empresa';
                 animateNumber(document.getElementById('stat-trabajadores'), trabajadores.length, value => Math.round(value).toString());
-                document.getElementById('stat-trabajadores-sub').textContent = `${activos} activos Â· ${trabajadores.length - activos} inactivos`;
+                document.getElementById('stat-trabajadores-sub').textContent =
+                    `${activos} activos · ${inactivos} inactivos · ${archivados} archivados` +
+                    (historicos.length ? ` · ${historicos.length} con historial` : '');
                 animateNumber(document.getElementById('stat-horas'), totalHoras, hours);
                 document.getElementById('stat-horas-sub').textContent = `${jornadas.length} jornadas registradas`;
                 animateNumber(document.getElementById('stat-total'), total, money);
-                document.getElementById('stat-periodo').textContent = ultima ? fmtDate(ultima) : 'â€”';
+                document.getElementById('stat-periodo').textContent = ultima ? fmtDate(ultima) : '—';
 
                 const tbody = document.getElementById('tabla-trabajadores');
                 tbody.innerHTML = trabajadores.map(t => {
                     const rows = groups.get(t.id) || [];
                     const workerHours = rows.reduce((sum, j) => sum + j.horas_calculadas, 0);
-                    const pago = workerHours * t.tarifa_hora;
+                    const pago = rows.reduce((sum, j) => sum + j.horas_calculadas * (Number(j.tarifa_hora) || 0), 0);
                     const activo = t.activo !== false;
+                    const archivado = t.archivado === true;
+                    const historico = t.historico === true;
+                    const estado = archivado ? 'Archivado' : historico ? 'Histórico' : activo ? 'Activo' : 'Inactivo';
+                    const badge = archivado || historico ? 'warn' : activo ? 'ok' : 'off';
                     return `
                         <tr>
                             <td>
@@ -165,8 +175,8 @@
                                     </div>
                                 </div>
                             </td>
-                            <td><span class="badge ${activo ? 'ok' : 'off'}"><i></i>${activo ? 'Activo' : 'Inactivo'}</span></td>
-                            <td class="num">${money(t.tarifa_hora)}/h</td>
+                            <td><span class="badge ${badge}"><i></i>${estado}</span></td>
+                            <td class="num">${historico ? '<span class="muted">—</span>' : `${money(t.tarifa_hora)}/h`}</td>
                             <td class="num">${hours(workerHours)}</td>
                             <td class="num"><strong>${money(pago)}</strong></td>
                             <td>
@@ -176,10 +186,12 @@
                                 </button>
                             </td>
                         </tr>`;
-                }).join('') || `<tr><td colspan="6"><div class="empty"><span class="icon" data-icon="users" data-size="26"></span>AÃºn no tienes trabajadores asignados.</div></td></tr>`;
+                }).join('') || `<tr><td colspan="6"><div class="empty"><span class="icon" data-icon="users" data-size="26"></span>Aún no tienes trabajadores asignados.</div></td></tr>`;
 
-                document.getElementById('workers-count').textContent = `${trabajadores.length} ${trabajadores.length === 1 ? 'trabajador' : 'trabajadores'} asignados`;
-                document.getElementById('total-label').textContent = `${trabajadores.length} ${trabajadores.length === 1 ? 'trabajador' : 'trabajadores'}`;
+                document.getElementById('workers-count').textContent =
+                    `${actuales.length} ${actuales.length === 1 ? 'trabajador' : 'trabajadores'} asignados` +
+                    (historicos.length ? ` · ${historicos.length} con historial` : '');
+                document.getElementById('total-label').textContent = `${actuales.length} ${actuales.length === 1 ? 'trabajador' : 'trabajadores'}`;
                 document.getElementById('total-horas').textContent = hours(totalHoras);
                 document.getElementById('total-pago').textContent = money(total);
                 hydrateIcons(tbody);
@@ -199,7 +211,7 @@
                     render();
                     if (showToast) toast('Datos actualizados.', 'ok');
                 } catch (error) {
-                    if (handleAuthFailure(error, 'index.html')) return;
+                    if (handleAuthFailure(error, 'index.html', 'cliente')) return;
                     toast(error.message, 'err');
                 } finally {
                     setLoading(refresh, false);
@@ -213,18 +225,18 @@
                 if (!worker) return;
                 const rows = groups.get(worker.id) || [];
                 const workerHours = rows.reduce((sum, j) => sum + j.horas_calculadas, 0);
-                const pago = workerHours * worker.tarifa_hora;
+                const pago = rows.reduce((sum, j) => sum + j.horas_calculadas * (Number(j.tarifa_hora) || 0), 0);
 
                 document.getElementById('detail-title').textContent = worker.nombre;
-                document.getElementById('detail-sub').textContent = `${money(worker.tarifa_hora)} por hora Â· ${rows.length} ${rows.length === 1 ? 'jornada' : 'jornadas'}`;
+                document.getElementById('detail-sub').textContent = `${rows.length} ${rows.length === 1 ? 'jornada' : 'jornadas'} · ${hours(workerHours)}`;
                 document.getElementById('detail-total').textContent = money(pago);
                 document.getElementById('detail-list').innerHTML = rows.map(j => `
                     <div class="detail-item">
                         <div class="who">
                             <strong>${fmtDate(j.fecha)}</strong>
-                            <span>${fmtTime(j.hora_entrada)} â€“ ${fmtTime(j.hora_salida)} Â· ${Number(j.minutos_lunch) || 0} min lunch${j.notas ? ' Â· ' + escapeHtml(j.notas) : ''}</span>
+                            <span>${fmtTime(j.hora_entrada)} – ${fmtTime(j.hora_salida)} · ${Number(j.minutos_lunch) || 0} min lunch${j.notas ? ' · ' + escapeHtml(j.notas) : ''}</span>
                         </div>
-                        <strong class="num">${hours(j.horas_calculadas)} Â· ${money(j.horas_calculadas * worker.tarifa_hora)}</strong>
+                        <strong class="num">${hours(j.horas_calculadas)} · ${money(j.horas_calculadas * (Number(j.tarifa_hora) || 0))}</strong>
                     </div>
                 `).join('') || '<div class="empty">Sin jornadas registradas.</div>';
 
@@ -238,7 +250,7 @@
             document.getElementById('refresh-btn').addEventListener('click', () => load(true));
 
             document.getElementById('logout-btn').addEventListener('click', async () => {
-                await api.logout();
+                await api.logout('cliente');
                 location.replace('index.html');
             });
 

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#e9edf6">
-    <title>AdministraciÃ³n Â· Portal de Trabajadores</title>
+    <title>Administración · Portal de Trabajadores</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -18,7 +18,7 @@
                 <span class="brand-icon"><span class="icon" data-icon="shield" data-size="20"></span></span>
                 <div>
                     <strong>Portal</strong>
-                    <span>AdministraciÃ³n</span>
+                    <span>Administración</span>
                 </div>
             </div>
 
@@ -27,7 +27,7 @@
                 <button class="nav-item active" data-section="resumen" type="button">
                     <span class="icon" data-icon="home" data-size="18"></span> Resumen
                 </button>
-                <span class="nav-label">GestiÃ³n</span>
+                <span class="nav-label">Gestión</span>
                 <button class="nav-item" data-section="clientes" type="button">
                     <span class="icon" data-icon="building" data-size="18"></span> Clientes
                 </button>
@@ -48,14 +48,14 @@
                     </div>
                 </div>
                 <button class="btn btn-ghost btn-block" id="logout-btn" type="button">
-                    <span class="icon" data-icon="logout" data-size="17"></span> Cerrar sesiÃ³n
+                    <span class="icon" data-icon="logout" data-size="17"></span> Cerrar sesión
                 </button>
             </div>
         </aside>
 
         <main class="main">
             <div class="mobile-bar">
-                <button class="btn btn-icon" id="menu-btn" type="button" aria-label="Abrir menÃº">
+                <button class="btn btn-icon" id="menu-btn" type="button" aria-label="Abrir menú">
                     <span class="icon" data-icon="menu" data-size="18"></span>
                 </button>
                 <span class="badge info"><i></i> Administrador</span>
@@ -64,7 +64,7 @@
             <header class="topbar">
                 <div>
                     <h1 id="page-title">Resumen general</h1>
-                    <p id="page-subtitle">Todo lo que estÃ¡ pasando en tu negocio.</p>
+                    <p id="page-subtitle">Todo lo que está pasando en tu negocio.</p>
                 </div>
                 <div class="topbar-actions">
                     <span class="badge" id="security-badge"></span>
@@ -79,22 +79,22 @@
                     <article class="stat" style="--i:0">
                         <div class="label"><span class="icon-chip purple"><span class="icon" data-icon="building" data-size="16"></span></span> Clientes</div>
                         <div class="value" id="stat-clientes">0</div>
-                        <div class="sub" id="stat-clientes-sub">â€”</div>
+                        <div class="sub" id="stat-clientes-sub">—</div>
                     </article>
                     <article class="stat" style="--i:1">
                         <div class="label"><span class="icon-chip"><span class="icon" data-icon="users" data-size="16"></span></span> Trabajadores</div>
                         <div class="value" id="stat-trabajadores">0</div>
-                        <div class="sub" id="stat-trabajadores-sub">â€”</div>
+                        <div class="sub" id="stat-trabajadores-sub">—</div>
                     </article>
                     <article class="stat" style="--i:2">
                         <div class="label"><span class="icon-chip green"><span class="icon" data-icon="clock" data-size="16"></span></span> Horas registradas</div>
                         <div class="value" id="stat-horas">0</div>
-                        <div class="sub" id="stat-horas-sub">â€”</div>
+                        <div class="sub" id="stat-horas-sub">—</div>
                     </article>
                     <article class="stat" style="--i:3">
                         <div class="label"><span class="icon-chip green"><span class="icon" data-icon="wallet" data-size="16"></span></span> Total a pagar</div>
                         <div class="value" id="stat-total">$0.00</div>
-                        <div class="sub" id="stat-total-sub">â€”</div>
+                        <div class="sub" id="stat-total-sub">—</div>
                     </article>
                 </div>
 
@@ -102,8 +102,8 @@
                     <div class="card">
                         <div class="card-head">
                             <div>
-                                <h2>Ãšltimas jornadas</h2>
-                                <p>Los registros mÃ¡s recientes de todos los trabajadores.</p>
+                                <h2>Últimas jornadas</h2>
+                                <p>Los registros más recientes de todos los trabajadores.</p>
                             </div>
                             <button class="btn btn-ghost btn-sm" type="button" data-goto="jornadas">Ver todas</button>
                         </div>
@@ -147,7 +147,7 @@
                         <form id="client-form" novalidate>
                             <div class="field">
                                 <label for="c-nombre">Nombre del contacto</label>
-                                <input class="input" id="c-nombre" placeholder="Carlos PÃ©rez" autocomplete="off" required>
+                                <input class="input" id="c-nombre" placeholder="Carlos Pérez" autocomplete="off" required>
                             </div>
                             <div class="field">
                                 <label for="c-empresa">Empresa</label>
@@ -158,8 +158,8 @@
                                 <input class="input" id="c-email" type="email" placeholder="cliente@empresa.com" autocomplete="off" required>
                             </div>
                             <div class="field">
-                                <label for="c-pass">ContraseÃ±a</label>
-                                <input class="input" id="c-pass" type="password" placeholder="MÃ­nimo 6 caracteres" autocomplete="new-password" required>
+                                <label for="c-pass">Contraseña</label>
+                                <input class="input" id="c-pass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" required>
                             </div>
                             <button class="btn btn-primary btn-block" id="c-submit" type="submit">
                                 <span class="spinner"></span>
@@ -173,7 +173,7 @@
                         <div class="card-head">
                             <div>
                                 <h2>Clientes registrados</h2>
-                                <p id="clientes-count">â€”</p>
+                                <p id="clientes-count">—</p>
                             </div>
                         </div>
                         <div class="table-wrap">
@@ -186,6 +186,7 @@
                                         <th>Trabajadores</th>
                                         <th>Horas</th>
                                         <th>Total</th>
+                                        <th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tabla-clientes"></tbody>
@@ -201,21 +202,21 @@
                         <div class="card-head">
                             <div>
                                 <h2>Nuevo trabajador</h2>
-                                <p>AsÃ­gnalo a un cliente para que aparezca en su portal.</p>
+                                <p>Asígnalo a un cliente para que aparezca en su portal.</p>
                             </div>
                         </div>
                         <form id="worker-form" novalidate>
                             <div class="field">
                                 <label for="t-nombre">Nombre</label>
-                                <input class="input" id="t-nombre" placeholder="Pedro LÃ³pez" autocomplete="off" required>
+                                <input class="input" id="t-nombre" placeholder="Pedro López" autocomplete="off" required>
                             </div>
                             <div class="field">
                                 <label for="t-email">Email de acceso</label>
                                 <input class="input" id="t-email" type="email" placeholder="trabajador@empresa.com" autocomplete="off" required>
                             </div>
                             <div class="field">
-                                <label for="t-pass">ContraseÃ±a</label>
-                                <input class="input" id="t-pass" type="password" placeholder="MÃ­nimo 6 caracteres" autocomplete="new-password" required>
+                                <label for="t-pass">Contraseña</label>
+                                <input class="input" id="t-pass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" required>
                             </div>
                             <div class="grid-2">
                                 <div class="field">
@@ -239,7 +240,7 @@
                         <div class="card-head">
                             <div>
                                 <h2>Trabajadores registrados</h2>
-                                <p id="trabajadores-count">â€”</p>
+                                <p id="trabajadores-count">—</p>
                             </div>
                         </div>
                         <div class="toolbar">
@@ -257,6 +258,7 @@
                                     <option value="todos">Todos</option>
                                     <option value="activos">Activos</option>
                                     <option value="inactivos">Inactivos</option>
+                                    <option value="archivados">Archivados</option>
                                 </select>
                             </div>
                         </div>
@@ -270,7 +272,7 @@
                                         <th>Horas</th>
                                         <th>Total</th>
                                         <th>Estado</th>
-                                        <th></th>
+                                        <th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tabla-trabajadores"></tbody>
@@ -346,16 +348,70 @@
         <div class="dialog-body">
             <div class="window-bar">
                 <div class="traffic"><i></i><i></i><i></i></div>
-                <div class="window-title">Confirmar acciÃ³n</div>
+                <div class="window-title">Confirmar acción</div>
                 <span style="width:52px"></span>
             </div>
             <div class="dialog-content">
-                <h3 id="confirm-title">Â¿Seguro?</h3>
+                <h3 id="confirm-title">¿Seguro?</h3>
                 <p class="muted" id="confirm-text" style="margin-top:6px;font-size:.85rem"></p>
                 <div class="dialog-actions">
                     <button class="btn btn-ghost" id="confirm-cancel" type="button">Cancelar</button>
                     <button class="btn btn-danger" id="confirm-ok" type="button">Eliminar</button>
                 </div>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="edit-dialog">
+        <div class="dialog-body">
+            <div class="window-bar">
+                <div class="traffic"><i></i><i></i><i></i></div>
+                <div class="window-title" id="edit-window-title">Editar</div>
+                <span style="width:52px"></span>
+            </div>
+            <div class="dialog-content">
+                <h3 id="edit-title">Editar</h3>
+                <p class="muted" id="edit-sub" style="margin-top:6px;font-size:.82rem"></p>
+                <form id="edit-form" novalidate>
+                    <input type="hidden" id="edit-id">
+                    <div class="field">
+                        <label for="edit-nombre">Nombre</label>
+                        <input class="input" id="edit-nombre" autocomplete="off" required>
+                    </div>
+                    <div class="field" id="edit-empresa-field">
+                        <label for="edit-empresa">Empresa</label>
+                        <input class="input" id="edit-empresa" autocomplete="off">
+                    </div>
+                    <div class="field">
+                        <label for="edit-email">Email de acceso</label>
+                        <input class="input" id="edit-email" type="email" autocomplete="off" required>
+                    </div>
+                    <div class="grid-2" id="edit-worker-fields">
+                        <div class="field">
+                            <label for="edit-tarifa">Tarifa por hora</label>
+                            <input class="input" id="edit-tarifa" type="number" min="0.01" step="0.01">
+                        </div>
+                        <div class="field">
+                            <label for="edit-cliente">Cliente asignado</label>
+                            <select class="select" id="edit-cliente"></select>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="edit-pass">Nueva contraseña <span class="muted">(opcional)</span></label>
+                        <input class="input" id="edit-pass" type="password" autocomplete="new-password" placeholder="Dejar vacío para conservar la actual">
+                    </div>
+                    <div class="hint" id="edit-hint">
+                        <span class="icon" data-icon="alert" data-size="16"></span>
+                        <span id="edit-hint-text"></span>
+                    </div>
+                    <div class="dialog-actions">
+                        <button class="btn btn-ghost" id="edit-cancel" type="button">Cancelar</button>
+                        <button class="btn btn-primary" id="edit-save" type="submit">
+                            <span class="spinner"></span>
+                            <span class="btn-label">Guardar cambios</span>
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </dialog>
@@ -373,7 +429,7 @@
             const state = { data: { clientes: [], trabajadores: [], jornadas: [] }, section: 'resumen' };
 
             const titles = {
-                resumen: ['Resumen general', 'Todo lo que estÃ¡ pasando en tu negocio.'],
+                resumen: ['Resumen general', 'Todo lo que está pasando en tu negocio.'],
                 clientes: ['Clientes', 'Crea accesos y revisa el consumo de cada empresa.'],
                 trabajadores: ['Trabajadores', 'Altas, tarifas, asignaciones y estado.'],
                 jornadas: ['Jornadas', 'Todas las horas registradas, con filtros y totales.']
@@ -427,7 +483,7 @@
                     renderAll();
                     if (showToast) toast('Datos actualizados.', 'ok');
                 } catch (error) {
-                    if (handleAuthFailure(error, 'admin-login.html')) return;
+                    if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
                     toast(error.message, 'err');
                 } finally {
                     setLoading(refresh, false);
@@ -447,7 +503,9 @@
 
             function renderStats() {
                 const { clientes, trabajadores, jornadas } = state.data;
-                const activos = trabajadores.filter(t => t.activo !== false).length;
+                const archivados = trabajadores.filter(t => t.archivado).length;
+                const activos = trabajadores.filter(t => !t.archivado && t.activo !== false).length;
+                const inactivos = trabajadores.length - archivados - activos;
                 const totalHoras = jornadas.reduce((sum, j) => sum + j.horas_calculadas, 0);
                 const totalPago = jornadas.reduce((sum, j) => sum + j.horas_calculadas * j.tarifa_hora, 0);
 
@@ -455,7 +513,7 @@
                 document.getElementById('stat-clientes-sub').textContent = clientes.length === 1 ? '1 empresa registrada' : `${clientes.length} empresas registradas`;
 
                 animateNumber(document.getElementById('stat-trabajadores'), trabajadores.length, value => Math.round(value).toString());
-                document.getElementById('stat-trabajadores-sub').textContent = `${activos} activos Â· ${trabajadores.length - activos} inactivos`;
+                document.getElementById('stat-trabajadores-sub').textContent = `${activos} activos · ${inactivos} inactivos · ${archivados} archivados`;
 
                 animateNumber(document.getElementById('stat-horas'), totalHoras, hours);
                 document.getElementById('stat-horas-sub').textContent = `${jornadas.length} jornadas registradas`;
@@ -479,14 +537,13 @@
                         <td class="num">${hours(j.horas_calculadas)}</td>
                         <td class="num">${money(j.horas_calculadas * j.tarifa_hora)}</td>
                     </tr>
-                `).join('') || emptyRow(5, 'AÃºn no hay jornadas registradas.');
+                `).join('') || emptyRow(5, 'Aún no hay jornadas registradas.');
             }
 
             function renderTopClients() {
-                const groups = groupByTrabajador(state.data.jornadas);
                 const items = state.data.clientes.map(cliente => {
                     const workers = state.data.trabajadores.filter(t => t.cliente_id === cliente.id);
-                    const rows = workers.flatMap(t => groups.get(t.id) || []);
+                    const rows = state.data.jornadas.filter(j => j.cliente_id === cliente.id);
                     const totalHoras = rows.reduce((sum, j) => sum + j.horas_calculadas, 0);
                     const pago = rows.reduce((sum, j) => sum + j.horas_calculadas * j.tarifa_hora, 0);
                     return { cliente, workers: workers.length, totalHoras, pago };
@@ -497,19 +554,18 @@
                     <div class="detail-item">
                         <div class="who">
                             <strong>${escapeHtml(item.cliente.empresa)}</strong>
-                            <span>${item.workers} ${item.workers === 1 ? 'trabajador' : 'trabajadores'} Â· ${hours(item.totalHoras)}</span>
+                            <span>${item.workers} ${item.workers === 1 ? 'trabajador' : 'trabajadores'} · ${hours(item.totalHoras)}</span>
                         </div>
                         <strong class="num">${money(item.pago)}</strong>
                     </div>
-                `).join('')}</div>` : '<div class="empty"><span class="icon" data-icon="building" data-size="26"></span>Sin clientes todavÃ­a.</div>';
+                `).join('')}</div>` : '<div class="empty"><span class="icon" data-icon="building" data-size="26"></span>Sin clientes todavía.</div>';
             }
 
             function renderClientes() {
-                const groups = groupByTrabajador(state.data.jornadas);
                 const tbody = document.getElementById('tabla-clientes');
                 const rows = state.data.clientes.map(cliente => {
                     const workers = state.data.trabajadores.filter(t => t.cliente_id === cliente.id);
-                    const jornadas = workers.flatMap(t => groups.get(t.id) || []);
+                    const jornadas = state.data.jornadas.filter(j => j.cliente_id === cliente.id);
                     const totalHoras = jornadas.reduce((sum, j) => sum + j.horas_calculadas, 0);
                     const pago = jornadas.reduce((sum, j) => sum + j.horas_calculadas * j.tarifa_hora, 0);
                     return `
@@ -525,10 +581,21 @@
                             <td class="num">${workers.length}</td>
                             <td class="num">${hours(totalHoras)}</td>
                             <td class="num"><strong>${money(pago)}</strong></td>
+                            <td>
+                                <div class="row-actions">
+                                    <button class="btn btn-icon btn-ghost" data-edit-cliente="${cliente.id}" title="Editar cliente" aria-label="Editar cliente">
+                                        <span class="icon" data-icon="pencil" data-size="16"></span>
+                                    </button>
+                                    <button class="btn btn-icon btn-ghost" data-delete-cliente="${cliente.id}" title="Eliminar cliente" aria-label="Eliminar cliente">
+                                        <span class="icon" data-icon="trash" data-size="16"></span>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>`;
                 }).join('');
-                tbody.innerHTML = rows || emptyRow(6, 'Crea tu primer cliente con el formulario.');
+                tbody.innerHTML = rows || emptyRow(7, 'Crea tu primer cliente con el formulario.');
                 document.getElementById('clientes-count').textContent = `${state.data.clientes.length} en total`;
+                hydrateIcons(tbody);
             }
 
             function renderTrabajadores() {
@@ -541,6 +608,9 @@
                 const visible = state.data.trabajadores.filter(t => {
                     if (search && !`${t.nombre} ${t.email}`.toLowerCase().includes(search)) return false;
                     if (clientFilter && t.cliente_id !== clientFilter) return false;
+                    const archivado = t.archivado === true;
+                    if (statusFilter === 'archivados') return archivado;
+                    if (archivado) return false;
                     if (statusFilter === 'activos' && t.activo === false) return false;
                     if (statusFilter === 'inactivos' && t.activo !== false) return false;
                     return true;
@@ -549,8 +619,11 @@
                 const rows = visible.map(t => {
                     const jornadas = groups.get(t.id) || [];
                     const totalHoras = jornadas.reduce((sum, j) => sum + j.horas_calculadas, 0);
-                    const pago = totalHoras * t.tarifa_hora;
+                    const pago = jornadas.reduce((sum, j) => sum + j.horas_calculadas * j.tarifa_hora, 0);
                     const activo = t.activo !== false;
+                    const archivado = t.archivado === true;
+                    const estado = archivado ? 'Archivado' : activo ? 'Activo' : 'Inactivo';
+                    const badge = archivado ? 'warn' : activo ? 'ok' : 'off';
                     return `
                         <tr>
                             <td>
@@ -566,18 +639,32 @@
                             <td class="num">${money(t.tarifa_hora)}/h</td>
                             <td class="num">${hours(totalHoras)}</td>
                             <td class="num"><strong>${money(pago)}</strong></td>
-                            <td><span class="badge ${activo ? 'ok' : 'off'}"><i></i>${activo ? 'Activo' : 'Inactivo'}</span></td>
+                            <td><span class="badge ${badge}"><i></i>${estado}</span></td>
                             <td>
-                                <button class="btn btn-sm ${activo ? 'btn-danger' : ''}" data-toggle-worker="${t.id}" data-active="${activo}">
-                                    ${activo ? 'Desactivar' : 'Activar'}
-                                </button>
+                                <div class="row-actions">
+                                    <button class="btn btn-icon btn-ghost" data-edit-worker="${t.id}" title="Editar trabajador" aria-label="Editar trabajador">
+                                        <span class="icon" data-icon="pencil" data-size="16"></span>
+                                    </button>
+                                    ${archivado
+                                        ? `<button class="btn btn-icon btn-ghost" data-restore-worker="${t.id}" title="Restaurar trabajador" aria-label="Restaurar trabajador">
+                                               <span class="icon" data-icon="restore" data-size="16"></span>
+                                           </button>`
+                                        : `<button class="btn btn-icon btn-ghost" data-archive-worker="${t.id}" title="Archivar trabajador" aria-label="Archivar trabajador">
+                                               <span class="icon" data-icon="archive" data-size="16"></span>
+                                           </button>
+                                           <button class="btn btn-sm ${activo ? 'btn-danger' : ''}" data-toggle-worker="${t.id}" data-active="${activo}">
+                                               ${activo ? 'Desactivar' : 'Activar'}
+                                           </button>`}
+                                </div>
                             </td>
                         </tr>`;
                 }).join('');
 
-                tbody.innerHTML = rows || emptyRow(7, visible.length ? 'NingÃºn trabajador coincide con los filtros.' : 'Crea tu primer trabajador con el formulario.');
+                tbody.innerHTML = rows || emptyRow(7, visible.length ? 'Ningún trabajador coincide con los filtros.' : 'Crea tu primer trabajador con el formulario.');
+                const archivados = state.data.trabajadores.filter(t => t.archivado).length;
+                const activos = state.data.trabajadores.filter(t => !t.archivado && t.activo !== false).length;
                 document.getElementById('trabajadores-count').textContent =
-                    `${state.data.trabajadores.length} en total Â· ${state.data.trabajadores.filter(t => t.activo !== false).length} activos`;
+                    `${state.data.trabajadores.length} en total · ${activos} activos · ${archivados} archivados`;
                 hydrateIcons(tbody);
             }
 
@@ -616,7 +703,7 @@
                         <td class="num">${Number(j.minutos_lunch) || 0} min</td>
                         <td class="num">${hours(j.horas_calculadas)}</td>
                         <td class="num"><strong>${money(jornadaMonto(j))}</strong></td>
-                        <td class="muted" style="max-width:180px;overflow:hidden;text-overflow:ellipsis" title="${escapeHtml(j.notas || '')}">${escapeHtml(j.notas || 'â€”')}</td>
+                        <td class="muted" style="max-width:180px;overflow:hidden;text-overflow:ellipsis" title="${escapeHtml(j.notas || '')}">${escapeHtml(j.notas || '—')}</td>
                         <td>
                             <button class="btn btn-icon btn-ghost" data-delete-jornada="${j.id}" aria-label="Eliminar jornada">
                                 <span class="icon" data-icon="trash" data-size="16"></span>
@@ -638,7 +725,7 @@
                     .map(c => `<option value="${c.id}">${escapeHtml(c.empresa)}</option>`)
                     .join('');
 
-                document.getElementById('t-cliente').innerHTML = '<option value="">â€” Selecciona cliente â€”</option>' + clientOptions;
+                document.getElementById('t-cliente').innerHTML = '<option value="">— Selecciona cliente —</option>' + clientOptions;
 
                 const workerFilterClient = document.getElementById('worker-client-filter');
                 const currentWorkerFilter = workerFilterClient.value;
@@ -649,6 +736,11 @@
                 const currentClient = jClient.value;
                 jClient.innerHTML = '<option value="">Todos</option>' + clientOptions;
                 jClient.value = currentClient;
+
+                const editCliente = document.getElementById('edit-cliente');
+                const currentEditCliente = editCliente.value;
+                editCliente.innerHTML = '<option value="">— Selecciona cliente —</option>' + clientOptions;
+                editCliente.value = currentEditCliente;
 
                 updateWorkerOptions();
             }
@@ -678,11 +770,11 @@
                     return;
                 }
                 if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
-                    toast('Escribe un email vÃ¡lido.', 'err');
+                    toast('Escribe un email válido.', 'err');
                     return;
                 }
                 if (payload.password.length < 6) {
-                    toast('La contraseÃ±a debe tener al menos 6 caracteres.', 'err');
+                    toast('La contraseña debe tener al menos 6 caracteres.', 'err');
                     return;
                 }
                 setLoading(button, true);
@@ -692,7 +784,7 @@
                     toast('Cliente creado correctamente.', 'ok');
                     await loadData();
                 } catch (error) {
-                    if (handleAuthFailure(error, 'admin-login.html')) return;
+                    if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
                     toast(error.message, 'err');
                 } finally {
                     setLoading(button, false);
@@ -715,11 +807,11 @@
                     return;
                 }
                 if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
-                    toast('Escribe un email vÃ¡lido.', 'err');
+                    toast('Escribe un email válido.', 'err');
                     return;
                 }
                 if (payload.password.length < 6) {
-                    toast('La contraseÃ±a debe tener al menos 6 caracteres.', 'err');
+                    toast('La contraseña debe tener al menos 6 caracteres.', 'err');
                     return;
                 }
                 if (!Number.isFinite(tarifa) || tarifa <= 0) {
@@ -734,7 +826,7 @@
                     toast('Trabajador creado correctamente.', 'ok');
                     await loadData();
                 } catch (error) {
-                    if (handleAuthFailure(error, 'admin-login.html')) return;
+                    if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
                     toast(error.message, 'err');
                 } finally {
                     setLoading(button, false);
@@ -764,6 +856,123 @@
                 });
             }
 
+            const editDialog = document.getElementById('edit-dialog');
+            const editForm = document.getElementById('edit-form');
+
+            function fillEditClientOptions(selectedId) {
+                const select = document.getElementById('edit-cliente');
+                select.innerHTML = '<option value="">— Selecciona cliente —</option>' +
+                    state.data.clientes.map(c => `<option value="${c.id}">${escapeHtml(c.empresa)}</option>`).join('');
+                select.value = selectedId || '';
+            }
+
+            function openEditCliente(id) {
+                const cliente = state.data.clientes.find(c => c.id === id);
+                if (!cliente) return;
+                editDialog.dataset.kind = 'cliente';
+                editDialog.dataset.id = cliente.id;
+                document.getElementById('edit-window-title').textContent = 'Editar cliente';
+                document.getElementById('edit-title').textContent = cliente.empresa || cliente.nombre;
+                document.getElementById('edit-sub').textContent = 'Actualiza los datos de acceso de la empresa.';
+                document.getElementById('edit-empresa-field').classList.remove('hidden');
+                document.getElementById('edit-worker-fields').classList.add('hidden');
+                document.getElementById('edit-nombre').value = cliente.nombre || '';
+                document.getElementById('edit-empresa').value = cliente.empresa || '';
+                document.getElementById('edit-email').value = cliente.email || '';
+                document.getElementById('edit-tarifa').value = '';
+                fillEditClientOptions('');
+                document.getElementById('edit-pass').value = '';
+                document.getElementById('edit-hint-text').textContent = 'Si cambiás la contraseña, se cerrarán las sesiones abiertas de este cliente.';
+                if (!editDialog.open) editDialog.showModal();
+                setTimeout(() => document.getElementById('edit-nombre').focus(), 60);
+            }
+
+            function openEditTrabajador(id) {
+                const worker = state.data.trabajadores.find(t => t.id === id);
+                if (!worker) return;
+                editDialog.dataset.kind = 'trabajador';
+                editDialog.dataset.id = worker.id;
+                document.getElementById('edit-window-title').textContent = 'Editar trabajador';
+                document.getElementById('edit-title').textContent = worker.nombre || 'Trabajador';
+                document.getElementById('edit-sub').textContent = 'Actualiza sus datos, tarifa y cliente asignado.';
+                document.getElementById('edit-empresa-field').classList.add('hidden');
+                document.getElementById('edit-worker-fields').classList.remove('hidden');
+                document.getElementById('edit-nombre').value = worker.nombre || '';
+                document.getElementById('edit-email').value = worker.email || '';
+                document.getElementById('edit-tarifa').value = worker.tarifa_hora;
+                fillEditClientOptions(worker.cliente_id);
+                document.getElementById('edit-pass').value = '';
+                document.getElementById('edit-hint-text').textContent = 'La nueva tarifa solo se aplica a las jornadas nuevas. Si cambiás el cliente, las jornadas anteriores quedan con el cliente anterior. Al cambiar la contraseña se cierran sus sesiones.';
+                if (!editDialog.open) editDialog.showModal();
+                setTimeout(() => document.getElementById('edit-nombre').focus(), 60);
+            }
+
+            document.getElementById('edit-cancel').addEventListener('click', () => editDialog.close());
+
+            editForm.addEventListener('submit', async event => {
+                event.preventDefault();
+                const kind = editDialog.dataset.kind;
+                const id = editDialog.dataset.id;
+                if (!kind || !id) return;
+
+                const nombre = document.getElementById('edit-nombre').value.trim();
+                const email = document.getElementById('edit-email').value.trim();
+                const password = document.getElementById('edit-pass').value;
+
+                if (!nombre || !email) {
+                    toast('Completa nombre y email.', 'err');
+                    return;
+                }
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                    toast('Escribe un email válido.', 'err');
+                    return;
+                }
+                if (password && password.length < 6) {
+                    toast('La contraseña debe tener al menos 6 caracteres.', 'err');
+                    return;
+                }
+
+                let payload;
+                if (kind === 'cliente') {
+                    const empresa = document.getElementById('edit-empresa').value.trim();
+                    if (!empresa) {
+                        toast('Completa la empresa.', 'err');
+                        return;
+                    }
+                    payload = { id, nombre, empresa, email, password };
+                } else {
+                    const tarifa = Number(document.getElementById('edit-tarifa').value);
+                    const clienteId = document.getElementById('edit-cliente').value;
+                    if (!clienteId) {
+                        toast('Asigna un cliente.', 'err');
+                        return;
+                    }
+                    if (!Number.isFinite(tarifa) || tarifa <= 0) {
+                        toast('La tarifa debe ser mayor que cero.', 'err');
+                        return;
+                    }
+                    payload = { id, nombre, email, tarifa_hora: tarifa, cliente_id: clienteId, password };
+                }
+
+                const button = document.getElementById('edit-save');
+                setLoading(button, true);
+                try {
+                    if (kind === 'cliente') {
+                        await api.updateCliente(payload, session);
+                    } else {
+                        await api.updateTrabajador(payload, session);
+                    }
+                    editDialog.close();
+                    toast('Datos actualizados correctamente.', 'ok');
+                    await loadData();
+                } catch (error) {
+                    if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
+                    toast(error.message, 'err');
+                } finally {
+                    setLoading(button, false);
+                }
+            });
+
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.addEventListener('click', () => setSection(item.dataset.section));
             });
@@ -775,7 +984,7 @@
             document.getElementById('menu-btn').addEventListener('click', openMenu);
             document.getElementById('scrim').addEventListener('click', closeMenu);
             document.getElementById('logout-btn').addEventListener('click', async () => {
-                await api.logout();
+                await api.logout('admin');
                 location.replace('admin-login.html');
             });
             document.getElementById('refresh-btn').addEventListener('click', () => loadData(true));
@@ -787,20 +996,106 @@
             document.getElementById('worker-client-filter').addEventListener('change', renderTrabajadores);
             document.getElementById('worker-status-filter').addEventListener('change', renderTrabajadores);
 
+            document.getElementById('tabla-clientes').addEventListener('click', async event => {
+                const editButton = event.target.closest('[data-edit-cliente]');
+                if (editButton) {
+                    openEditCliente(editButton.dataset.editCliente);
+                    return;
+                }
+
+                const deleteButton = event.target.closest('[data-delete-cliente]');
+                if (!deleteButton) return;
+                const cliente = state.data.clientes.find(c => c.id === deleteButton.dataset.deleteCliente);
+                if (!cliente) return;
+
+                const workers = state.data.trabajadores.filter(t => t.cliente_id === cliente.id).length;
+                if (workers > 0) {
+                    toast(`No se puede eliminar: tiene ${workers} ${workers === 1 ? 'trabajador' : 'trabajadores'}. Reasígnalos a otro cliente primero.`, 'err', 6000);
+                    return;
+                }
+
+                const confirmed = await confirmAction({
+                    title: 'Eliminar cliente',
+                    text: `Se eliminará el acceso de ${cliente.empresa}. Esta acción no se puede deshacer.`,
+                    okLabel: 'Eliminar'
+                });
+                if (!confirmed) return;
+
+                deleteButton.disabled = true;
+                try {
+                    await api.deleteCliente(cliente.id, session);
+                    toast('Cliente eliminado.', 'ok');
+                    await loadData();
+                } catch (error) {
+                    if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
+                    toast(error.message, 'err');
+                    deleteButton.disabled = false;
+                }
+            });
+
             document.getElementById('tabla-trabajadores').addEventListener('click', async event => {
-                const button = event.target.closest('[data-toggle-worker]');
-                if (!button) return;
-                const id = button.dataset.toggleWorker;
-                const activo = button.dataset.active === 'true';
-                button.disabled = true;
+                const editButton = event.target.closest('[data-edit-worker]');
+                if (editButton) {
+                    openEditTrabajador(editButton.dataset.editWorker);
+                    return;
+                }
+
+                const archiveButton = event.target.closest('[data-archive-worker]');
+                if (archiveButton) {
+                    const worker = state.data.trabajadores.find(t => t.id === archiveButton.dataset.archiveWorker);
+                    if (!worker) return;
+                    if (worker.activo !== false) {
+                        toast('Desactiva al trabajador antes de archivarlo.', 'err');
+                        return;
+                    }
+                    const count = state.data.jornadas.filter(j => j.trabajador_id === worker.id).length;
+                    const confirmed = await confirmAction({
+                        title: 'Archivar trabajador',
+                        text: `${worker.nombre} saldrá de la lista y no podrá iniciar sesión. Sus ${count} ${count === 1 ? 'jornada se conservará' : 'jornadas se conservarán'} y seguirán visibles para el cliente.`,
+                        okLabel: 'Archivar'
+                    });
+                    if (!confirmed) return;
+                    archiveButton.disabled = true;
+                    try {
+                        await api.archiveTrabajador(worker.id, session);
+                        toast('Trabajador archivado.', 'ok');
+                        await loadData();
+                    } catch (error) {
+                        if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
+                        toast(error.message, 'err');
+                        archiveButton.disabled = false;
+                    }
+                    return;
+                }
+
+                const restoreButton = event.target.closest('[data-restore-worker]');
+                if (restoreButton) {
+                    restoreButton.disabled = true;
+                    try {
+                        await api.restoreTrabajador(restoreButton.dataset.restoreWorker, session);
+                        toast('Trabajador restaurado. Ahora puedes activarlo.', 'ok');
+                        await loadData();
+                    } catch (error) {
+                        if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
+                        toast(error.message, 'err');
+                        restoreButton.disabled = false;
+                    }
+                    return;
+                }
+
+                const toggleButton = event.target.closest('[data-toggle-worker]');
+                if (!toggleButton) return;
+                const id = toggleButton.dataset.toggleWorker;
+                const activo = toggleButton.dataset.active === 'true';
+                toggleButton.disabled = true;
                 try {
                     await api.setTrabajadorActivo(id, !activo, session);
                     toast(activo ? 'Trabajador desactivado.' : 'Trabajador activado.', 'ok');
                     await loadData();
                 } catch (error) {
-                    if (handleAuthFailure(error, 'admin-login.html')) return;
+                    if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
                     toast(error.message, 'err');
-                    button.disabled = false;
+                    toggleButton.disabled = false;
                 }
             });
 
@@ -825,7 +1120,7 @@
                 if (!button) return;
                 const confirmed = await confirmAction({
                     title: 'Eliminar jornada',
-                    text: 'Se borrarÃ¡ este registro de horas de forma permanente.',
+                    text: 'Se borrará este registro de horas de forma permanente.',
                     okLabel: 'Eliminar'
                 });
                 if (!confirmed) return;
@@ -835,7 +1130,7 @@
                     toast('Jornada eliminada.', 'ok');
                     await loadData();
                 } catch (error) {
-                    if (handleAuthFailure(error, 'admin-login.html')) return;
+                    if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
                     toast(error.message, 'err');
                     button.disabled = false;
                 }

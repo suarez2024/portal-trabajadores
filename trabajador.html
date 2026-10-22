@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#e9edf6">
-    <title>Mi portal Â· Portal de Trabajadores</title>
+    <title>Mi portal · Portal de Trabajadores</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -31,17 +31,17 @@
             <article class="stat" style="--i:0">
                 <div class="label"><span class="icon-chip"><span class="icon" data-icon="clock" data-size="16"></span></span> Horas totales</div>
                 <div class="value" id="stat-horas">0.00 h</div>
-                <div class="sub" id="stat-horas-sub">â€”</div>
+                <div class="sub" id="stat-horas-sub">—</div>
             </article>
             <article class="stat" style="--i:1">
                 <div class="label"><span class="icon-chip green"><span class="icon" data-icon="wallet" data-size="16"></span></span> Total a cobrar</div>
                 <div class="value" id="stat-pago">$0.00</div>
-                <div class="sub" id="stat-pago-sub">â€”</div>
+                <div class="sub" id="stat-pago-sub">—</div>
             </article>
             <article class="stat" style="--i:2">
                 <div class="label"><span class="icon-chip purple"><span class="icon" data-icon="calendar" data-size="16"></span></span> Jornadas</div>
                 <div class="value" id="stat-jornadas">0</div>
-                <div class="sub" id="stat-jornadas-sub">â€”</div>
+                <div class="sub" id="stat-jornadas-sub">—</div>
             </article>
             <article class="stat" style="--i:3">
                 <div class="label"><span class="icon-chip green"><span class="icon" data-icon="chart" data-size="16"></span></span> Tu tarifa</div>
@@ -79,7 +79,7 @@
                     </div>
                     <div class="field">
                         <label for="notas">Notas <span class="muted">(opcional)</span></label>
-                        <textarea class="textarea" id="notas" placeholder="Ej. turno nocturno, incidenciaâ€¦"></textarea>
+                        <textarea class="textarea" id="notas" placeholder="Ej. turno nocturno, incidencia…"></textarea>
                     </div>
 
                     <div class="total-strip">
@@ -99,7 +99,7 @@
                 <div class="card-head">
                     <div>
                         <h2>Mis jornadas</h2>
-                        <p id="jornadas-count">â€”</p>
+                        <p id="jornadas-count">—</p>
                     </div>
                 </div>
                 <div class="table-wrap">
@@ -134,12 +134,12 @@
         <div class="dialog-body">
             <div class="window-bar">
                 <div class="traffic"><i></i><i></i><i></i></div>
-                <div class="window-title">Confirmar acciÃ³n</div>
+                <div class="window-title">Confirmar acción</div>
                 <span style="width:52px"></span>
             </div>
             <div class="dialog-content">
                 <h3 id="confirm-title">Eliminar jornada</h3>
-                <p class="muted" id="confirm-text" style="margin-top:6px;font-size:.85rem">Se borrarÃ¡ este registro de forma permanente.</p>
+                <p class="muted" id="confirm-text" style="margin-top:6px;font-size:.85rem">Se borrará este registro de forma permanente.</p>
                 <div class="dialog-actions">
                     <button class="btn btn-ghost" id="confirm-cancel" type="button">Cancelar</button>
                     <button class="btn btn-danger" id="confirm-ok" type="button">Eliminar</button>
@@ -152,7 +152,7 @@
         import {
             api, bootstrap, money, hours, fmtDate, fmtTime, escapeHtml, calcularHoras,
             requireRole, handleAuthFailure, setLoading, toast, animateNumber, hydrateIcons,
-            getSession, setSession, todayISO
+            setSession, todayISO
         } from './app.js';
 
         await bootstrap();
@@ -180,14 +180,15 @@
             function render() {
                 const totalHoras = jornadas.reduce((sum, j) => sum + j.horas_calculadas, 0);
                 const tarifa = Number(usuario.tarifa_hora) || 0;
-                const total = totalHoras * tarifa;
+                const tarifaDe = j => Number(j.tarifa_hora) || tarifa;
+                const total = jornadas.reduce((sum, j) => sum + j.horas_calculadas * tarifaDe(j), 0);
                 const days = new Set(jornadas.map(j => String(j.fecha).slice(0, 10)));
 
                 document.getElementById('user-name').textContent = usuario.nombre || 'trabajador';
                 animateNumber(document.getElementById('stat-horas'), totalHoras, hours);
-                document.getElementById('stat-horas-sub').textContent = `${days.size} ${days.size === 1 ? 'dÃ­a registrado' : 'dÃ­as registrados'}`;
+                document.getElementById('stat-horas-sub').textContent = `${days.size} ${days.size === 1 ? 'día registrado' : 'días registrados'}`;
                 animateNumber(document.getElementById('stat-pago'), total, money);
-                document.getElementById('stat-pago-sub').textContent = `$${tarifa.toFixed(2)} por hora`;
+                document.getElementById('stat-pago-sub').textContent = `Tarifa actual: ${money(tarifa)}/h`;
                 animateNumber(document.getElementById('stat-jornadas'), jornadas.length, value => Math.round(value).toString());
                 document.getElementById('stat-jornadas-sub').textContent = 'registros guardados';
                 animateNumber(document.getElementById('stat-tarifa'), tarifa, money);
@@ -200,17 +201,17 @@
                         <td class="num">${fmtTime(j.hora_salida)}</td>
                         <td class="num">${Number(j.minutos_lunch) || 0} min</td>
                         <td class="num">${hours(j.horas_calculadas)}</td>
-                        <td class="num"><strong>${money(j.horas_calculadas * tarifa)}</strong></td>
-                        <td class="muted" style="max-width:170px;overflow:hidden;text-overflow:ellipsis" title="${escapeHtml(j.notas || '')}">${escapeHtml(j.notas || 'â€”')}</td>
+                        <td class="num"><strong>${money(j.horas_calculadas * tarifaDe(j))}</strong></td>
+                        <td class="muted" style="max-width:170px;overflow:hidden;text-overflow:ellipsis" title="${escapeHtml(j.notas || '')}">${escapeHtml(j.notas || '—')}</td>
                         <td>
                             <button class="btn btn-icon btn-ghost" data-delete="${j.id}" aria-label="Eliminar jornada">
                                 <span class="icon" data-icon="trash" data-size="16"></span>
                             </button>
                         </td>
                     </tr>
-                `).join('') || `<tr><td colspan="8"><div class="empty"><span class="icon" data-icon="calendar" data-size="26"></span>Tu primera jornada aparecerÃ¡ aquÃ­.</div></td></tr>`;
+                `).join('') || `<tr><td colspan="8"><div class="empty"><span class="icon" data-icon="calendar" data-size="26"></span>Tu primera jornada aparecerá aquí.</div></td></tr>`;
 
-                document.getElementById('jornadas-count').textContent = jornadas.length ? `${jornadas.length} ${jornadas.length === 1 ? 'registro' : 'registros'}` : 'Sin registros todavÃ­a';
+                document.getElementById('jornadas-count').textContent = jornadas.length ? `${jornadas.length} ${jornadas.length === 1 ? 'registro' : 'registros'}` : 'Sin registros todavía';
                 document.getElementById('total-label').textContent = `${jornadas.length} ${jornadas.length === 1 ? 'jornada' : 'jornadas'}`;
                 document.getElementById('total-horas').textContent = hours(totalHoras);
                 document.getElementById('total-pago').textContent = money(total);
@@ -228,7 +229,7 @@
                     render();
                     if (showToast) toast('Datos actualizados.', 'ok');
                 } catch (error) {
-                    if (handleAuthFailure(error, 'index.html')) return;
+                    if (handleAuthFailure(error, 'index.html', 'trabajador')) return;
                     toast(error.message, 'err');
                 }
             }
@@ -259,7 +260,7 @@
                     toast('Jornada guardada.', 'ok');
                     await load();
                 } catch (error) {
-                    if (handleAuthFailure(error, 'index.html')) return;
+                    if (handleAuthFailure(error, 'index.html', 'trabajador')) return;
                     toast(error.message, 'err');
                 } finally {
                     setLoading(saveButton, false);
@@ -296,14 +297,14 @@
                     toast('Jornada eliminada.', 'ok');
                     await load();
                 } catch (error) {
-                    if (handleAuthFailure(error, 'index.html')) return;
+                    if (handleAuthFailure(error, 'index.html', 'trabajador')) return;
                     toast(error.message, 'err');
                     button.disabled = false;
                 }
             });
 
             document.getElementById('logout-btn').addEventListener('click', async () => {
-                await api.logout();
+                await api.logout('trabajador');
                 location.replace('index.html');
             });
 
