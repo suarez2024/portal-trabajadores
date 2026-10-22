@@ -69,7 +69,7 @@ export function hours(value) {
 }
 
 export function fmtDate(value) {
-  if (!value) return '—';
+  if (!value) return '-';
   const raw = String(value);
   const datePart = raw.length >= 10 ? raw.slice(0, 10) : raw;
   const [y, m, d] = datePart.split('-');
@@ -78,7 +78,7 @@ export function fmtDate(value) {
 }
 
 export function fmtTime(value) {
-  if (!value) return '—';
+  if (!value) return '-';
   return String(value).slice(0, 5);
 }
 
@@ -211,6 +211,7 @@ const ICONS = {
   eyeOff: '<path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.2"/><path d="M6.2 6.2A17.4 17.4 0 0 0 2 12s3.5 7 10 7a10.7 10.7 0 0 0 4.1-.8"/>',
   menu: '<path d="M3 6h18M3 12h18M3 18h18"/>',
   refresh: '<path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/>',
+  settings: '<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M2 14h4M10 8h4M18 16h4"/>',
   shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>',
   sparkles: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><path d="M6.3 6.3l2.4 2.4M15.3 15.3l2.4 2.4M17.7 6.3l-2.4 2.4M8.7 15.3l-2.4 2.4"/>',
   x: '<path d="M18 6 6 18M6 6l12 12"/>',
@@ -287,7 +288,7 @@ function normalizeTrabajadores(rows = []) {
       archivado: trabajador.archivado === true,
       archivado_en: trabajador.archivado_en ?? null,
       historico: trabajador.historico === true,
-      cliente_nombre: row.cliente_nombre ?? clientes?.empresa ?? '—'
+      cliente_nombre: row.cliente_nombre ?? clientes?.empresa ?? '-'
     };
   });
 }
@@ -305,10 +306,10 @@ function normalizeJornadas(rows = []) {
       horas_calculadas: Number(row.horas_calculadas) || 0,
       notas: row.notas,
       creado_en: row.creado_en,
-      trabajador_nombre: row.trabajador_nombre ?? nested.nombre ?? '—',
+      trabajador_nombre: row.trabajador_nombre ?? nested.nombre ?? '-',
       tarifa_hora: Number(row.tarifa_hora ?? nested.tarifa_hora) || 0,
       cliente_id: row.cliente_id ?? nested.cliente_id ?? null,
-      cliente_nombre: row.cliente_nombre ?? nested.clientes?.empresa ?? '—'
+      cliente_nombre: row.cliente_nombre ?? nested.clientes?.empresa ?? '-'
     };
   });
 }
@@ -745,6 +746,18 @@ export const api = {
     }
     const { error } = await supabase.from('clientes').delete().eq('id', id);
     if (error) throw new Error(friendlyError(error));
+  },
+
+  async resetDatabase(confirmacion, session) {
+    if (!this.secure) {
+      throw new Error('Aplicá la actualización de Supabase para reiniciar los datos.');
+    }
+    const { data, error } = await supabase.rpc('portal_admin_reiniciar_datos', {
+      p_token: session.token,
+      p_confirmacion: confirmacion
+    });
+    if (error) throw missingFeatureError(error) || new Error(friendlyError(error));
+    if (!data?.ok) throw rpcError(data);
   },
 
   async archiveTrabajador(id, session) {

@@ -68,8 +68,10 @@ as $$
   select 'ok'::text;
 $$;
 
+drop function if exists public.portal_token(uuid);
+
 create or replace function public.portal_token(p_token uuid)
-returns public.sesiones
+returns setof public.sesiones
 language sql
 security definer
 set search_path = public, extensions
@@ -214,7 +216,7 @@ begin
     ), '[]'::jsonb),
     'trabajadores', coalesce((
       select jsonb_agg(
-        (to_jsonb(t) - 'password') || jsonb_build_object('cliente_nombre', coalesce(c.empresa, '—'))
+        (to_jsonb(t) - 'password') || jsonb_build_object('cliente_nombre', coalesce(c.empresa, '-'))
         order by t.creado_en
       )
       from public.trabajadores t
@@ -226,7 +228,7 @@ begin
           'trabajador_nombre', t.nombre,
           'tarifa_hora', coalesce(j.tarifa_hora, t.tarifa_hora),
           'cliente_id', coalesce(j.cliente_id, t.cliente_id),
-          'cliente_nombre', coalesce(c.empresa, '—')
+          'cliente_nombre', coalesce(c.empresa, '-')
         )
         order by j.fecha desc, j.creado_en desc
       )
@@ -837,6 +839,41 @@ begin
 end;
 $$;
 
+create or replace function public.portal_admin_reiniciar_datos(
+  p_token uuid,
+  p_confirmacion text
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+declare
+  v_sesion public.sesiones;
+begin
+  select * into v_sesion
+  from public.sesiones
+  where token = p_token
+    and expira_en > now()
+  limit 1;
+
+  if not found or v_sesion.rol <> 'admin' then
+    return jsonb_build_object('ok', false, 'code', 'auth', 'error', 'Sesión no válida. Vuelve a entrar.');
+  end if;
+
+  if upper(coalesce(trim(p_confirmacion), '')) <> 'BORRAR TODO' then
+    return jsonb_build_object('ok', false, 'error', 'Escribí BORRAR TODO para confirmar.');
+  end if;
+
+  delete from public.jornadas;
+  delete from public.trabajadores;
+  delete from public.clientes;
+  delete from public.sesiones;
+
+  return jsonb_build_object('ok', true);
+end;
+$$;
+
 revoke execute on function public.portal_token(uuid) from public, anon, authenticated;
 revoke execute on function public.portal_ping() from public;
 revoke execute on function public.portal_login(text, text) from public;
@@ -851,6 +888,7 @@ revoke execute on function public.portal_admin_actualizar_trabajador(uuid, uuid,
 revoke execute on function public.portal_admin_archivar_trabajador(uuid, uuid) from public;
 revoke execute on function public.portal_admin_restaurar_trabajador(uuid, uuid) from public;
 revoke execute on function public.portal_admin_borrar_cliente(uuid, uuid) from public;
+revoke execute on function public.portal_admin_reiniciar_datos(uuid, text) from public;
 revoke execute on function public.portal_admin_borrar_jornada(uuid, uuid) from public;
 revoke execute on function public.portal_trabajador_datos(uuid) from public;
 revoke execute on function public.portal_trabajador_crear_jornada(uuid, date, time, time, integer, text) from public;
@@ -870,6 +908,7 @@ grant execute on function public.portal_admin_actualizar_trabajador(uuid, uuid, 
 grant execute on function public.portal_admin_archivar_trabajador(uuid, uuid) to anon;
 grant execute on function public.portal_admin_restaurar_trabajador(uuid, uuid) to anon;
 grant execute on function public.portal_admin_borrar_cliente(uuid, uuid) to anon;
+grant execute on function public.portal_admin_reiniciar_datos(uuid, text) to anon;
 grant execute on function public.portal_admin_borrar_jornada(uuid, uuid) to anon;
 grant execute on function public.portal_trabajador_datos(uuid) to anon;
 grant execute on function public.portal_trabajador_crear_jornada(uuid, date, time, time, integer, text) to anon;

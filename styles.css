@@ -1194,6 +1194,26 @@ dialog[open] {
   margin-top: 1px;
 }
 
+.danger-zone {
+  border-color: rgba(255, 69, 58, .24);
+}
+
+.danger-hint {
+  margin-bottom: 16px;
+  background: var(--red-soft);
+  border-color: rgba(255, 69, 58, .22);
+}
+
+.danger-hint svg {
+  color: var(--red);
+}
+
+.danger-summary {
+  margin: 0 0 16px;
+  color: var(--ink-soft);
+  font-size: .82rem;
+}
+
 .segmented {
   display: inline-flex;
   padding: 3px;

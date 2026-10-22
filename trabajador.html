@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#e9edf6">
-    <title>Mi portal · Portal de Trabajadores</title>
+    <title>Mi portal - Portal de Trabajadores</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -31,17 +31,17 @@
             <article class="stat" style="--i:0">
                 <div class="label"><span class="icon-chip"><span class="icon" data-icon="clock" data-size="16"></span></span> Horas totales</div>
                 <div class="value" id="stat-horas">0.00 h</div>
-                <div class="sub" id="stat-horas-sub">—</div>
+                <div class="sub" id="stat-horas-sub">-</div>
             </article>
             <article class="stat" style="--i:1">
                 <div class="label"><span class="icon-chip green"><span class="icon" data-icon="wallet" data-size="16"></span></span> Total a cobrar</div>
                 <div class="value" id="stat-pago">$0.00</div>
-                <div class="sub" id="stat-pago-sub">—</div>
+                <div class="sub" id="stat-pago-sub">-</div>
             </article>
             <article class="stat" style="--i:2">
                 <div class="label"><span class="icon-chip purple"><span class="icon" data-icon="calendar" data-size="16"></span></span> Jornadas</div>
                 <div class="value" id="stat-jornadas">0</div>
-                <div class="sub" id="stat-jornadas-sub">—</div>
+                <div class="sub" id="stat-jornadas-sub">-</div>
             </article>
             <article class="stat" style="--i:3">
                 <div class="label"><span class="icon-chip green"><span class="icon" data-icon="chart" data-size="16"></span></span> Tu tarifa</div>
@@ -79,7 +79,7 @@
                     </div>
                     <div class="field">
                         <label for="notas">Notas <span class="muted">(opcional)</span></label>
-                        <textarea class="textarea" id="notas" placeholder="Ej. turno nocturno, incidencia…"></textarea>
+                        <textarea class="textarea" id="notas" placeholder="Ej. turno nocturno, incidencia..."></textarea>
                     </div>
 
                     <div class="total-strip">
@@ -99,7 +99,7 @@
                 <div class="card-head">
                     <div>
                         <h2>Mis jornadas</h2>
-                        <p id="jornadas-count">—</p>
+                        <p id="jornadas-count">-</p>
                     </div>
                 </div>
                 <div class="table-wrap">
@@ -202,7 +202,7 @@
                         <td class="num">${Number(j.minutos_lunch) || 0} min</td>
                         <td class="num">${hours(j.horas_calculadas)}</td>
                         <td class="num"><strong>${money(j.horas_calculadas * tarifaDe(j))}</strong></td>
-                        <td class="muted" style="max-width:170px;overflow:hidden;text-overflow:ellipsis" title="${escapeHtml(j.notas || '')}">${escapeHtml(j.notas || '—')}</td>
+                        <td class="muted" style="max-width:170px;overflow:hidden;text-overflow:ellipsis" title="${escapeHtml(j.notas || '')}">${escapeHtml(j.notas || '-')}</td>
                         <td>
                             <button class="btn btn-icon btn-ghost" data-delete="${j.id}" aria-label="Eliminar jornada">
                                 <span class="icon" data-icon="trash" data-size="16"></span>

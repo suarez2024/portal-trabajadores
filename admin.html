@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#e9edf6">
-    <title>Administración · Portal de Trabajadores</title>
+    <title>Administración - Portal de Trabajadores</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -36,6 +36,10 @@
                 </button>
                 <button class="nav-item" data-section="jornadas" type="button">
                     <span class="icon" data-icon="clock" data-size="18"></span> Jornadas
+                </button>
+                <span class="nav-label">Sistema</span>
+                <button class="nav-item" data-section="ajustes" type="button">
+                    <span class="icon" data-icon="settings" data-size="18"></span> Ajustes
                 </button>
             </nav>
 
@@ -79,22 +83,22 @@
                     <article class="stat" style="--i:0">
                         <div class="label"><span class="icon-chip purple"><span class="icon" data-icon="building" data-size="16"></span></span> Clientes</div>
                         <div class="value" id="stat-clientes">0</div>
-                        <div class="sub" id="stat-clientes-sub">—</div>
+                        <div class="sub" id="stat-clientes-sub">-</div>
                     </article>
                     <article class="stat" style="--i:1">
                         <div class="label"><span class="icon-chip"><span class="icon" data-icon="users" data-size="16"></span></span> Trabajadores</div>
                         <div class="value" id="stat-trabajadores">0</div>
-                        <div class="sub" id="stat-trabajadores-sub">—</div>
+                        <div class="sub" id="stat-trabajadores-sub">-</div>
                     </article>
                     <article class="stat" style="--i:2">
                         <div class="label"><span class="icon-chip green"><span class="icon" data-icon="clock" data-size="16"></span></span> Horas registradas</div>
                         <div class="value" id="stat-horas">0</div>
-                        <div class="sub" id="stat-horas-sub">—</div>
+                        <div class="sub" id="stat-horas-sub">-</div>
                     </article>
                     <article class="stat" style="--i:3">
                         <div class="label"><span class="icon-chip green"><span class="icon" data-icon="wallet" data-size="16"></span></span> Total a pagar</div>
                         <div class="value" id="stat-total">$0.00</div>
-                        <div class="sub" id="stat-total-sub">—</div>
+                        <div class="sub" id="stat-total-sub">-</div>
                     </article>
                 </div>
 
@@ -173,7 +177,7 @@
                         <div class="card-head">
                             <div>
                                 <h2>Clientes registrados</h2>
-                                <p id="clientes-count">—</p>
+                                <p id="clientes-count">-</p>
                             </div>
                         </div>
                         <div class="table-wrap">
@@ -240,7 +244,7 @@
                         <div class="card-head">
                             <div>
                                 <h2>Trabajadores registrados</h2>
-                                <p id="trabajadores-count">—</p>
+                                <p id="trabajadores-count">-</p>
                             </div>
                         </div>
                         <div class="toolbar">
@@ -341,6 +345,25 @@
                     </div>
                 </div>
             </section>
+
+            <section class="section" id="section-ajustes">
+                <div class="card danger-zone">
+                    <div class="card-head">
+                        <div>
+                            <h2>Reiniciar base de datos</h2>
+                            <p>Borra clientes, trabajadores, jornadas y sesiones para empezar de cero.</p>
+                        </div>
+                    </div>
+                    <div class="hint danger-hint">
+                        <span class="icon" data-icon="alert" data-size="16"></span>
+                        <span>Esta acción no se puede deshacer. El administrador y la estructura de la base se conservan.</span>
+                    </div>
+                    <p class="danger-summary" id="reset-summary"></p>
+                    <button class="btn btn-danger" id="reset-open" type="button">
+                        <span class="icon" data-icon="trash" data-size="16"></span> Reiniciar base de datos
+                    </button>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -416,10 +439,40 @@
         </div>
     </dialog>
 
+    <dialog id="reset-dialog">
+        <div class="dialog-body">
+            <div class="window-bar">
+                <div class="traffic"><i></i><i></i><i></i></div>
+                <div class="window-title">Reiniciar base de datos</div>
+                <span style="width:52px"></span>
+            </div>
+            <div class="dialog-content">
+                <h3>Borrar todos los datos</h3>
+                <p class="muted" id="reset-text" style="margin-top:6px;font-size:.85rem"></p>
+                <div class="hint danger-hint" style="margin-top:14px">
+                    <span class="icon" data-icon="alert" data-size="16"></span>
+                    <span>Los clientes y trabajadores deberán volver a registrarse.</span>
+                </div>
+                <div class="field" style="margin-top:16px">
+                    <label for="reset-confirm">Escribe BORRAR TODO para confirmar</label>
+                    <input class="input" id="reset-confirm" autocomplete="off" spellcheck="false" placeholder="BORRAR TODO">
+                </div>
+                <div class="dialog-actions">
+                    <button class="btn btn-ghost" id="reset-cancel" type="button">Cancelar</button>
+                    <button class="btn btn-danger" id="reset-submit" type="button" disabled>
+                        <span class="spinner"></span>
+                        <span class="btn-label">Borrar todo</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
     <script type="module">
         import {
             api, bootstrap, money, hours, fmtDate, fmtTime, escapeHtml, initials,
-            requireRole, handleAuthFailure, setLoading, toast, animateNumber, hydrateIcons
+            requireRole, handleAuthFailure, setLoading, toast, animateNumber, hydrateIcons,
+            clearSession
         } from './app.js';
 
         await bootstrap();
@@ -432,10 +485,11 @@
                 resumen: ['Resumen general', 'Todo lo que está pasando en tu negocio.'],
                 clientes: ['Clientes', 'Crea accesos y revisa el consumo de cada empresa.'],
                 trabajadores: ['Trabajadores', 'Altas, tarifas, asignaciones y estado.'],
-                jornadas: ['Jornadas', 'Todas las horas registradas, con filtros y totales.']
+                jornadas: ['Jornadas', 'Todas las horas registradas, con filtros y totales.'],
+                ajustes: ['Ajustes', 'Configuración general y mantenimiento de los datos.']
             };
 
-            const sectionIds = ['resumen', 'clientes', 'trabajadores', 'jornadas'];
+            const sectionIds = ['resumen', 'clientes', 'trabajadores', 'jornadas', 'ajustes'];
 
             function groupByTrabajador(jornadas) {
                 const map = new Map();
@@ -498,7 +552,15 @@
                 renderTrabajadores();
                 renderJornadas();
                 renderSelects();
+                renderResetInfo();
                 hydrateIcons();
+            }
+
+            function renderResetInfo() {
+                const { clientes, trabajadores, jornadas } = state.data;
+                const resumen = `${clientes.length} ${clientes.length === 1 ? 'cliente' : 'clientes'}, ${trabajadores.length} ${trabajadores.length === 1 ? 'trabajador' : 'trabajadores'} y ${jornadas.length} ${jornadas.length === 1 ? 'jornada' : 'jornadas'}`;
+                document.getElementById('reset-summary').textContent = `Actualmente hay ${resumen}.`;
+                document.getElementById('reset-text').textContent = `Se eliminarán ${resumen} y todas las sesiones activas. No se puede deshacer.`;
             }
 
             function renderStats() {
@@ -513,7 +575,7 @@
                 document.getElementById('stat-clientes-sub').textContent = clientes.length === 1 ? '1 empresa registrada' : `${clientes.length} empresas registradas`;
 
                 animateNumber(document.getElementById('stat-trabajadores'), trabajadores.length, value => Math.round(value).toString());
-                document.getElementById('stat-trabajadores-sub').textContent = `${activos} activos · ${inactivos} inactivos · ${archivados} archivados`;
+                document.getElementById('stat-trabajadores-sub').textContent = `${activos} activos - ${inactivos} inactivos - ${archivados} archivados`;
 
                 animateNumber(document.getElementById('stat-horas'), totalHoras, hours);
                 document.getElementById('stat-horas-sub').textContent = `${jornadas.length} jornadas registradas`;
@@ -554,7 +616,7 @@
                     <div class="detail-item">
                         <div class="who">
                             <strong>${escapeHtml(item.cliente.empresa)}</strong>
-                            <span>${item.workers} ${item.workers === 1 ? 'trabajador' : 'trabajadores'} · ${hours(item.totalHoras)}</span>
+                            <span>${item.workers} ${item.workers === 1 ? 'trabajador' : 'trabajadores'} - ${hours(item.totalHoras)}</span>
                         </div>
                         <strong class="num">${money(item.pago)}</strong>
                     </div>
@@ -664,7 +726,7 @@
                 const archivados = state.data.trabajadores.filter(t => t.archivado).length;
                 const activos = state.data.trabajadores.filter(t => !t.archivado && t.activo !== false).length;
                 document.getElementById('trabajadores-count').textContent =
-                    `${state.data.trabajadores.length} en total · ${activos} activos · ${archivados} archivados`;
+                    `${state.data.trabajadores.length} en total - ${activos} activos - ${archivados} archivados`;
                 hydrateIcons(tbody);
             }
 
@@ -703,7 +765,7 @@
                         <td class="num">${Number(j.minutos_lunch) || 0} min</td>
                         <td class="num">${hours(j.horas_calculadas)}</td>
                         <td class="num"><strong>${money(jornadaMonto(j))}</strong></td>
-                        <td class="muted" style="max-width:180px;overflow:hidden;text-overflow:ellipsis" title="${escapeHtml(j.notas || '')}">${escapeHtml(j.notas || '—')}</td>
+                        <td class="muted" style="max-width:180px;overflow:hidden;text-overflow:ellipsis" title="${escapeHtml(j.notas || '')}">${escapeHtml(j.notas || '-')}</td>
                         <td>
                             <button class="btn btn-icon btn-ghost" data-delete-jornada="${j.id}" aria-label="Eliminar jornada">
                                 <span class="icon" data-icon="trash" data-size="16"></span>
@@ -725,7 +787,7 @@
                     .map(c => `<option value="${c.id}">${escapeHtml(c.empresa)}</option>`)
                     .join('');
 
-                document.getElementById('t-cliente').innerHTML = '<option value="">— Selecciona cliente —</option>' + clientOptions;
+                document.getElementById('t-cliente').innerHTML = '<option value="">- Selecciona cliente -</option>' + clientOptions;
 
                 const workerFilterClient = document.getElementById('worker-client-filter');
                 const currentWorkerFilter = workerFilterClient.value;
@@ -739,7 +801,7 @@
 
                 const editCliente = document.getElementById('edit-cliente');
                 const currentEditCliente = editCliente.value;
-                editCliente.innerHTML = '<option value="">— Selecciona cliente —</option>' + clientOptions;
+                editCliente.innerHTML = '<option value="">- Selecciona cliente -</option>' + clientOptions;
                 editCliente.value = currentEditCliente;
 
                 updateWorkerOptions();
@@ -861,7 +923,7 @@
 
             function fillEditClientOptions(selectedId) {
                 const select = document.getElementById('edit-cliente');
-                select.innerHTML = '<option value="">— Selecciona cliente —</option>' +
+                select.innerHTML = '<option value="">- Selecciona cliente -</option>' +
                     state.data.clientes.map(c => `<option value="${c.id}">${escapeHtml(c.empresa)}</option>`).join('');
                 select.value = selectedId || '';
             }
@@ -1133,6 +1195,47 @@
                     if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
                     toast(error.message, 'err');
                     button.disabled = false;
+                }
+            });
+
+            const resetDialog = document.getElementById('reset-dialog');
+            const resetInput = document.getElementById('reset-confirm');
+            const resetSubmit = document.getElementById('reset-submit');
+
+            document.getElementById('reset-open').addEventListener('click', () => {
+                renderResetInfo();
+                resetInput.value = '';
+                resetSubmit.disabled = true;
+                resetDialog.showModal();
+                setTimeout(() => resetInput.focus(), 60);
+            });
+
+            document.getElementById('reset-cancel').addEventListener('click', () => resetDialog.close());
+
+            resetInput.addEventListener('input', () => {
+                resetSubmit.disabled = resetInput.value.trim().toUpperCase() !== 'BORRAR TODO';
+            });
+
+            resetInput.addEventListener('keydown', event => {
+                if (event.key === 'Enter' && !resetSubmit.disabled) {
+                    event.preventDefault();
+                    resetSubmit.click();
+                }
+            });
+
+            resetSubmit.addEventListener('click', async () => {
+                if (resetSubmit.disabled) return;
+                setLoading(resetSubmit, true);
+                try {
+                    await api.resetDatabase(resetInput.value.trim(), session);
+                    clearSession();
+                    resetDialog.close();
+                    toast('Base de datos reiniciada. Inicia sesión de nuevo.', 'ok', 3000);
+                    setTimeout(() => location.replace('admin-login.html'), 900);
+                } catch (error) {
+                    if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
+                    toast(error.message, 'err');
+                    setLoading(resetSubmit, false);
                 }
             });
 
