@@ -67,6 +67,7 @@
                     <p id="page-subtitle">Todo lo que estÃ¡ pasando en tu negocio.</p>
                 </div>
                 <div class="topbar-actions">
+                    <span class="badge" id="security-badge"></span>
                     <button class="btn btn-sm" id="refresh-btn" type="button">
                         <span class="icon" data-icon="refresh" data-size="16"></span> Actualizar
                     </button>
@@ -846,6 +847,17 @@
 
             hydrateIcons();
             setSection(location.hash.replace('#', '') || 'resumen', false);
+
+            const securityBadge = document.getElementById('security-badge');
+            if (api.secure) {
+                securityBadge.className = 'badge ok';
+                securityBadge.innerHTML = '<i></i> Modo seguro';
+            } else {
+                securityBadge.className = 'badge off';
+                securityBadge.innerHTML = '<i></i> Modo demo';
+                securityBadge.title = 'Las tablas siguen abiertas a la clave pública. Aplica supabase/hardening.sql para activar RLS y sesiones.';
+            }
+
             await loadData();
         }
     </script>
