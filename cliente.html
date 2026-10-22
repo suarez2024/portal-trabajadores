@@ -1,176 +1,252 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal Cliente</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: system-ui, Arial, sans-serif;
-    }
-
-    body {
-      background: #f0f2f5;
-      padding: 20px;
-    }
-
-    header {
-      max-width: 800px;
-      margin: 0 auto 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    h1 {
-      font-size: 1.2rem;
-      color: #1e3c72;
-    }
-
-    .logout {
-      background: #e74c3c;
-      color: #fff;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .card {
-      max-width: 800px;
-      margin: 0 auto 20px;
-      background: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
-    }
-
-    h2 {
-      font-size: 1rem;
-      margin-bottom: 14px;
-      color: #333;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: .9rem;
-    }
-
-    th,
-    td {
-      padding: 10px;
-      text-align: left;
-      border-bottom: 1px solid #eee;
-    }
-
-    th {
-      background: #f7f9fc;
-      font-size: .75rem;
-      text-transform: uppercase;
-      color: #666;
-    }
-
-    .total {
-      background: #e8f0fe;
-      padding: 16px;
-      border-radius: 8px;
-      text-align: center;
-      margin-top: 16px;
-    }
-
-    .total .num {
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: #1e3c72;
-    }
-
-    .total .lbl {
-      font-size: .8rem;
-      color: #666;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#e9edf6">
+    <title>Mi empresa Â· Portal de Trabajadores</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-  <header>
-    <h1>Portal Cliente</h1>
-    <button class="logout" onclick="logout()">Salir</button>
-  </header>
+    <main class="main solo-main page-enter">
+        <header class="topbar">
+            <div style="display:flex;align-items:center;gap:12px">
+                <span class="brand-icon"><span class="icon" data-icon="building" data-size="20"></span></span>
+                <div>
+                    <h1 id="company-name">Mi empresa</h1>
+                    <p>Horas y montos a pagar por tus trabajadores.</p>
+                </div>
+            </div>
+            <div class="topbar-actions">
+                <span class="badge info"><i></i> Cliente</span>
+                <button class="btn btn-sm" id="logout-btn" type="button">
+                    <span class="icon" data-icon="logout" data-size="16"></span> Salir
+                </button>
+            </div>
+        </header>
 
-  <div class="card">
-    <h2>Mis trabajadores</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Trabajador</th>
-          <th>Horas totales</th>
-          <th>Tarifa/hora</th>
-          <th>Monto a pagar</th>
-        </tr>
-      </thead>
-      <tbody id="tabla"></tbody>
-    </table>
-    <div class="total" id="totalGeneral"></div>
-  </div>
+        <div class="stats">
+            <article class="stat" style="--i:0">
+                <div class="label"><span class="icon-chip"><span class="icon" data-icon="users" data-size="16"></span></span> Trabajadores</div>
+                <div class="value" id="stat-trabajadores">0</div>
+                <div class="sub" id="stat-trabajadores-sub">â€”</div>
+            </article>
+            <article class="stat" style="--i:1">
+                <div class="label"><span class="icon-chip green"><span class="icon" data-icon="clock" data-size="16"></span></span> Horas totales</div>
+                <div class="value" id="stat-horas">0.00 h</div>
+                <div class="sub" id="stat-horas-sub">â€”</div>
+            </article>
+            <article class="stat" style="--i:2">
+                <div class="label"><span class="icon-chip green"><span class="icon" data-icon="wallet" data-size="16"></span></span> Total a pagar</div>
+                <div class="value" id="stat-total">$0.00</div>
+                <div class="sub">por las horas registradas</div>
+            </article>
+            <article class="stat" style="--i:3">
+                <div class="label"><span class="icon-chip purple"><span class="icon" data-icon="calendar" data-size="16"></span></span> PerÃ­odo</div>
+                <div class="value" id="stat-periodo">â€”</div>
+                <div class="sub">Ãºltima jornada registrada</div>
+            </article>
+        </div>
 
-  <script type="module">
-    import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        <div class="card">
+            <div class="card-head">
+                <div>
+                    <h2>Tus trabajadores</h2>
+                    <p id="workers-count">â€”</p>
+                </div>
+                <button class="btn btn-sm" id="refresh-btn" type="button">
+                    <span class="icon" data-icon="refresh" data-size="16"></span> Actualizar
+                </button>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Trabajador</th>
+                            <th>Estado</th>
+                            <th>Tarifa</th>
+                            <th>Horas</th>
+                            <th>Monto a pagar</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-trabajadores"></tbody>
+                </table>
+            </div>
+            <div class="total-strip">
+                <div>
+                    <div class="lbl" id="total-label">0 trabajadores</div>
+                    <div class="lbl">Horas: <strong id="total-horas">0.00 h</strong></div>
+                </div>
+                <div class="val" id="total-pago">$0.00</div>
+            </div>
+        </div>
+    </main>
 
-    const SUPABASE_URL = 'https://qcqhxtoffjnhvbqltrnu.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjcWh4dG9mZmpuaHZicWx0cm51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2NDkzMzcsImV4cCI6MjEwODIyNTMzN30.0uyZM_wUrIktt0JlqbO9lXipes6yHrj6sSAA3a6pvBM';
-    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    <dialog id="detail-dialog">
+        <div class="dialog-body">
+            <div class="window-bar">
+                <div class="traffic"><i></i><i></i><i></i></div>
+                <div class="window-title">Detalle de jornadas</div>
+                <span style="width:52px"></span>
+            </div>
+            <div class="dialog-content">
+                <h3 id="detail-title">Trabajador</h3>
+                <p class="muted" id="detail-sub" style="font-size:.82rem;margin-top:4px">â€”</p>
+                <div class="detail-list" id="detail-list"></div>
+                <div class="total-strip">
+                    <span class="lbl">Total a pagar</span>
+                    <span class="val" id="detail-total">$0.00</span>
+                </div>
+                <div class="dialog-actions">
+                    <button class="btn btn-ghost" id="detail-close" type="button">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </dialog>
 
-    const usuario = JSON.parse(localStorage.getItem('usuario') || 'null');
-    if (!usuario || usuario.rol !== 'cliente') {
-      window.location.href = 'index.html';
-    }
+    <script type="module">
+        import {
+            api, bootstrap, money, hours, fmtDate, fmtTime, escapeHtml, initials,
+            requireRole, handleAuthFailure, setLoading, toast, animateNumber, hydrateIcons,
+            setSession
+        } from './app.js';
 
-    function logout() {localStorage.removeItem('usuario'); window.location.href = 'index.html';}
-    window.logout = logout;
+        await bootstrap();
+        let session = requireRole('cliente', 'index.html', api.secure);
 
-    async function cargar() {
-      // Traer trabajadores de este cliente
-      const {data: trabajadores} = await supabase
-        .from('trabajadores')
-        .select('*')
-        .eq('cliente_id', usuario.id);
+        if (session) {
+            let trabajadores = [];
+            let jornadas = [];
+            let usuario = session.usuario;
 
-      const tbody = document.getElementById('tabla');
-      let granTotal = 0;
-      let filas = '';
+            const groups = new Map();
 
-      for (const t of (trabajadores || [])) {
-        const {data: jornadas} = await supabase
-          .from('jornadas')
-          .select('horas_calculadas')
-          .eq('trabajador_id', t.id);
+            function buildGroups() {
+                groups.clear();
+                jornadas.forEach(j => {
+                    if (!groups.has(j.trabajador_id)) groups.set(j.trabajador_id, []);
+                    groups.get(j.trabajador_id).push(j);
+                });
+                groups.forEach(rows => rows.sort((a, b) => String(b.fecha).localeCompare(String(a.fecha))));
+            }
 
-        const horas = (jornadas || []).reduce((s, j) => s + Number(j.horas_calculadas || 0), 0);
-        const monto = horas * Number(t.tarifa_hora);
-        granTotal += monto;
+            function render() {
+                buildGroups();
+                const totalHoras = jornadas.reduce((sum, j) => sum + j.horas_calculadas, 0);
+                const total = trabajadores.reduce((sum, t) => sum + (groups.get(t.id) || []).reduce((s, j) => s + j.horas_calculadas * t.tarifa_hora, 0), 0);
+                const activos = trabajadores.filter(t => t.activo !== false).length;
+                const ultima = jornadas.reduce((latest, j) => !latest || String(j.fecha) > String(latest) ? j.fecha : latest, null);
 
-        filas += `<tr>
-      <td>${t.nombre}</td>
-      <td>${horas.toFixed(2)} h</td>
-      <td>$${Number(t.tarifa_hora).toFixed(2)}</td>
-      <td>$${monto.toFixed(2)}</td>
-    </tr>`;
-      }
+                document.getElementById('company-name').textContent = usuario.empresa || 'Mi empresa';
+                animateNumber(document.getElementById('stat-trabajadores'), trabajadores.length, value => Math.round(value).toString());
+                document.getElementById('stat-trabajadores-sub').textContent = `${activos} activos Â· ${trabajadores.length - activos} inactivos`;
+                animateNumber(document.getElementById('stat-horas'), totalHoras, hours);
+                document.getElementById('stat-horas-sub').textContent = `${jornadas.length} jornadas registradas`;
+                animateNumber(document.getElementById('stat-total'), total, money);
+                document.getElementById('stat-periodo').textContent = ultima ? fmtDate(ultima) : 'â€”';
 
-      tbody.innerHTML = filas || '<tr><td colspan="4" style="text-align:center;color:#999">Sin trabajadores asignados</td></tr>';
-      document.getElementById('totalGeneral').innerHTML = `
-    <div class="num">$${granTotal.toFixed(2)}</div>
-    <div class="lbl">Total a pagar este período</div>
-  `;
-    }
+                const tbody = document.getElementById('tabla-trabajadores');
+                tbody.innerHTML = trabajadores.map(t => {
+                    const rows = groups.get(t.id) || [];
+                    const workerHours = rows.reduce((sum, j) => sum + j.horas_calculadas, 0);
+                    const pago = workerHours * t.tarifa_hora;
+                    const activo = t.activo !== false;
+                    return `
+                        <tr>
+                            <td>
+                                <div style="display:flex;align-items:center;gap:9px">
+                                    <span class="avatar">${escapeHtml(initials(t.nombre))}</span>
+                                    <div>
+                                        <div>${escapeHtml(t.nombre)}</div>
+                                        <div class="muted" style="font-size:.73rem">${escapeHtml(t.email)}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge ${activo ? 'ok' : 'off'}"><i></i>${activo ? 'Activo' : 'Inactivo'}</span></td>
+                            <td class="num">${money(t.tarifa_hora)}/h</td>
+                            <td class="num">${hours(workerHours)}</td>
+                            <td class="num"><strong>${money(pago)}</strong></td>
+                            <td>
+                                <button class="btn btn-sm" data-detail="${t.id}" type="button">
+                                    Ver detalle
+                                    <span class="icon" data-icon="arrowRight" data-size="15"></span>
+                                </button>
+                            </td>
+                        </tr>`;
+                }).join('') || `<tr><td colspan="6"><div class="empty"><span class="icon" data-icon="users" data-size="26"></span>AÃºn no tienes trabajadores asignados.</div></td></tr>`;
 
-    cargar();
-  </script>
+                document.getElementById('workers-count').textContent = `${trabajadores.length} ${trabajadores.length === 1 ? 'trabajador' : 'trabajadores'} asignados`;
+                document.getElementById('total-label').textContent = `${trabajadores.length} ${trabajadores.length === 1 ? 'trabajador' : 'trabajadores'}`;
+                document.getElementById('total-horas').textContent = hours(totalHoras);
+                document.getElementById('total-pago').textContent = money(total);
+                hydrateIcons(tbody);
+            }
+
+            async function load(showToast = false) {
+                const refresh = document.getElementById('refresh-btn');
+                setLoading(refresh, true);
+                try {
+                    const data = await api.clientData(session);
+                    usuario = data.usuario || usuario;
+                    trabajadores = data.trabajadores || [];
+                    jornadas = data.jornadas || [];
+                    const refreshed = { ...session, usuario };
+                    setSession(refreshed);
+                    session = refreshed;
+                    render();
+                    if (showToast) toast('Datos actualizados.', 'ok');
+                } catch (error) {
+                    if (handleAuthFailure(error, 'index.html')) return;
+                    toast(error.message, 'err');
+                } finally {
+                    setLoading(refresh, false);
+                }
+            }
+
+            document.getElementById('tabla-trabajadores').addEventListener('click', event => {
+                const button = event.target.closest('[data-detail]');
+                if (!button) return;
+                const worker = trabajadores.find(t => t.id === button.dataset.detail);
+                if (!worker) return;
+                const rows = groups.get(worker.id) || [];
+                const workerHours = rows.reduce((sum, j) => sum + j.horas_calculadas, 0);
+                const pago = workerHours * worker.tarifa_hora;
+
+                document.getElementById('detail-title').textContent = worker.nombre;
+                document.getElementById('detail-sub').textContent = `${money(worker.tarifa_hora)} por hora Â· ${rows.length} ${rows.length === 1 ? 'jornada' : 'jornadas'}`;
+                document.getElementById('detail-total').textContent = money(pago);
+                document.getElementById('detail-list').innerHTML = rows.map(j => `
+                    <div class="detail-item">
+                        <div class="who">
+                            <strong>${fmtDate(j.fecha)}</strong>
+                            <span>${fmtTime(j.hora_entrada)} â€“ ${fmtTime(j.hora_salida)} Â· ${Number(j.minutos_lunch) || 0} min lunch${j.notas ? ' Â· ' + escapeHtml(j.notas) : ''}</span>
+                        </div>
+                        <strong class="num">${hours(j.horas_calculadas)} Â· ${money(j.horas_calculadas * worker.tarifa_hora)}</strong>
+                    </div>
+                `).join('') || '<div class="empty">Sin jornadas registradas.</div>';
+
+                document.getElementById('detail-dialog').showModal();
+            });
+
+            document.getElementById('detail-close').addEventListener('click', () => {
+                document.getElementById('detail-dialog').close();
+            });
+
+            document.getElementById('refresh-btn').addEventListener('click', () => load(true));
+
+            document.getElementById('logout-btn').addEventListener('click', async () => {
+                await api.logout();
+                location.replace('index.html');
+            });
+
+            hydrateIcons();
+            await load();
+        }
+    </script>
 </body>
 
 </html>
+

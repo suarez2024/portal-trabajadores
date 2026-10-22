@@ -4,142 +4,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Portal</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, Arial, sans-serif;
-        }
-
-        body {
-            background: #f0f2f5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-        }
-
-        .box {
-            background: #fff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, .1);
-            width: 340px;
-        }
-
-        h1 {
-            font-size: 1.3rem;
-            margin-bottom: 20px;
-            color: #1e3c72;
-        }
-
-        label {
-            display: block;
-            font-size: .85rem;
-            margin: 12px 0 4px;
-            font-weight: 600;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 20px;
-            background: #1e3c72;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #152b55;
-        }
-
-        .error {
-            color: #e74c3c;
-            font-size: .8rem;
-            margin-top: 10px;
-        }
-
-        .admin-link {
-            text-align: center;
-            margin-top: 16px;
-            font-size: .75rem;
-        }
-
-        .admin-link a {
-            color: #888;
-            text-decoration: none;
-        }
-
-        .admin-link a:hover {
-            color: #1e3c72;
-            text-decoration: underline;
-        }
-    </style>
+    <meta name="theme-color" content="#e9edf6">
+    <title>Portal de Trabajadores</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <div class="box">
-        <h1>Portal de Trabajadores</h1>
-        <label>Email</label>
-        <input type="email" id="email" placeholder="tu@email.com">
-        <label>Contraseña</label>
-        <input type="password" id="password">
-        <button onclick="login()">Entrar</button>
-        <div class="error" id="error"></div>
-        <div class="admin-link"><a href="admin-login.html">Acceso administrador</a></div>
-    </div>
+    <main class="auth-shell page-enter">
+        <section class="auth-brand">
+            <span class="badge-app">
+                <span class="icon" data-icon="sparkles" data-size="16"></span>
+                Portal de Trabajadores
+            </span>
+            <h1>Horas claras.<br><span class="gradient-text">Pagos simples.</span></h1>
+            <p class="lead">Registra tus jornadas, calcula las horas efectivas y sabe exactamente cuánto pagar. Sin hojas de cálculo ni papeleo.</p>
+            <ul class="feature-list">
+                <li><span class="dot"><span class="icon" data-icon="clock" data-size="16"></span></span> Entrada, salida y lunch registrados a mano</li>
+                <li><span class="dot"><span class="icon" data-icon="wallet" data-size="16"></span></span> Totales automáticos por trabajador</li>
+                <li><span class="dot"><span class="icon" data-icon="shield" data-size="16"></span></span> Cada cuenta ve solo su información</li>
+            </ul>
+        </section>
+
+        <section class="auth-card-wrap">
+            <div class="window">
+                <div class="window-bar">
+                    <div class="traffic"><i></i><i></i><i></i></div>
+                    <div class="window-title">Iniciar sesión</div>
+                    <span style="width:52px"></span>
+                </div>
+                <div class="window-body">
+                    <header class="auth-head">
+                        <div class="app-icon"><span class="icon" data-icon="clock" data-size="26"></span></div>
+                        <h2>Bienvenido</h2>
+                        <p>Entra con tu cuenta de trabajador o cliente.</p>
+                    </header>
+
+                    <form id="login-form" novalidate>
+                        <div class="field">
+                            <label for="email">Email</label>
+                            <input class="input" id="email" name="email" type="email" autocomplete="username" placeholder="tu@email.com" required>
+                        </div>
+                        <div class="field">
+                            <label for="password">Contraseña</label>
+                            <div class="input-wrap">
+                                <input class="input" id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required>
+                                <button class="ghost-icon" type="button" id="toggle-pass" aria-label="Mostrar contraseña">
+                                    <span class="icon" data-icon="eye" data-size="18"></span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="hint hidden" id="form-error" role="alert">
+                            <span class="icon" data-icon="alert" data-size="16"></span>
+                            <span id="form-error-text"></span>
+                        </div>
+
+                        <button class="btn btn-primary btn-block" id="submit-btn" type="submit">
+                            <span class="spinner"></span>
+                            <span class="btn-label">Entrar</span>
+                            <span class="icon" data-icon="arrowRight" data-size="16"></span>
+                        </button>
+                    </form>
+
+                    <p class="auth-switch">¿Eres el administrador? <a href="admin-login.html">Acceso administrador</a></p>
+                </div>
+            </div>
+            <p class="foot-note">Portal de Trabajadores · 2026</p>
+        </section>
+    </main>
 
     <script type="module">
-        import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        import { api, bootstrap, getSession, setLoading, toast, hydrateIcons } from './app.js';
 
-        const supabase = createClient(
-            'https://qcqhxtoffjnhvbqltrnu.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjcWh4dG9mZmpuaHZicWx0cm51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2NDkzMzcsImV4cCI6MjEwODIyNTMzN30.0uyZM_wUrIktt0JlqbO9lXipes6yHrj6sSAA3a6pvBM'
-        );
+        await bootstrap();
 
-        async function login() {
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const errorEl = document.getElementById('error');
-            errorEl.textContent = '';
+        const existing = getSession();
+        if (existing?.rol === 'trabajador') location.replace('trabajador.html');
+        if (existing?.rol === 'cliente') location.replace('cliente.html');
 
-            // Buscar en trabajadores
-            const {data: trabajador} = await supabase
-                .from('trabajadores').select('*')
-                .eq('email', email).eq('password', password).maybeSingle();
+        const form = document.getElementById('login-form');
+        const email = document.getElementById('email');
+        const password = document.getElementById('password');
+        const errorBox = document.getElementById('form-error');
+        const errorText = document.getElementById('form-error-text');
+        const button = document.getElementById('submit-btn');
+        const toggle = document.getElementById('toggle-pass');
 
-            if (trabajador) {
-                localStorage.setItem('usuario', JSON.stringify({...trabajador, rol: 'trabajador'}));
-                window.location.href = 'trabajador.html';
-                return;
-            }
+        toggle.addEventListener('click', () => {
+            const hidden = password.type === 'password';
+            password.type = hidden ? 'text' : 'password';
+            toggle.querySelector('[data-icon]').setAttribute('data-icon', hidden ? 'eyeOff' : 'eye');
+            toggle.setAttribute('aria-label', hidden ? 'Ocultar contraseña' : 'Mostrar contraseña');
+            hydrateIcons(toggle);
+        });
 
-            // Buscar en clientes
-            const {data: cliente} = await supabase
-                .from('clientes').select('*')
-                .eq('email', email).eq('password', password).maybeSingle();
-
-            if (cliente) {
-                localStorage.setItem('usuario', JSON.stringify({...cliente, rol: 'cliente'}));
-                window.location.href = 'cliente.html';
-                return;
-            }
-
-            errorEl.textContent = 'Credenciales incorrectas';
+        function showError(message) {
+            errorText.textContent = message;
+            errorBox.classList.remove('hidden');
         }
-        window.login = login;
+
+        form.addEventListener('submit', async event => {
+            event.preventDefault();
+            errorBox.classList.add('hidden');
+            setLoading(button, true);
+            try {
+                const result = await api.login(email.value, password.value);
+                if (!result.ok) {
+                    showError(result.error);
+                    password.select();
+                    return;
+                }
+                toast('Sesión iniciada. Redirigiendo…', 'ok', 1600);
+                const target = result.session.rol === 'admin' ? 'admin.html' : result.session.rol === 'trabajador' ? 'trabajador.html' : 'cliente.html';
+                setTimeout(() => location.replace(target), 320);
+            } catch (error) {
+                showError(error.message || 'No se pudo iniciar sesión.');
+            } finally {
+                setLoading(button, false);
+            }
+        });
     </script>
 </body>
 

@@ -1,288 +1,317 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Trabajador</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, Arial, sans-serif;
-        }
-
-        body {
-            background: #f0f2f5;
-            padding: 20px;
-        }
-
-        header {
-            max-width: 800px;
-            margin: 0 auto 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        h1 {
-            font-size: 1.2rem;
-            color: #27ae60;
-        }
-
-        .logout {
-            background: #e74c3c;
-            color: #fff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .card {
-            max-width: 800px;
-            margin: 0 auto 20px;
-            background: #fff;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
-        }
-
-        h2 {
-            font-size: 1rem;
-            margin-bottom: 14px;
-            color: #333;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        label {
-            display: block;
-            font-size: .8rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-            color: #555;
-        }
-
-        input,
-        textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: .9rem;
-        }
-
-        button.primary {
-            background: #27ae60;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        button.primary:hover {
-            background: #1e8449;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: .85rem;
-        }
-
-        th,
-        td {
-            padding: 8px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-
-        th {
-            background: #f7f9fc;
-            font-size: .75rem;
-            text-transform: uppercase;
-            color: #666;
-        }
-
-        .totales {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .total-box {
-            flex: 1;
-            background: #e8f8ef;
-            padding: 16px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .total-box .num {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #1e8449;
-        }
-
-        .total-box .lbl {
-            font-size: .75rem;
-            color: #666;
-        }
-
-        .del {
-            background: #e74c3c;
-            color: #fff;
-            border: none;
-            padding: 4px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: .75rem;
-        }
-    </style>
+    <meta name="theme-color" content="#e9edf6">
+    <title>Mi portal Â· Portal de Trabajadores</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <header>
-        <h1>Portal Trabajador</h1>
-        <button class="logout" onclick="logout()">Salir</button>
-    </header>
+    <main class="main solo-main page-enter">
+        <header class="topbar">
+            <div style="display:flex;align-items:center;gap:12px">
+                <span class="brand-icon"><span class="icon" data-icon="clock" data-size="20"></span></span>
+                <div>
+                    <h1>Hola, <span id="user-name">trabajador</span></h1>
+                    <p>Registra tu jornada y revisa tus horas y tu pago.</p>
+                </div>
+            </div>
+            <div class="topbar-actions">
+                <span class="badge info"><i></i> Trabajador</span>
+                <button class="btn btn-sm" id="logout-btn" type="button">
+                    <span class="icon" data-icon="logout" data-size="16"></span> Salir
+                </button>
+            </div>
+        </header>
 
-    <div class="card">
-        <h2>Registrar jornada</h2>
-        <div class="form-row">
-            <div><label>Fecha</label><input type="date" id="fecha"></div>
-            <div><label>Entrada</label><input type="time" id="entrada" value="08:00"></div>
-            <div><label>Salida</label><input type="time" id="salida" value="18:00"></div>
-            <div><label>Minutos lunch</label><input type="number" id="lunch" value="60" min="0"></div>
+        <div class="stats">
+            <article class="stat" style="--i:0">
+                <div class="label"><span class="icon-chip"><span class="icon" data-icon="clock" data-size="16"></span></span> Horas totales</div>
+                <div class="value" id="stat-horas">0.00 h</div>
+                <div class="sub" id="stat-horas-sub">â€”</div>
+            </article>
+            <article class="stat" style="--i:1">
+                <div class="label"><span class="icon-chip green"><span class="icon" data-icon="wallet" data-size="16"></span></span> Total a cobrar</div>
+                <div class="value" id="stat-pago">$0.00</div>
+                <div class="sub" id="stat-pago-sub">â€”</div>
+            </article>
+            <article class="stat" style="--i:2">
+                <div class="label"><span class="icon-chip purple"><span class="icon" data-icon="calendar" data-size="16"></span></span> Jornadas</div>
+                <div class="value" id="stat-jornadas">0</div>
+                <div class="sub" id="stat-jornadas-sub">â€”</div>
+            </article>
+            <article class="stat" style="--i:3">
+                <div class="label"><span class="icon-chip green"><span class="icon" data-icon="chart" data-size="16"></span></span> Tu tarifa</div>
+                <div class="value" id="stat-tarifa">$0.00</div>
+                <div class="sub">por hora trabajada</div>
+            </article>
         </div>
-        <div class="form-row">
-            <div style="grid-column:1/-1"><label>Notas (opcional)</label><input type="text" id="notas"
-                    placeholder="Ej. Día normal"></div>
+
+        <div class="split">
+            <div class="card">
+                <div class="card-head">
+                    <div>
+                        <h2>Registrar jornada</h2>
+                        <p>Las horas se calculan al guardar.</p>
+                    </div>
+                </div>
+                <form id="jornada-form" novalidate>
+                    <div class="field">
+                        <label for="fecha">Fecha</label>
+                        <input class="input" id="fecha" type="date" required>
+                    </div>
+                    <div class="grid-2">
+                        <div class="field">
+                            <label for="entrada">Hora de entrada</label>
+                            <input class="input" id="entrada" type="time" required>
+                        </div>
+                        <div class="field">
+                            <label for="salida">Hora de salida</label>
+                            <input class="input" id="salida" type="time" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="lunch">Lunch (minutos)</label>
+                        <input class="input" id="lunch" type="number" min="0" max="600" step="5" value="60">
+                    </div>
+                    <div class="field">
+                        <label for="notas">Notas <span class="muted">(opcional)</span></label>
+                        <textarea class="textarea" id="notas" placeholder="Ej. turno nocturno, incidenciaâ€¦"></textarea>
+                    </div>
+
+                    <div class="total-strip">
+                        <span class="lbl">Horas efectivas</span>
+                        <span class="val" id="preview-horas">0.00 h</span>
+                    </div>
+
+                    <button class="btn btn-primary btn-block" id="save-btn" type="submit" style="margin-top:14px">
+                        <span class="spinner"></span>
+                        <span class="btn-label">Guardar jornada</span>
+                        <span class="icon" data-icon="check" data-size="16"></span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-head">
+                    <div>
+                        <h2>Mis jornadas</h2>
+                        <p id="jornadas-count">â€”</p>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Entrada</th>
+                                <th>Salida</th>
+                                <th>Lunch</th>
+                                <th>Horas</th>
+                                <th>Monto</th>
+                                <th>Notas</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-jornadas"></tbody>
+                    </table>
+                </div>
+                <div class="total-strip">
+                    <div>
+                        <div class="lbl" id="total-label">0 jornadas</div>
+                        <div class="lbl">Horas: <strong id="total-horas">0.00 h</strong></div>
+                    </div>
+                    <div class="val" id="total-pago">$0.00</div>
+                </div>
+            </div>
         </div>
-        <button class="primary" onclick="guardarJornada()">Guardar jornada</button>
-    </div>
+    </main>
 
-    <div class="totales" id="totales"></div>
-
-    <div class="card">
-        <h2>Mis jornadas</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Fecha</th>
-                    <th>Entrada</th>
-                    <th>Salida</th>
-                    <th>Lunch</th>
-                    <th>Horas</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody id="tabla"></tbody>
-        </table>
-    </div>
+    <dialog id="confirm-dialog">
+        <div class="dialog-body">
+            <div class="window-bar">
+                <div class="traffic"><i></i><i></i><i></i></div>
+                <div class="window-title">Confirmar acciÃ³n</div>
+                <span style="width:52px"></span>
+            </div>
+            <div class="dialog-content">
+                <h3 id="confirm-title">Eliminar jornada</h3>
+                <p class="muted" id="confirm-text" style="margin-top:6px;font-size:.85rem">Se borrarÃ¡ este registro de forma permanente.</p>
+                <div class="dialog-actions">
+                    <button class="btn btn-ghost" id="confirm-cancel" type="button">Cancelar</button>
+                    <button class="btn btn-danger" id="confirm-ok" type="button">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </dialog>
 
     <script type="module">
-        import {createClient} from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        import {
+            api, bootstrap, money, hours, fmtDate, fmtTime, escapeHtml, calcularHoras,
+            requireRole, handleAuthFailure, setLoading, toast, animateNumber, hydrateIcons,
+            getSession, setSession, todayISO
+        } from './app.js';
 
-        const SUPABASE_URL = 'https://qcqhxtoffjnhvbqltrnu.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjcWh4dG9mZmpuaHZicWx0cm51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2NDkzMzcsImV4cCI6MjEwODIyNTMzN30.0uyZM_wUrIktt0JlqbO9lXipes6yHrj6sSAA3a6pvBM';
-        const supabase = createClient(
-            'https://qcqhxtoffjnhvbqltrnu.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjcWh4dG9mZmpuaHZicWx0cm51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2NDkzMzcsImV4cCI6MjEwODIyNTMzN30.0uyZM_wUrIktt0JlqbO9lXipes6yHrj6sSAA3a6pvBM'
-        );
+        await bootstrap();
+        let session = requireRole('trabajador', 'index.html', api.secure);
 
-        const usuario = JSON.parse(localStorage.getItem('usuario') || 'null');
-        if (!usuario || usuario.rol !== 'trabajador') {
-            window.location.href = 'index.html';
+        if (session) {
+            let jornadas = [];
+            let usuario = session.usuario;
+
+            const form = document.getElementById('jornada-form');
+            const fecha = document.getElementById('fecha');
+            const entrada = document.getElementById('entrada');
+            const salida = document.getElementById('salida');
+            const lunch = document.getElementById('lunch');
+            const notas = document.getElementById('notas');
+            const saveButton = document.getElementById('save-btn');
+
+            fecha.value = todayISO();
+
+            function renderPreview() {
+                const value = calcularHoras(entrada.value, salida.value, lunch.value);
+                document.getElementById('preview-horas').textContent = hours(value);
+            }
+
+            function render() {
+                const totalHoras = jornadas.reduce((sum, j) => sum + j.horas_calculadas, 0);
+                const tarifa = Number(usuario.tarifa_hora) || 0;
+                const total = totalHoras * tarifa;
+                const days = new Set(jornadas.map(j => String(j.fecha).slice(0, 10)));
+
+                document.getElementById('user-name').textContent = usuario.nombre || 'trabajador';
+                animateNumber(document.getElementById('stat-horas'), totalHoras, hours);
+                document.getElementById('stat-horas-sub').textContent = `${days.size} ${days.size === 1 ? 'dÃ­a registrado' : 'dÃ­as registrados'}`;
+                animateNumber(document.getElementById('stat-pago'), total, money);
+                document.getElementById('stat-pago-sub').textContent = `$${tarifa.toFixed(2)} por hora`;
+                animateNumber(document.getElementById('stat-jornadas'), jornadas.length, value => Math.round(value).toString());
+                document.getElementById('stat-jornadas-sub').textContent = 'registros guardados';
+                animateNumber(document.getElementById('stat-tarifa'), tarifa, money);
+
+                const tbody = document.getElementById('tabla-jornadas');
+                tbody.innerHTML = jornadas.map(j => `
+                    <tr>
+                        <td class="num">${fmtDate(j.fecha)}</td>
+                        <td class="num">${fmtTime(j.hora_entrada)}</td>
+                        <td class="num">${fmtTime(j.hora_salida)}</td>
+                        <td class="num">${Number(j.minutos_lunch) || 0} min</td>
+                        <td class="num">${hours(j.horas_calculadas)}</td>
+                        <td class="num"><strong>${money(j.horas_calculadas * tarifa)}</strong></td>
+                        <td class="muted" style="max-width:170px;overflow:hidden;text-overflow:ellipsis" title="${escapeHtml(j.notas || '')}">${escapeHtml(j.notas || 'â€”')}</td>
+                        <td>
+                            <button class="btn btn-icon btn-ghost" data-delete="${j.id}" aria-label="Eliminar jornada">
+                                <span class="icon" data-icon="trash" data-size="16"></span>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('') || `<tr><td colspan="8"><div class="empty"><span class="icon" data-icon="calendar" data-size="26"></span>Tu primera jornada aparecerÃ¡ aquÃ­.</div></td></tr>`;
+
+                document.getElementById('jornadas-count').textContent = jornadas.length ? `${jornadas.length} ${jornadas.length === 1 ? 'registro' : 'registros'}` : 'Sin registros todavÃ­a';
+                document.getElementById('total-label').textContent = `${jornadas.length} ${jornadas.length === 1 ? 'jornada' : 'jornadas'}`;
+                document.getElementById('total-horas').textContent = hours(totalHoras);
+                document.getElementById('total-pago').textContent = money(total);
+                hydrateIcons(tbody);
+            }
+
+            async function load(showToast = false) {
+                try {
+                    const data = await api.workerData(session);
+                    usuario = data.usuario || usuario;
+                    jornadas = data.jornadas || [];
+                    const refreshed = { ...session, usuario };
+                    setSession(refreshed);
+                    session = refreshed;
+                    render();
+                    if (showToast) toast('Datos actualizados.', 'ok');
+                } catch (error) {
+                    if (handleAuthFailure(error, 'index.html')) return;
+                    toast(error.message, 'err');
+                }
+            }
+
+            form.addEventListener('submit', async event => {
+                event.preventDefault();
+                const payload = {
+                    fecha: fecha.value,
+                    hora_entrada: entrada.value,
+                    hora_salida: salida.value,
+                    minutos_lunch: Number(lunch.value) || 0,
+                    notas: notas.value.trim() || null
+                };
+
+                if (!payload.fecha || !payload.hora_entrada || !payload.hora_salida) {
+                    toast('Completa fecha, entrada y salida.', 'err');
+                    return;
+                }
+                if (payload.minutos_lunch < 0 || payload.minutos_lunch > 600) {
+                    toast('Los minutos de lunch deben estar entre 0 y 600.', 'err');
+                    return;
+                }
+
+                setLoading(saveButton, true);
+                try {
+                    await api.createJornada(payload, session);
+                    notas.value = '';
+                    toast('Jornada guardada.', 'ok');
+                    await load();
+                } catch (error) {
+                    if (handleAuthFailure(error, 'index.html')) return;
+                    toast(error.message, 'err');
+                } finally {
+                    setLoading(saveButton, false);
+                }
+            });
+
+            [entrada, salida, lunch].forEach(el => el.addEventListener('input', renderPreview));
+            renderPreview();
+
+            document.getElementById('tabla-jornadas').addEventListener('click', async event => {
+                const button = event.target.closest('[data-delete]');
+                if (!button) return;
+                const dialog = document.getElementById('confirm-dialog');
+                dialog.showModal();
+                const result = await new Promise(resolve => {
+                    const ok = document.getElementById('confirm-ok');
+                    const cancel = document.getElementById('confirm-cancel');
+                    const finish = value => {
+                        dialog.close();
+                        ok.removeEventListener('click', onOk);
+                        cancel.removeEventListener('click', onCancel);
+                        resolve(value);
+                    };
+                    const onOk = () => finish(true);
+                    const onCancel = () => finish(false);
+                    ok.addEventListener('click', onOk);
+                    cancel.addEventListener('click', onCancel);
+                    dialog.addEventListener('cancel', () => finish(false), { once: true });
+                });
+                if (!result) return;
+                button.disabled = true;
+                try {
+                    await api.deleteJornada(button.dataset.delete, session, false);
+                    toast('Jornada eliminada.', 'ok');
+                    await load();
+                } catch (error) {
+                    if (handleAuthFailure(error, 'index.html')) return;
+                    toast(error.message, 'err');
+                    button.disabled = false;
+                }
+            });
+
+            document.getElementById('logout-btn').addEventListener('click', async () => {
+                await api.logout();
+                location.replace('index.html');
+            });
+
+            hydrateIcons();
+            await load();
         }
-
-        function logout() {localStorage.removeItem('usuario'); window.location.href = 'index.html';}
-        window.logout = logout;
-
-        function calcularHoras(entrada, salida, lunch) {
-            const [eh, em] = entrada.split(':').map(Number);
-            const [sh, sm] = salida.split(':').map(Number);
-            const minEntrada = eh * 60 + em;
-            const minSalida = sh * 60 + sm;
-            let total = minSalida - minEntrada;
-            if (total < 0) total += 24 * 60; // turno nocturno
-            const efectivos = total - (lunch || 0);
-            return Math.max(0, efectivos / 60);
-        }
-
-        async function cargar() {
-            const {data: jornadas} = await supabase
-                .from('jornadas')
-                .select('*')
-                .eq('trabajador_id', usuario.id)
-                .order('fecha', {ascending: false});
-
-            const tbody = document.getElementById('tabla');
-            tbody.innerHTML = (jornadas || []).map(j => `
-    <tr>
-      <td>${j.fecha}</td>
-      <td>${j.hora_entrada.slice(0, 5)}</td>
-      <td>${j.hora_salida.slice(0, 5)}</td>
-      <td>${j.minutos_lunch} min</td>
-      <td>${Number(j.horas_calculadas).toFixed(2)} h</td>
-      <td><button class="del" onclick="borrar('${j.id}')">×</button></td>
-    </tr>
-  `).join('') || '<tr><td colspan="6" style="text-align:center;color:#999">Sin jornadas</td></tr>';
-
-            const totalHoras = (jornadas || []).reduce((s, j) => s + Number(j.horas_calculadas), 0);
-            const totalPago = totalHoras * Number(usuario.tarifa_hora);
-
-            document.getElementById('totales').innerHTML = `
-    <div class="total-box"><div class="num">${totalHoras.toFixed(2)} h</div><div class="lbl">Total horas</div></div>
-    <div class="total-box"><div class="num">$${totalPago.toFixed(2)}</div><div class="lbl">Total a cobrar ($${usuario.tarifa_hora}/h)</div></div>
-  `;
-        }
-
-        async function guardarJornada() {
-            const fecha = document.getElementById('fecha').value;
-            const entrada = document.getElementById('entrada').value;
-            const salida = document.getElementById('salida').value;
-            const lunch = parseInt(document.getElementById('lunch').value) || 0;
-            const notas = document.getElementById('notas').value;
-
-            if (!fecha || !entrada || !salida) {alert('Completa fecha, entrada y salida'); return;}
-
-            const horas = calcularHoras(entrada, salida, lunch);
-
-            const {error} = await supabase.from('jornadas').insert([{
-                trabajador_id: usuario.id,
-                fecha,
-                hora_entrada: entrada,
-                hora_salida: salida,
-                minutos_lunch: lunch,
-                horas_calculadas: horas,
-                notas
-            }]);
-
-            if (error) {alert('Error: ' + error.message); return;}
-            document.getElementById('notas').value = '';
-            cargar();
-        }
-
-        window.guardarJornada = guardarJornada;
-        window.borrar = async (id) => {
-            if (!confirm('¿Borrar esta jornada?')) return;
-            await supabase.from('jornadas').delete().eq('id', id);
-            cargar();
-        };
-
-        // Fecha de hoy por defecto
-        document.getElementById('fecha').valueAsDate = new Date();
-        cargar();
     </script>
 </body>
 
 </html>
+
