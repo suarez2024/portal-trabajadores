@@ -1,1265 +1,362 @@
 <!DOCTYPE html>
-<html lang="es">
-
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#e9edf6">
-    <title>Administración - Portal de Trabajadores</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0A1A2F">
+  <title data-i18n="admin.nav.dashboard">Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand on-dark" href="index.html">
+        <span class="brand-mark">KG</span>
+        <span>Kageon Global<small>ADMIN PORTAL</small></span>
+      </a>
+      <nav class="nav">
+        <div class="nav-label">Menu</div>
+        <button class="nav-item active" data-nav="dashboard" data-section="dashboard"><span class="icon" data-icon="home" data-size="18"></span><span data-i18n="admin.nav.dashboard">Dashboard</span></button>
+        <button class="nav-item" data-nav="clients" data-section="clients"><span class="icon" data-icon="building" data-size="18"></span><span data-i18n="admin.nav.clients">Clients</span></button>
+        <button class="nav-item" data-nav="assistants" data-section="assistants"><span class="icon" data-icon="users" data-size="18"></span><span data-i18n="admin.nav.assistants">Assistants</span></button>
+        <button class="nav-item" data-nav="jobs" data-section="jobs"><span class="icon" data-icon="search" data-size="18"></span><span data-i18n="admin.nav.jobs">Jobs</span></button>
+        <button class="nav-item" data-nav="applications" data-section="applications"><span class="icon" data-icon="fileText" data-size="18"></span><span data-i18n="admin.nav.applications">Applications</span></button>
+        <button class="nav-item" data-nav="engagements" data-section="engagements"><span class="icon" data-icon="userPlus" data-size="18"></span><span data-i18n="admin.nav.engagements">Placements</span></button>
+        <button class="nav-item" data-nav="time" data-section="time"><span class="icon" data-icon="clock" data-size="18"></span><span data-i18n="admin.nav.time">Time entries</span></button>
+        <button class="nav-item" data-nav="billing" data-section="billing"><span class="icon" data-icon="wallet" data-size="18"></span><span data-i18n="admin.nav.billing">Billing</span></button>
+        <button class="nav-item" data-nav="settings" data-section="settings"><span class="icon" data-icon="settings" data-size="18"></span><span data-i18n="admin.nav.settings">Settings</span></button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="user-chip">
+          <div class="avatar" id="user-avatar">AD</div>
+          <div class="meta"><strong id="user-name">Admin</strong><span id="user-role">Administrator</span></div>
+        </div>
+        <div class="lang-switch on-dark"><button type="button" data-lang="en" data-i18n="common.english">English</button><button type="button" data-lang="es" data-i18n="common.spanish">Spanish</button></div>
+        <button class="btn btn-ghost btn-block" id="logout-btn"><span class="icon" data-icon="logout" data-size="16"></span><span data-i18n="common.logout">Log out</span></button>
+      </div>
+    </aside>
     <div class="scrim" id="scrim"></div>
-
-    <div class="app">
-        <aside class="sidebar" id="sidebar">
-            <div class="brand">
-                <span class="brand-icon"><span class="icon" data-icon="shield" data-size="20"></span></span>
-                <div>
-                    <strong>Portal</strong>
-                    <span>Administración</span>
-                </div>
-            </div>
-
-            <nav class="nav">
-                <span class="nav-label">General</span>
-                <button class="nav-item active" data-section="resumen" type="button">
-                    <span class="icon" data-icon="home" data-size="18"></span> Resumen
-                </button>
-                <span class="nav-label">Gestión</span>
-                <button class="nav-item" data-section="clientes" type="button">
-                    <span class="icon" data-icon="building" data-size="18"></span> Clientes
-                </button>
-                <button class="nav-item" data-section="trabajadores" type="button">
-                    <span class="icon" data-icon="users" data-size="18"></span> Trabajadores
-                </button>
-                <button class="nav-item" data-section="jornadas" type="button">
-                    <span class="icon" data-icon="clock" data-size="18"></span> Jornadas
-                </button>
-                <span class="nav-label">Sistema</span>
-                <button class="nav-item" data-section="ajustes" type="button">
-                    <span class="icon" data-icon="settings" data-size="18"></span> Ajustes
-                </button>
-            </nav>
-
-            <div class="sidebar-foot">
-                <div class="user-chip">
-                    <span class="avatar">A</span>
-                    <div class="meta">
-                        <strong>Admin</strong>
-                        <span>Administrador</span>
-                    </div>
-                </div>
-                <button class="btn btn-ghost btn-block" id="logout-btn" type="button">
-                    <span class="icon" data-icon="logout" data-size="17"></span> Cerrar sesión
-                </button>
-            </div>
-        </aside>
-
-        <main class="main">
-            <div class="mobile-bar">
-                <button class="btn btn-icon" id="menu-btn" type="button" aria-label="Abrir menú">
-                    <span class="icon" data-icon="menu" data-size="18"></span>
-                </button>
-                <span class="badge info"><i></i> Administrador</span>
-            </div>
-
-            <header class="topbar">
-                <div>
-                    <h1 id="page-title">Resumen general</h1>
-                    <p id="page-subtitle">Todo lo que está pasando en tu negocio.</p>
-                </div>
-                <div class="topbar-actions">
-                    <span class="badge" id="security-badge"></span>
-                    <button class="btn btn-sm" id="refresh-btn" type="button">
-                        <span class="icon" data-icon="refresh" data-size="16"></span> Actualizar
-                    </button>
-                </div>
-            </header>
-
-            <section class="section active" id="section-resumen">
-                <div class="stats">
-                    <article class="stat" style="--i:0">
-                        <div class="label"><span class="icon-chip purple"><span class="icon" data-icon="building" data-size="16"></span></span> Clientes</div>
-                        <div class="value" id="stat-clientes">0</div>
-                        <div class="sub" id="stat-clientes-sub">-</div>
-                    </article>
-                    <article class="stat" style="--i:1">
-                        <div class="label"><span class="icon-chip"><span class="icon" data-icon="users" data-size="16"></span></span> Trabajadores</div>
-                        <div class="value" id="stat-trabajadores">0</div>
-                        <div class="sub" id="stat-trabajadores-sub">-</div>
-                    </article>
-                    <article class="stat" style="--i:2">
-                        <div class="label"><span class="icon-chip green"><span class="icon" data-icon="clock" data-size="16"></span></span> Horas registradas</div>
-                        <div class="value" id="stat-horas">0</div>
-                        <div class="sub" id="stat-horas-sub">-</div>
-                    </article>
-                    <article class="stat" style="--i:3">
-                        <div class="label"><span class="icon-chip green"><span class="icon" data-icon="wallet" data-size="16"></span></span> Total a pagar</div>
-                        <div class="value" id="stat-total">$0.00</div>
-                        <div class="sub" id="stat-total-sub">-</div>
-                    </article>
-                </div>
-
-                <div class="dashboard-grid">
-                    <div class="card">
-                        <div class="card-head">
-                            <div>
-                                <h2>Últimas jornadas</h2>
-                                <p>Los registros más recientes de todos los trabajadores.</p>
-                            </div>
-                            <button class="btn btn-ghost btn-sm" type="button" data-goto="jornadas">Ver todas</button>
-                        </div>
-                        <div class="table-wrap">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Fecha</th>
-                                        <th>Trabajador</th>
-                                        <th>Cliente</th>
-                                        <th>Horas</th>
-                                        <th>Monto</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="recent-jornadas"></tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-head">
-                            <div>
-                                <h2>Clientes</h2>
-                                <p>Horas y montos acumulados.</p>
-                            </div>
-                        </div>
-                        <div id="top-clientes"></div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="section" id="section-clientes">
-                <div class="split">
-                    <div class="card">
-                        <div class="card-head">
-                            <div>
-                                <h2>Nuevo cliente</h2>
-                                <p>Crea el acceso al portal del cliente.</p>
-                            </div>
-                        </div>
-                        <form id="client-form" novalidate>
-                            <div class="field">
-                                <label for="c-nombre">Nombre del contacto</label>
-                                <input class="input" id="c-nombre" placeholder="Carlos Pérez" autocomplete="off" required>
-                            </div>
-                            <div class="field">
-                                <label for="c-empresa">Empresa</label>
-                                <input class="input" id="c-empresa" placeholder="Empresa S.A." autocomplete="off" required>
-                            </div>
-                            <div class="field">
-                                <label for="c-email">Email de acceso</label>
-                                <input class="input" id="c-email" type="email" placeholder="cliente@empresa.com" autocomplete="off" required>
-                            </div>
-                            <div class="field">
-                                <label for="c-pass">Contraseña</label>
-                                <input class="input" id="c-pass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" required>
-                            </div>
-                            <button class="btn btn-primary btn-block" id="c-submit" type="submit">
-                                <span class="spinner"></span>
-                                <span class="btn-label">Crear cliente</span>
-                                <span class="icon" data-icon="plus" data-size="16"></span>
-                            </button>
-                        </form>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-head">
-                            <div>
-                                <h2>Clientes registrados</h2>
-                                <p id="clientes-count">-</p>
-                            </div>
-                        </div>
-                        <div class="table-wrap">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Contacto</th>
-                                        <th>Empresa</th>
-                                        <th>Email</th>
-                                        <th>Trabajadores</th>
-                                        <th>Horas</th>
-                                        <th>Total</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabla-clientes"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="section" id="section-trabajadores">
-                <div class="split">
-                    <div class="card">
-                        <div class="card-head">
-                            <div>
-                                <h2>Nuevo trabajador</h2>
-                                <p>Asígnalo a un cliente para que aparezca en su portal.</p>
-                            </div>
-                        </div>
-                        <form id="worker-form" novalidate>
-                            <div class="field">
-                                <label for="t-nombre">Nombre</label>
-                                <input class="input" id="t-nombre" placeholder="Pedro López" autocomplete="off" required>
-                            </div>
-                            <div class="field">
-                                <label for="t-email">Email de acceso</label>
-                                <input class="input" id="t-email" type="email" placeholder="trabajador@empresa.com" autocomplete="off" required>
-                            </div>
-                            <div class="field">
-                                <label for="t-pass">Contraseña</label>
-                                <input class="input" id="t-pass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" required>
-                            </div>
-                            <div class="grid-2">
-                                <div class="field">
-                                    <label for="t-tarifa">Tarifa por hora</label>
-                                    <input class="input" id="t-tarifa" type="number" min="0.01" step="0.01" value="10" required>
-                                </div>
-                                <div class="field">
-                                    <label for="t-cliente">Cliente asignado</label>
-                                    <select class="select" id="t-cliente" required></select>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary btn-block" id="t-submit" type="submit">
-                                <span class="spinner"></span>
-                                <span class="btn-label">Crear trabajador</span>
-                                <span class="icon" data-icon="plus" data-size="16"></span>
-                            </button>
-                        </form>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-head">
-                            <div>
-                                <h2>Trabajadores registrados</h2>
-                                <p id="trabajadores-count">-</p>
-                            </div>
-                        </div>
-                        <div class="toolbar">
-                            <div class="field grow">
-                                <label for="worker-search">Buscar</label>
-                                <input class="input" id="worker-search" placeholder="Nombre o email" autocomplete="off">
-                            </div>
-                            <div class="field">
-                                <label for="worker-client-filter">Cliente</label>
-                                <select class="select" id="worker-client-filter"></select>
-                            </div>
-                            <div class="field">
-                                <label for="worker-status-filter">Estado</label>
-                                <select class="select" id="worker-status-filter">
-                                    <option value="todos">Todos</option>
-                                    <option value="activos">Activos</option>
-                                    <option value="inactivos">Inactivos</option>
-                                    <option value="archivados">Archivados</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="table-wrap">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Trabajador</th>
-                                        <th>Cliente</th>
-                                        <th>Tarifa</th>
-                                        <th>Horas</th>
-                                        <th>Total</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tabla-trabajadores"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="section" id="section-jornadas">
-                <div class="card">
-                    <div class="card-head">
-                        <div>
-                            <h2>Jornadas consolidadas</h2>
-                            <p>Todos los registros de horas del negocio.</p>
-                        </div>
-                    </div>
-                    <div class="toolbar">
-                        <div class="field grow">
-                            <label for="j-search">Buscar</label>
-                            <input class="input" id="j-search" placeholder="Trabajador, cliente o nota" autocomplete="off">
-                        </div>
-                        <div class="field">
-                            <label for="j-client">Cliente</label>
-                            <select class="select" id="j-client"></select>
-                        </div>
-                        <div class="field">
-                            <label for="j-worker">Trabajador</label>
-                            <select class="select" id="j-worker"></select>
-                        </div>
-                        <div class="field">
-                            <label for="j-from">Desde</label>
-                            <input class="input" id="j-from" type="date">
-                        </div>
-                        <div class="field">
-                            <label for="j-to">Hasta</label>
-                            <input class="input" id="j-to" type="date">
-                        </div>
-                        <button class="btn btn-ghost" id="j-clear" type="button" style="height:40px">Limpiar</button>
-                    </div>
-                    <div class="table-wrap">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Trabajador</th>
-                                    <th>Cliente</th>
-                                    <th>Entrada</th>
-                                    <th>Salida</th>
-                                    <th>Lunch</th>
-                                    <th>Horas</th>
-                                    <th>Monto</th>
-                                    <th>Notas</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-jornadas"></tbody>
-                        </table>
-                    </div>
-                    <div class="total-strip">
-                        <div>
-                            <div class="lbl" id="j-resumen-count">0 jornadas</div>
-                            <div class="lbl">Horas: <strong id="j-resumen-horas">0.00 h</strong></div>
-                        </div>
-                        <div class="val" id="j-resumen-total">$0.00</div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="section" id="section-ajustes">
-                <div class="card danger-zone">
-                    <div class="card-head">
-                        <div>
-                            <h2>Reiniciar base de datos</h2>
-                            <p>Borra clientes, trabajadores, jornadas y sesiones para empezar de cero.</p>
-                        </div>
-                    </div>
-                    <div class="hint danger-hint">
-                        <span class="icon" data-icon="alert" data-size="16"></span>
-                        <span>Esta acción no se puede deshacer. El administrador y la estructura de la base se conservan.</span>
-                    </div>
-                    <p class="danger-summary" id="reset-summary"></p>
-                    <button class="btn btn-danger" id="reset-open" type="button">
-                        <span class="icon" data-icon="trash" data-size="16"></span> Reiniciar base de datos
-                    </button>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <dialog id="confirm-dialog">
-        <div class="dialog-body">
-            <div class="window-bar">
-                <div class="traffic"><i></i><i></i><i></i></div>
-                <div class="window-title">Confirmar acción</div>
-                <span style="width:52px"></span>
-            </div>
-            <div class="dialog-content">
-                <h3 id="confirm-title">¿Seguro?</h3>
-                <p class="muted" id="confirm-text" style="margin-top:6px;font-size:.85rem"></p>
-                <div class="dialog-actions">
-                    <button class="btn btn-ghost" id="confirm-cancel" type="button">Cancelar</button>
-                    <button class="btn btn-danger" id="confirm-ok" type="button">Eliminar</button>
-                </div>
-            </div>
+    <main class="main">
+      <header class="mobile-bar">
+        <button class="btn btn-ghost btn-icon" id="mobile-toggle"><span class="icon" data-icon="menu" data-size="18"></span></button>
+        <div class="brand"><span class="brand-mark">KG</span><span>Kageon Global</span></div>
+        <div class="lang-switch"><button type="button" data-lang="en">EN</button><button type="button" data-lang="es">ES</button></div>
+      </header>
+      <div class="topbar">
+        <div>
+          <h1 id="page-title" data-i18n="admin.dashboard.title">Dashboard</h1>
+          <p id="page-subtitle" data-i18n="admin.dashboard.subtitle">Pending reviews, hours and margin.</p>
         </div>
-    </dialog>
-
-    <dialog id="edit-dialog">
-        <div class="dialog-body">
-            <div class="window-bar">
-                <div class="traffic"><i></i><i></i><i></i></div>
-                <div class="window-title" id="edit-window-title">Editar</div>
-                <span style="width:52px"></span>
+        <div class="topbar-actions"><button class="btn btn-ghost btn-sm" id="refresh-btn"><span class="icon" data-icon="refresh" data-size="16"></span><span data-i18n="common.refresh">Refresh</span></button></div>
+      </div>
+      <div class="content">
+        <section class="page-section active" data-section="dashboard">
+          <div class="grid grid-stats">
+            <article class="stat"><span class="stat-label" data-i18n="admin.dashboard.pending_clients">Pending clients</span><span class="stat-value" id="d-pc">0</span></article>
+            <article class="stat"><span class="stat-label" data-i18n="admin.dashboard.pending_assistants">Pending assistants</span><span class="stat-value" id="d-pa">0</span></article>
+            <article class="stat"><span class="stat-label" data-i18n="admin.dashboard.hours">Hours this month</span><span class="stat-value" id="d-h">0.00 h</span></article>
+            <article class="stat accent"><span class="stat-label" data-i18n="admin.dashboard.margin">Margin this month</span><span class="stat-value" id="d-m">$0.00</span></article>
+          </div>
+          <div class="two-col">
+            <div class="card">
+              <div class="card-head"><div><h2 data-i18n="admin.clients.title">Clients</h2><p data-i18n="admin.dashboard.pending_clients">Pending clients</p></div></div>
+              <div class="table-wrap"><table class="data"><thead><tr><th data-i18n="admin.clients.company">Company</th><th data-i18n="admin.clients.contact">Contact</th><th data-i18n="common.email">Email</th><th data-i18n="common.actions">Actions</th></tr></thead><tbody id="d-clients"></tbody></table></div>
             </div>
-            <div class="dialog-content">
-                <h3 id="edit-title">Editar</h3>
-                <p class="muted" id="edit-sub" style="margin-top:6px;font-size:.82rem"></p>
-                <form id="edit-form" novalidate>
-                    <input type="hidden" id="edit-id">
-                    <div class="field">
-                        <label for="edit-nombre">Nombre</label>
-                        <input class="input" id="edit-nombre" autocomplete="off" required>
-                    </div>
-                    <div class="field" id="edit-empresa-field">
-                        <label for="edit-empresa">Empresa</label>
-                        <input class="input" id="edit-empresa" autocomplete="off">
-                    </div>
-                    <div class="field">
-                        <label for="edit-email">Email de acceso</label>
-                        <input class="input" id="edit-email" type="email" autocomplete="off" required>
-                    </div>
-                    <div class="grid-2" id="edit-worker-fields">
-                        <div class="field">
-                            <label for="edit-tarifa">Tarifa por hora</label>
-                            <input class="input" id="edit-tarifa" type="number" min="0.01" step="0.01">
-                        </div>
-                        <div class="field">
-                            <label for="edit-cliente">Cliente asignado</label>
-                            <select class="select" id="edit-cliente"></select>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label for="edit-pass">Nueva contraseña <span class="muted">(opcional)</span></label>
-                        <input class="input" id="edit-pass" type="password" autocomplete="new-password" placeholder="Dejar vacío para conservar la actual">
-                    </div>
-                    <div class="hint" id="edit-hint">
-                        <span class="icon" data-icon="alert" data-size="16"></span>
-                        <span id="edit-hint-text"></span>
-                    </div>
-                    <div class="dialog-actions">
-                        <button class="btn btn-ghost" id="edit-cancel" type="button">Cancelar</button>
-                        <button class="btn btn-primary" id="edit-save" type="submit">
-                            <span class="spinner"></span>
-                            <span class="btn-label">Guardar cambios</span>
-                        </button>
-                    </div>
+            <div class="card">
+              <div class="card-head"><div><h2 data-i18n="admin.assistants.title">Assistants</h2><p data-i18n="admin.dashboard.pending_assistants">Pending assistants</p></div></div>
+              <div class="table-wrap"><table class="data"><thead><tr><th data-i18n="admin.assistants.first_name">First name</th><th data-i18n="common.email">Email</th><th data-i18n="admin.assistants.code">Public ID</th><th data-i18n="common.actions">Actions</th></tr></thead><tbody id="d-assistants"></tbody></table></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="page-section" data-section="clients">
+          <div class="card">
+            <div class="card-head"><div><h2 data-i18n="admin.clients.title">Clients</h2><p data-i18n="admin.clients.subtitle">Review and manage client accounts.</p></div></div>
+            <div class="table-wrap"><table class="data"><thead><tr><th data-i18n="admin.clients.company">Company</th><th data-i18n="admin.clients.contact">Contact</th><th data-i18n="common.email">Email</th><th data-i18n="common.status">Status</th><th data-i18n="common.actions">Actions</th></tr></thead><tbody id="clients-table"></tbody></table></div>
+          </div>
+        </section>
+
+        <section class="page-section" data-section="assistants">
+          <div class="card">
+            <div class="card-head"><div><h2 data-i18n="admin.assistants.title">Assistants</h2><p data-i18n="admin.assistants.subtitle">Review profiles and manage assistants.</p></div></div>
+            <div class="table-wrap"><table class="data"><thead><tr><th data-i18n="admin.assistants.first_name">First name</th><th data-i18n="common.email">Email</th><th data-i18n="common.status">Status</th><th data-i18n="admin.assistants.skills">Skills</th><th data-i18n="common.actions">Actions</th></tr></thead><tbody id="assistants-table"></tbody></table></div>
+          </div>
+        </section>
+
+        <section class="page-section" data-section="jobs">
+          <div class="card">
+            <div class="card-head"><div><h2 data-i18n="admin.jobs.title">Jobs</h2><p data-i18n="admin.jobs.subtitle">Create and publish open roles.</p></div><button class="btn btn-primary btn-sm" id="job-new"><span class="icon" data-icon="plus" data-size="16"></span><span data-i18n="admin.jobs.new">New job</span></button></div>
+            <div class="table-wrap"><table class="data"><thead><tr><th data-i18n="admin.jobs.title_field">Job title</th><th data-i18n="admin.jobs.client">Client</th><th data-i18n="admin.jobs.rate">Assistant rate</th><th data-i18n="common.status">Status</th><th data-i18n="common.actions">Actions</th></tr></thead><tbody id="jobs-table"></tbody></table></div>
+          </div>
+        </section>
+
+        <section class="page-section" data-section="applications">
+          <div class="card">
+            <div class="card-head"><div><h2 data-i18n="admin.applications.title">Applications</h2><p data-i18n="admin.applications.subtitle">Shortlist candidates and send them to the client.</p></div><button class="btn btn-primary btn-sm" id="send-candidates"><span class="icon" data-icon="send" data-size="16"></span><span data-i18n="admin.applications.send">Send to client</span></button></div>
+            <div class="card-body"><select class="select" id="send-client" style="max-width:320px"></select></div>
+            <div class="table-wrap"><table class="data"><thead><tr><th></th><th data-i18n="admin.applications.assistant">Assistant</th><th data-i18n="admin.applications.job">Job</th><th data-i18n="common.status">Status</th><th data-i18n="common.actions">Actions</th></tr></thead><tbody id="apps-table"></tbody></table></div>
+          </div>
+        </section>
+
+        <section class="page-section" data-section="engagements">
+          <div class="card">
+            <div class="card-head"><div><h2 data-i18n="admin.engagements.title">Placements</h2><p data-i18n="admin.engagements.subtitle">Active client-assistant assignments and rates.</p></div><button class="btn btn-primary btn-sm" id="eng-new"><span class="icon" data-icon="plus" data-size="16"></span><span data-i18n="admin.engagements.create">Create placement</span></button></div>
+            <div class="table-wrap"><table class="data"><thead><tr><th data-i18n="admin.engagements.client">Client</th><th data-i18n="admin.engagements.assistant">Assistant</th><th data-i18n="admin.engagements.client_rate">Client rate</th><th data-i18n="admin.engagements.assistant_rate">Assistant rate</th><th data-i18n="admin.engagements.margin">Margin</th><th data-i18n="common.status">Status</th><th data-i18n="common.actions">Actions</th></tr></thead><tbody id="eng-table"></tbody></table></div>
+          </div>
+        </section>
+
+        <section class="page-section" data-section="time">
+          <div class="card">
+            <div class="card-head"><div><h2 data-i18n="admin.time.title">Time entries</h2><p data-i18n="admin.time.subtitle">Review and correct reported hours.</p></div></div>
+            <div class="table-wrap"><table class="data"><thead><tr><th data-i18n="common.date">Date</th><th data-i18n="admin.time.assistant">Assistant</th><th data-i18n="admin.time.client">Client</th><th data-i18n="admin.time.start">Start</th><th data-i18n="admin.time.end">End</th><th data-i18n="common.hours">Hours</th><th data-i18n="common.actions">Actions</th></tr></thead><tbody id="time-table"></tbody></table></div>
+          </div>
+        </section>
+
+        <section class="page-section" data-section="billing">
+          <div class="card">
+            <div class="card-head"><div><h2 data-i18n="admin.billing.title">Billing</h2><p data-i18n="admin.billing.subtitle">Billed hours, assistant pay and margin.</p></div><button class="btn btn-ghost btn-sm" id="billing-csv"><span class="icon" data-icon="fileText" data-size="16"></span><span data-i18n="admin.billing.download">Download CSV</span></button></div>
+            <div class="table-wrap"><table class="data"><thead><tr><th data-i18n="admin.billing.client">Client</th><th data-i18n="admin.billing.assistant">Assistant</th><th data-i18n="common.hours">Hours</th><th data-i18n="admin.billing.client_rate">Client rate</th><th data-i18n="admin.billing.client_amount">Client amount</th><th data-i18n="admin.billing.assistant_rate">Assistant rate</th><th data-i18n="admin.billing.assistant_pay">Assistant pay</th><th data-i18n="admin.billing.margin">Margin</th></tr></thead><tbody id="billing-table"></tbody><tfoot id="billing-foot"></tfoot></table></div>
+          </div>
+        </section>
+
+        <section class="page-section" data-section="settings">
+          <div class="two-col">
+            <div class="card">
+              <div class="card-head"><div><h2 data-i18n="admin.settings.title">Settings</h2><p data-i18n="admin.settings.subtitle">Global portal settings.</p></div></div>
+              <div class="card-body">
+                <form class="stack" id="settings-form">
+                  <div class="field"><label data-i18n="admin.settings.fx">USD to MXN rate</label><input class="input" id="fx-rate" type="number" step="0.01"><p class="tiny muted" data-i18n="admin.settings.fx_note">Used to show assistants an estimated pay in Mexican pesos.</p></div>
+                  <div class="form-actions"><button class="btn btn-primary" id="fx-save"><span class="spinner"></span><span class="btn-label" data-i18n="common.save">Save</span></button></div>
                 </form>
+              </div>
             </div>
-        </div>
-    </dialog>
-
-    <dialog id="reset-dialog">
-        <div class="dialog-body">
-            <div class="window-bar">
-                <div class="traffic"><i></i><i></i><i></i></div>
-                <div class="window-title">Reiniciar base de datos</div>
-                <span style="width:52px"></span>
+            <div class="card">
+              <div class="card-head"><div><h2 data-i18n="admin.settings.password">Change admin password</h2><p data-i18n="admin.settings.password_note">Use at least 8 characters.</p></div></div>
+              <div class="card-body">
+                <form class="stack" id="pass-form">
+                  <div class="field"><label data-i18n="common.current_password">Current password</label><input class="input" type="password" id="p-current" required></div>
+                  <div class="field"><label data-i18n="common.new_password">New password</label><input class="input" type="password" id="p-new" required></div>
+                  <div class="form-actions"><button class="btn btn-primary" id="p-change"><span class="spinner"></span><span class="btn-label" data-i18n="common.save">Save</span></button></div>
+                </form>
+              </div>
             </div>
-            <div class="dialog-content">
-                <h3>Borrar todos los datos</h3>
-                <p class="muted" id="reset-text" style="margin-top:6px;font-size:.85rem"></p>
-                <div class="hint danger-hint" style="margin-top:14px">
-                    <span class="icon" data-icon="alert" data-size="16"></span>
-                    <span>Los clientes y trabajadores deberán volver a registrarse.</span>
-                </div>
-                <div class="field" style="margin-top:16px">
-                    <label for="reset-confirm">Escribe BORRAR TODO para confirmar</label>
-                    <input class="input" id="reset-confirm" autocomplete="off" spellcheck="false" placeholder="BORRAR TODO">
-                </div>
-                <div class="dialog-actions">
-                    <button class="btn btn-ghost" id="reset-cancel" type="button">Cancelar</button>
-                    <button class="btn btn-danger" id="reset-submit" type="button" disabled>
-                        <span class="spinner"></span>
-                        <span class="btn-label">Borrar todo</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </dialog>
-
-    <script type="module">
-        import {
-            api, bootstrap, money, hours, fmtDate, fmtTime, escapeHtml, initials,
-            requireRole, handleAuthFailure, setLoading, toast, animateNumber, hydrateIcons,
-            clearSession
-        } from './app.js';
-
-        await bootstrap();
-        const session = requireRole('admin', 'admin-login.html', api.secure);
-
-        if (session) {
-            const state = { data: { clientes: [], trabajadores: [], jornadas: [] }, section: 'resumen' };
-
-            const titles = {
-                resumen: ['Resumen general', 'Todo lo que está pasando en tu negocio.'],
-                clientes: ['Clientes', 'Crea accesos y revisa el consumo de cada empresa.'],
-                trabajadores: ['Trabajadores', 'Altas, tarifas, asignaciones y estado.'],
-                jornadas: ['Jornadas', 'Todas las horas registradas, con filtros y totales.'],
-                ajustes: ['Ajustes', 'Configuración general y mantenimiento de los datos.']
-            };
-
-            const sectionIds = ['resumen', 'clientes', 'trabajadores', 'jornadas', 'ajustes'];
-
-            function groupByTrabajador(jornadas) {
-                const map = new Map();
-                jornadas.forEach(j => {
-                    if (!map.has(j.trabajador_id)) map.set(j.trabajador_id, []);
-                    map.get(j.trabajador_id).push(j);
-                });
-                return map;
-            }
-
-            function setSection(name, updateHash = true) {
-                if (!sectionIds.includes(name)) name = 'resumen';
-                state.section = name;
-                document.querySelectorAll('.section').forEach(section => {
-                    section.classList.toggle('active', section.id === `section-${name}`);
-                });
-                document.querySelectorAll('.nav-item').forEach(item => {
-                    item.classList.toggle('active', item.dataset.section === name);
-                });
-                document.getElementById('page-title').textContent = titles[name][0];
-                document.getElementById('page-subtitle').textContent = titles[name][1];
-                if (updateHash) history.replaceState(null, '', `#${name}`);
-                closeMenu();
-            }
-
-            function openMenu() {
-                document.getElementById('sidebar').classList.add('open');
-                document.getElementById('scrim').classList.add('show');
-            }
-
-            function closeMenu() {
-                document.getElementById('sidebar').classList.remove('open');
-                document.getElementById('scrim').classList.remove('show');
-            }
-
-            function emptyRow(colspan, message) {
-                return `<tr><td colspan="${colspan}"><div class="empty"><span class="icon" data-icon="chart" data-size="26"></span>${message}</div></td></tr>`;
-            }
-
-            async function loadData(showToast = false) {
-                const refresh = document.getElementById('refresh-btn');
-                setLoading(refresh, true);
-                try {
-                    state.data = await api.adminData(session);
-                    renderAll();
-                    if (showToast) toast('Datos actualizados.', 'ok');
-                } catch (error) {
-                    if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
-                    toast(error.message, 'err');
-                } finally {
-                    setLoading(refresh, false);
-                }
-            }
-
-            function renderAll() {
-                renderStats();
-                renderRecent();
-                renderTopClients();
-                renderClientes();
-                renderTrabajadores();
-                renderJornadas();
-                renderSelects();
-                renderResetInfo();
-                hydrateIcons();
-            }
-
-            function renderResetInfo() {
-                const { clientes, trabajadores, jornadas } = state.data;
-                const resumen = `${clientes.length} ${clientes.length === 1 ? 'cliente' : 'clientes'}, ${trabajadores.length} ${trabajadores.length === 1 ? 'trabajador' : 'trabajadores'} y ${jornadas.length} ${jornadas.length === 1 ? 'jornada' : 'jornadas'}`;
-                document.getElementById('reset-summary').textContent = `Actualmente hay ${resumen}.`;
-                document.getElementById('reset-text').textContent = `Se eliminarán ${resumen} y todas las sesiones activas. No se puede deshacer.`;
-            }
-
-            function renderStats() {
-                const { clientes, trabajadores, jornadas } = state.data;
-                const archivados = trabajadores.filter(t => t.archivado).length;
-                const activos = trabajadores.filter(t => !t.archivado && t.activo !== false).length;
-                const inactivos = trabajadores.length - archivados - activos;
-                const totalHoras = jornadas.reduce((sum, j) => sum + j.horas_calculadas, 0);
-                const totalPago = jornadas.reduce((sum, j) => sum + j.horas_calculadas * j.tarifa_hora, 0);
-
-                animateNumber(document.getElementById('stat-clientes'), clientes.length, value => Math.round(value).toString());
-                document.getElementById('stat-clientes-sub').textContent = clientes.length === 1 ? '1 empresa registrada' : `${clientes.length} empresas registradas`;
-
-                animateNumber(document.getElementById('stat-trabajadores'), trabajadores.length, value => Math.round(value).toString());
-                document.getElementById('stat-trabajadores-sub').textContent = `${activos} activos - ${inactivos} inactivos - ${archivados} archivados`;
-
-                animateNumber(document.getElementById('stat-horas'), totalHoras, hours);
-                document.getElementById('stat-horas-sub').textContent = `${jornadas.length} jornadas registradas`;
-
-                animateNumber(document.getElementById('stat-total'), totalPago, money);
-                const mes = new Date().toISOString().slice(0, 7);
-                const horasMes = jornadas.filter(j => String(j.fecha).slice(0, 7) === mes).reduce((sum, j) => sum + j.horas_calculadas, 0);
-                document.getElementById('stat-total-sub').textContent = `${horasMes.toFixed(1)} h este mes`;
-            }
-
-            function renderRecent() {
-                const tbody = document.getElementById('recent-jornadas');
-                const rows = [...state.data.jornadas]
-                    .sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)))
-                    .slice(0, 8);
-                tbody.innerHTML = rows.map(j => `
-                    <tr>
-                        <td class="num">${fmtDate(j.fecha)}</td>
-                        <td>${escapeHtml(j.trabajador_nombre)}</td>
-                        <td>${escapeHtml(j.cliente_nombre)}</td>
-                        <td class="num">${hours(j.horas_calculadas)}</td>
-                        <td class="num">${money(j.horas_calculadas * j.tarifa_hora)}</td>
-                    </tr>
-                `).join('') || emptyRow(5, 'Aún no hay jornadas registradas.');
-            }
-
-            function renderTopClients() {
-                const items = state.data.clientes.map(cliente => {
-                    const workers = state.data.trabajadores.filter(t => t.cliente_id === cliente.id);
-                    const rows = state.data.jornadas.filter(j => j.cliente_id === cliente.id);
-                    const totalHoras = rows.reduce((sum, j) => sum + j.horas_calculadas, 0);
-                    const pago = rows.reduce((sum, j) => sum + j.horas_calculadas * j.tarifa_hora, 0);
-                    return { cliente, workers: workers.length, totalHoras, pago };
-                }).sort((a, b) => b.pago - a.pago).slice(0, 5);
-
-                const container = document.getElementById('top-clientes');
-                container.innerHTML = items.length ? `<div class="detail-list">${items.map(item => `
-                    <div class="detail-item">
-                        <div class="who">
-                            <strong>${escapeHtml(item.cliente.empresa)}</strong>
-                            <span>${item.workers} ${item.workers === 1 ? 'trabajador' : 'trabajadores'} - ${hours(item.totalHoras)}</span>
-                        </div>
-                        <strong class="num">${money(item.pago)}</strong>
-                    </div>
-                `).join('')}</div>` : '<div class="empty"><span class="icon" data-icon="building" data-size="26"></span>Sin clientes todavía.</div>';
-            }
-
-            function renderClientes() {
-                const tbody = document.getElementById('tabla-clientes');
-                const rows = state.data.clientes.map(cliente => {
-                    const workers = state.data.trabajadores.filter(t => t.cliente_id === cliente.id);
-                    const jornadas = state.data.jornadas.filter(j => j.cliente_id === cliente.id);
-                    const totalHoras = jornadas.reduce((sum, j) => sum + j.horas_calculadas, 0);
-                    const pago = jornadas.reduce((sum, j) => sum + j.horas_calculadas * j.tarifa_hora, 0);
-                    return `
-                        <tr>
-                            <td>
-                                <div style="display:flex;align-items:center;gap:9px">
-                                    <span class="avatar">${escapeHtml(initials(cliente.nombre))}</span>
-                                    <span>${escapeHtml(cliente.nombre)}</span>
-                                </div>
-                            </td>
-                            <td>${escapeHtml(cliente.empresa)}</td>
-                            <td class="muted">${escapeHtml(cliente.email)}</td>
-                            <td class="num">${workers.length}</td>
-                            <td class="num">${hours(totalHoras)}</td>
-                            <td class="num"><strong>${money(pago)}</strong></td>
-                            <td>
-                                <div class="row-actions">
-                                    <button class="btn btn-icon btn-ghost" data-edit-cliente="${cliente.id}" title="Editar cliente" aria-label="Editar cliente">
-                                        <span class="icon" data-icon="pencil" data-size="16"></span>
-                                    </button>
-                                    <button class="btn btn-icon btn-ghost" data-delete-cliente="${cliente.id}" title="Eliminar cliente" aria-label="Eliminar cliente">
-                                        <span class="icon" data-icon="trash" data-size="16"></span>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>`;
-                }).join('');
-                tbody.innerHTML = rows || emptyRow(7, 'Crea tu primer cliente con el formulario.');
-                document.getElementById('clientes-count').textContent = `${state.data.clientes.length} en total`;
-                hydrateIcons(tbody);
-            }
-
-            function renderTrabajadores() {
-                const groups = groupByTrabajador(state.data.jornadas);
-                const tbody = document.getElementById('tabla-trabajadores');
-                const search = document.getElementById('worker-search').value.trim().toLowerCase();
-                const clientFilter = document.getElementById('worker-client-filter').value;
-                const statusFilter = document.getElementById('worker-status-filter').value;
-
-                const visible = state.data.trabajadores.filter(t => {
-                    if (search && !`${t.nombre} ${t.email}`.toLowerCase().includes(search)) return false;
-                    if (clientFilter && t.cliente_id !== clientFilter) return false;
-                    const archivado = t.archivado === true;
-                    if (statusFilter === 'archivados') return archivado;
-                    if (archivado) return false;
-                    if (statusFilter === 'activos' && t.activo === false) return false;
-                    if (statusFilter === 'inactivos' && t.activo !== false) return false;
-                    return true;
-                });
-
-                const rows = visible.map(t => {
-                    const jornadas = groups.get(t.id) || [];
-                    const totalHoras = jornadas.reduce((sum, j) => sum + j.horas_calculadas, 0);
-                    const pago = jornadas.reduce((sum, j) => sum + j.horas_calculadas * j.tarifa_hora, 0);
-                    const activo = t.activo !== false;
-                    const archivado = t.archivado === true;
-                    const estado = archivado ? 'Archivado' : activo ? 'Activo' : 'Inactivo';
-                    const badge = archivado ? 'warn' : activo ? 'ok' : 'off';
-                    return `
-                        <tr>
-                            <td>
-                                <div style="display:flex;align-items:center;gap:9px">
-                                    <span class="avatar">${escapeHtml(initials(t.nombre))}</span>
-                                    <div>
-                                        <div>${escapeHtml(t.nombre)}</div>
-                                        <div class="muted" style="font-size:.73rem">${escapeHtml(t.email)}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>${escapeHtml(t.cliente_nombre)}</td>
-                            <td class="num">${money(t.tarifa_hora)}/h</td>
-                            <td class="num">${hours(totalHoras)}</td>
-                            <td class="num"><strong>${money(pago)}</strong></td>
-                            <td><span class="badge ${badge}"><i></i>${estado}</span></td>
-                            <td>
-                                <div class="row-actions">
-                                    <button class="btn btn-icon btn-ghost" data-edit-worker="${t.id}" title="Editar trabajador" aria-label="Editar trabajador">
-                                        <span class="icon" data-icon="pencil" data-size="16"></span>
-                                    </button>
-                                    ${archivado
-                                        ? `<button class="btn btn-icon btn-ghost" data-restore-worker="${t.id}" title="Restaurar trabajador" aria-label="Restaurar trabajador">
-                                               <span class="icon" data-icon="restore" data-size="16"></span>
-                                           </button>`
-                                        : `<button class="btn btn-icon btn-ghost" data-archive-worker="${t.id}" title="Archivar trabajador" aria-label="Archivar trabajador">
-                                               <span class="icon" data-icon="archive" data-size="16"></span>
-                                           </button>
-                                           <button class="btn btn-sm ${activo ? 'btn-danger' : ''}" data-toggle-worker="${t.id}" data-active="${activo}">
-                                               ${activo ? 'Desactivar' : 'Activar'}
-                                           </button>`}
-                                </div>
-                            </td>
-                        </tr>`;
-                }).join('');
-
-                tbody.innerHTML = rows || emptyRow(7, visible.length ? 'Ningún trabajador coincide con los filtros.' : 'Crea tu primer trabajador con el formulario.');
-                const archivados = state.data.trabajadores.filter(t => t.archivado).length;
-                const activos = state.data.trabajadores.filter(t => !t.archivado && t.activo !== false).length;
-                document.getElementById('trabajadores-count').textContent =
-                    `${state.data.trabajadores.length} en total - ${activos} activos - ${archivados} archivados`;
-                hydrateIcons(tbody);
-            }
-
-            function jornadaMonto(j) {
-                return j.horas_calculadas * j.tarifa_hora;
-            }
-
-            function filteredJornadas() {
-                const search = document.getElementById('j-search').value.trim().toLowerCase();
-                const client = document.getElementById('j-client').value;
-                const worker = document.getElementById('j-worker').value;
-                const from = document.getElementById('j-from').value;
-                const to = document.getElementById('j-to').value;
-
-                return state.data.jornadas.filter(j => {
-                    if (client && j.cliente_id !== client) return false;
-                    if (worker && j.trabajador_id !== worker) return false;
-                    if (from && String(j.fecha).slice(0, 10) < from) return false;
-                    if (to && String(j.fecha).slice(0, 10) > to) return false;
-                    if (search && !`${j.trabajador_nombre} ${j.cliente_nombre} ${j.notas || ''}`.toLowerCase().includes(search)) return false;
-                    return true;
-                }).sort((a, b) => String(b.fecha).localeCompare(String(a.fecha)));
-            }
-
-            function renderJornadas() {
-                const rows = filteredJornadas();
-                const tbody = document.getElementById('tabla-jornadas');
-
-                tbody.innerHTML = rows.map(j => `
-                    <tr>
-                        <td class="num">${fmtDate(j.fecha)}</td>
-                        <td>${escapeHtml(j.trabajador_nombre)}</td>
-                        <td>${escapeHtml(j.cliente_nombre)}</td>
-                        <td class="num">${fmtTime(j.hora_entrada)}</td>
-                        <td class="num">${fmtTime(j.hora_salida)}</td>
-                        <td class="num">${Number(j.minutos_lunch) || 0} min</td>
-                        <td class="num">${hours(j.horas_calculadas)}</td>
-                        <td class="num"><strong>${money(jornadaMonto(j))}</strong></td>
-                        <td class="muted" style="max-width:180px;overflow:hidden;text-overflow:ellipsis" title="${escapeHtml(j.notas || '')}">${escapeHtml(j.notas || '-')}</td>
-                        <td>
-                            <button class="btn btn-icon btn-ghost" data-delete-jornada="${j.id}" aria-label="Eliminar jornada">
-                                <span class="icon" data-icon="trash" data-size="16"></span>
-                            </button>
-                        </td>
-                    </tr>
-                `).join('') || emptyRow(10, 'No hay jornadas con esos filtros.');
-
-                const totalHoras = rows.reduce((sum, j) => sum + j.horas_calculadas, 0);
-                const total = rows.reduce((sum, j) => sum + jornadaMonto(j), 0);
-                document.getElementById('j-resumen-count').textContent = `${rows.length} ${rows.length === 1 ? 'jornada' : 'jornadas'}`;
-                document.getElementById('j-resumen-horas').textContent = hours(totalHoras);
-                document.getElementById('j-resumen-total').textContent = money(total);
-                hydrateIcons(tbody);
-            }
-
-            function renderSelects() {
-                const clientOptions = state.data.clientes
-                    .map(c => `<option value="${c.id}">${escapeHtml(c.empresa)}</option>`)
-                    .join('');
-
-                document.getElementById('t-cliente').innerHTML = '<option value="">- Selecciona cliente -</option>' + clientOptions;
-
-                const workerFilterClient = document.getElementById('worker-client-filter');
-                const currentWorkerFilter = workerFilterClient.value;
-                workerFilterClient.innerHTML = '<option value="">Todos</option>' + clientOptions;
-                workerFilterClient.value = currentWorkerFilter;
-
-                const jClient = document.getElementById('j-client');
-                const currentClient = jClient.value;
-                jClient.innerHTML = '<option value="">Todos</option>' + clientOptions;
-                jClient.value = currentClient;
-
-                const editCliente = document.getElementById('edit-cliente');
-                const currentEditCliente = editCliente.value;
-                editCliente.innerHTML = '<option value="">- Selecciona cliente -</option>' + clientOptions;
-                editCliente.value = currentEditCliente;
-
-                updateWorkerOptions();
-            }
-
-            function updateWorkerOptions() {
-                const clientId = document.getElementById('j-client').value;
-                const select = document.getElementById('j-worker');
-                const current = select.value;
-                const workers = state.data.trabajadores.filter(t => !clientId || t.cliente_id === clientId);
-                select.innerHTML = '<option value="">Todos</option>' + workers
-                    .map(t => `<option value="${t.id}">${escapeHtml(t.nombre)}</option>`)
-                    .join('');
-                select.value = workers.some(t => t.id === current) ? current : '';
-            }
-
-            async function submitCliente(event) {
-                event.preventDefault();
-                const button = document.getElementById('c-submit');
-                const payload = {
-                    nombre: document.getElementById('c-nombre').value.trim(),
-                    empresa: document.getElementById('c-empresa').value.trim(),
-                    email: document.getElementById('c-email').value.trim(),
-                    password: document.getElementById('c-pass').value
-                };
-                if (!payload.nombre || !payload.empresa || !payload.email || !payload.password) {
-                    toast('Completa todos los campos.', 'err');
-                    return;
-                }
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
-                    toast('Escribe un email válido.', 'err');
-                    return;
-                }
-                if (payload.password.length < 6) {
-                    toast('La contraseña debe tener al menos 6 caracteres.', 'err');
-                    return;
-                }
-                setLoading(button, true);
-                try {
-                    await api.createCliente(payload, session);
-                    document.getElementById('client-form').reset();
-                    toast('Cliente creado correctamente.', 'ok');
-                    await loadData();
-                } catch (error) {
-                    if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
-                    toast(error.message, 'err');
-                } finally {
-                    setLoading(button, false);
-                }
-            }
-
-            async function submitTrabajador(event) {
-                event.preventDefault();
-                const button = document.getElementById('t-submit');
-                const tarifa = Number(document.getElementById('t-tarifa').value);
-                const payload = {
-                    nombre: document.getElementById('t-nombre').value.trim(),
-                    email: document.getElementById('t-email').value.trim(),
-                    password: document.getElementById('t-pass').value,
-                    tarifa_hora: tarifa,
-                    cliente_id: document.getElementById('t-cliente').value
-                };
-                if (!payload.nombre || !payload.email || !payload.password || !payload.cliente_id) {
-                    toast('Completa todos los campos y asigna un cliente.', 'err');
-                    return;
-                }
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
-                    toast('Escribe un email válido.', 'err');
-                    return;
-                }
-                if (payload.password.length < 6) {
-                    toast('La contraseña debe tener al menos 6 caracteres.', 'err');
-                    return;
-                }
-                if (!Number.isFinite(tarifa) || tarifa <= 0) {
-                    toast('La tarifa debe ser mayor que cero.', 'err');
-                    return;
-                }
-                setLoading(button, true);
-                try {
-                    await api.createTrabajador(payload, session);
-                    document.getElementById('worker-form').reset();
-                    document.getElementById('t-tarifa').value = '10';
-                    toast('Trabajador creado correctamente.', 'ok');
-                    await loadData();
-                } catch (error) {
-                    if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
-                    toast(error.message, 'err');
-                } finally {
-                    setLoading(button, false);
-                }
-            }
-
-            function confirmAction({ title, text, okLabel = 'Eliminar' }) {
-                const dialog = document.getElementById('confirm-dialog');
-                document.getElementById('confirm-title').textContent = title;
-                document.getElementById('confirm-text').textContent = text;
-                const ok = document.getElementById('confirm-ok');
-                const cancel = document.getElementById('confirm-cancel');
-                ok.textContent = okLabel;
-                dialog.showModal();
-                return new Promise(resolve => {
-                    const finish = value => {
-                        dialog.close();
-                        ok.removeEventListener('click', onOk);
-                        cancel.removeEventListener('click', onCancel);
-                        resolve(value);
-                    };
-                    const onOk = () => finish(true);
-                    const onCancel = () => finish(false);
-                    ok.addEventListener('click', onOk);
-                    cancel.addEventListener('click', onCancel);
-                    dialog.addEventListener('cancel', () => finish(false), { once: true });
-                });
-            }
-
-            const editDialog = document.getElementById('edit-dialog');
-            const editForm = document.getElementById('edit-form');
-
-            function fillEditClientOptions(selectedId) {
-                const select = document.getElementById('edit-cliente');
-                select.innerHTML = '<option value="">- Selecciona cliente -</option>' +
-                    state.data.clientes.map(c => `<option value="${c.id}">${escapeHtml(c.empresa)}</option>`).join('');
-                select.value = selectedId || '';
-            }
-
-            function openEditCliente(id) {
-                const cliente = state.data.clientes.find(c => c.id === id);
-                if (!cliente) return;
-                editDialog.dataset.kind = 'cliente';
-                editDialog.dataset.id = cliente.id;
-                document.getElementById('edit-window-title').textContent = 'Editar cliente';
-                document.getElementById('edit-title').textContent = cliente.empresa || cliente.nombre;
-                document.getElementById('edit-sub').textContent = 'Actualiza los datos de acceso de la empresa.';
-                document.getElementById('edit-empresa-field').classList.remove('hidden');
-                document.getElementById('edit-worker-fields').classList.add('hidden');
-                document.getElementById('edit-nombre').value = cliente.nombre || '';
-                document.getElementById('edit-empresa').value = cliente.empresa || '';
-                document.getElementById('edit-email').value = cliente.email || '';
-                document.getElementById('edit-tarifa').value = '';
-                fillEditClientOptions('');
-                document.getElementById('edit-pass').value = '';
-                document.getElementById('edit-hint-text').textContent = 'Si cambiás la contraseña, se cerrarán las sesiones abiertas de este cliente.';
-                if (!editDialog.open) editDialog.showModal();
-                setTimeout(() => document.getElementById('edit-nombre').focus(), 60);
-            }
-
-            function openEditTrabajador(id) {
-                const worker = state.data.trabajadores.find(t => t.id === id);
-                if (!worker) return;
-                editDialog.dataset.kind = 'trabajador';
-                editDialog.dataset.id = worker.id;
-                document.getElementById('edit-window-title').textContent = 'Editar trabajador';
-                document.getElementById('edit-title').textContent = worker.nombre || 'Trabajador';
-                document.getElementById('edit-sub').textContent = 'Actualiza sus datos, tarifa y cliente asignado.';
-                document.getElementById('edit-empresa-field').classList.add('hidden');
-                document.getElementById('edit-worker-fields').classList.remove('hidden');
-                document.getElementById('edit-nombre').value = worker.nombre || '';
-                document.getElementById('edit-email').value = worker.email || '';
-                document.getElementById('edit-tarifa').value = worker.tarifa_hora;
-                fillEditClientOptions(worker.cliente_id);
-                document.getElementById('edit-pass').value = '';
-                document.getElementById('edit-hint-text').textContent = 'La nueva tarifa solo se aplica a las jornadas nuevas. Si cambiás el cliente, las jornadas anteriores quedan con el cliente anterior. Al cambiar la contraseña se cierran sus sesiones.';
-                if (!editDialog.open) editDialog.showModal();
-                setTimeout(() => document.getElementById('edit-nombre').focus(), 60);
-            }
-
-            document.getElementById('edit-cancel').addEventListener('click', () => editDialog.close());
-
-            editForm.addEventListener('submit', async event => {
-                event.preventDefault();
-                const kind = editDialog.dataset.kind;
-                const id = editDialog.dataset.id;
-                if (!kind || !id) return;
-
-                const nombre = document.getElementById('edit-nombre').value.trim();
-                const email = document.getElementById('edit-email').value.trim();
-                const password = document.getElementById('edit-pass').value;
-
-                if (!nombre || !email) {
-                    toast('Completa nombre y email.', 'err');
-                    return;
-                }
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                    toast('Escribe un email válido.', 'err');
-                    return;
-                }
-                if (password && password.length < 6) {
-                    toast('La contraseña debe tener al menos 6 caracteres.', 'err');
-                    return;
-                }
-
-                let payload;
-                if (kind === 'cliente') {
-                    const empresa = document.getElementById('edit-empresa').value.trim();
-                    if (!empresa) {
-                        toast('Completa la empresa.', 'err');
-                        return;
-                    }
-                    payload = { id, nombre, empresa, email, password };
-                } else {
-                    const tarifa = Number(document.getElementById('edit-tarifa').value);
-                    const clienteId = document.getElementById('edit-cliente').value;
-                    if (!clienteId) {
-                        toast('Asigna un cliente.', 'err');
-                        return;
-                    }
-                    if (!Number.isFinite(tarifa) || tarifa <= 0) {
-                        toast('La tarifa debe ser mayor que cero.', 'err');
-                        return;
-                    }
-                    payload = { id, nombre, email, tarifa_hora: tarifa, cliente_id: clienteId, password };
-                }
-
-                const button = document.getElementById('edit-save');
-                setLoading(button, true);
-                try {
-                    if (kind === 'cliente') {
-                        await api.updateCliente(payload, session);
-                    } else {
-                        await api.updateTrabajador(payload, session);
-                    }
-                    editDialog.close();
-                    toast('Datos actualizados correctamente.', 'ok');
-                    await loadData();
-                } catch (error) {
-                    if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
-                    toast(error.message, 'err');
-                } finally {
-                    setLoading(button, false);
-                }
-            });
-
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', () => setSection(item.dataset.section));
-            });
-
-            document.querySelectorAll('[data-goto]').forEach(item => {
-                item.addEventListener('click', () => setSection(item.dataset.goto));
-            });
-
-            document.getElementById('menu-btn').addEventListener('click', openMenu);
-            document.getElementById('scrim').addEventListener('click', closeMenu);
-            document.getElementById('logout-btn').addEventListener('click', async () => {
-                await api.logout('admin');
-                location.replace('admin-login.html');
-            });
-            document.getElementById('refresh-btn').addEventListener('click', () => loadData(true));
-
-            document.getElementById('client-form').addEventListener('submit', submitCliente);
-            document.getElementById('worker-form').addEventListener('submit', submitTrabajador);
-
-            document.getElementById('worker-search').addEventListener('input', renderTrabajadores);
-            document.getElementById('worker-client-filter').addEventListener('change', renderTrabajadores);
-            document.getElementById('worker-status-filter').addEventListener('change', renderTrabajadores);
-
-            document.getElementById('tabla-clientes').addEventListener('click', async event => {
-                const editButton = event.target.closest('[data-edit-cliente]');
-                if (editButton) {
-                    openEditCliente(editButton.dataset.editCliente);
-                    return;
-                }
-
-                const deleteButton = event.target.closest('[data-delete-cliente]');
-                if (!deleteButton) return;
-                const cliente = state.data.clientes.find(c => c.id === deleteButton.dataset.deleteCliente);
-                if (!cliente) return;
-
-                const workers = state.data.trabajadores.filter(t => t.cliente_id === cliente.id).length;
-                if (workers > 0) {
-                    toast(`No se puede eliminar: tiene ${workers} ${workers === 1 ? 'trabajador' : 'trabajadores'}. Reasígnalos a otro cliente primero.`, 'err', 6000);
-                    return;
-                }
-
-                const confirmed = await confirmAction({
-                    title: 'Eliminar cliente',
-                    text: `Se eliminará el acceso de ${cliente.empresa}. Esta acción no se puede deshacer.`,
-                    okLabel: 'Eliminar'
-                });
-                if (!confirmed) return;
-
-                deleteButton.disabled = true;
-                try {
-                    await api.deleteCliente(cliente.id, session);
-                    toast('Cliente eliminado.', 'ok');
-                    await loadData();
-                } catch (error) {
-                    if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
-                    toast(error.message, 'err');
-                    deleteButton.disabled = false;
-                }
-            });
-
-            document.getElementById('tabla-trabajadores').addEventListener('click', async event => {
-                const editButton = event.target.closest('[data-edit-worker]');
-                if (editButton) {
-                    openEditTrabajador(editButton.dataset.editWorker);
-                    return;
-                }
-
-                const archiveButton = event.target.closest('[data-archive-worker]');
-                if (archiveButton) {
-                    const worker = state.data.trabajadores.find(t => t.id === archiveButton.dataset.archiveWorker);
-                    if (!worker) return;
-                    if (worker.activo !== false) {
-                        toast('Desactiva al trabajador antes de archivarlo.', 'err');
-                        return;
-                    }
-                    const count = state.data.jornadas.filter(j => j.trabajador_id === worker.id).length;
-                    const confirmed = await confirmAction({
-                        title: 'Archivar trabajador',
-                        text: `${worker.nombre} saldrá de la lista y no podrá iniciar sesión. Sus ${count} ${count === 1 ? 'jornada se conservará' : 'jornadas se conservarán'} y seguirán visibles para el cliente.`,
-                        okLabel: 'Archivar'
-                    });
-                    if (!confirmed) return;
-                    archiveButton.disabled = true;
-                    try {
-                        await api.archiveTrabajador(worker.id, session);
-                        toast('Trabajador archivado.', 'ok');
-                        await loadData();
-                    } catch (error) {
-                        if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
-                        toast(error.message, 'err');
-                        archiveButton.disabled = false;
-                    }
-                    return;
-                }
-
-                const restoreButton = event.target.closest('[data-restore-worker]');
-                if (restoreButton) {
-                    restoreButton.disabled = true;
-                    try {
-                        await api.restoreTrabajador(restoreButton.dataset.restoreWorker, session);
-                        toast('Trabajador restaurado. Ahora puedes activarlo.', 'ok');
-                        await loadData();
-                    } catch (error) {
-                        if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
-                        toast(error.message, 'err');
-                        restoreButton.disabled = false;
-                    }
-                    return;
-                }
-
-                const toggleButton = event.target.closest('[data-toggle-worker]');
-                if (!toggleButton) return;
-                const id = toggleButton.dataset.toggleWorker;
-                const activo = toggleButton.dataset.active === 'true';
-                toggleButton.disabled = true;
-                try {
-                    await api.setTrabajadorActivo(id, !activo, session);
-                    toast(activo ? 'Trabajador desactivado.' : 'Trabajador activado.', 'ok');
-                    await loadData();
-                } catch (error) {
-                    if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
-                    toast(error.message, 'err');
-                    toggleButton.disabled = false;
-                }
-            });
-
-            ['j-search', 'j-from', 'j-to'].forEach(id => {
-                const el = document.getElementById(id);
-                el.addEventListener(id === 'j-search' ? 'input' : 'change', renderJornadas);
-            });
-            document.getElementById('j-client').addEventListener('change', () => {
-                updateWorkerOptions();
-                renderJornadas();
-            });
-            document.getElementById('j-worker').addEventListener('change', renderJornadas);
-            document.getElementById('j-clear').addEventListener('click', () => {
-                ['j-search', 'j-from', 'j-to'].forEach(id => { document.getElementById(id).value = ''; });
-                document.getElementById('j-client').value = '';
-                updateWorkerOptions();
-                renderJornadas();
-            });
-
-            document.getElementById('tabla-jornadas').addEventListener('click', async event => {
-                const button = event.target.closest('[data-delete-jornada]');
-                if (!button) return;
-                const confirmed = await confirmAction({
-                    title: 'Eliminar jornada',
-                    text: 'Se borrará este registro de horas de forma permanente.',
-                    okLabel: 'Eliminar'
-                });
-                if (!confirmed) return;
-                button.disabled = true;
-                try {
-                    await api.deleteJornada(button.dataset.deleteJornada, session, true);
-                    toast('Jornada eliminada.', 'ok');
-                    await loadData();
-                } catch (error) {
-                    if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
-                    toast(error.message, 'err');
-                    button.disabled = false;
-                }
-            });
-
-            const resetDialog = document.getElementById('reset-dialog');
-            const resetInput = document.getElementById('reset-confirm');
-            const resetSubmit = document.getElementById('reset-submit');
-
-            document.getElementById('reset-open').addEventListener('click', () => {
-                renderResetInfo();
-                resetInput.value = '';
-                resetSubmit.disabled = true;
-                resetDialog.showModal();
-                setTimeout(() => resetInput.focus(), 60);
-            });
-
-            document.getElementById('reset-cancel').addEventListener('click', () => resetDialog.close());
-
-            resetInput.addEventListener('input', () => {
-                resetSubmit.disabled = resetInput.value.trim().toUpperCase() !== 'BORRAR TODO';
-            });
-
-            resetInput.addEventListener('keydown', event => {
-                if (event.key === 'Enter' && !resetSubmit.disabled) {
-                    event.preventDefault();
-                    resetSubmit.click();
-                }
-            });
-
-            resetSubmit.addEventListener('click', async () => {
-                if (resetSubmit.disabled) return;
-                setLoading(resetSubmit, true);
-                try {
-                    await api.resetDatabase(resetInput.value.trim(), session);
-                    clearSession();
-                    resetDialog.close();
-                    toast('Base de datos reiniciada. Inicia sesión de nuevo.', 'ok', 3000);
-                    setTimeout(() => location.replace('admin-login.html'), 900);
-                } catch (error) {
-                    if (handleAuthFailure(error, 'admin-login.html', 'admin')) return;
-                    toast(error.message, 'err');
-                    setLoading(resetSubmit, false);
-                }
-            });
-
-            window.addEventListener('hashchange', () => {
-                setSection(location.hash.replace('#', ''), false);
-            });
-
-            hydrateIcons();
-            setSection(location.hash.replace('#', '') || 'resumen', false);
-
-            const securityBadge = document.getElementById('security-badge');
-            if (api.secure) {
-                securityBadge.className = 'badge ok';
-                securityBadge.innerHTML = '<i></i> Modo seguro';
-            } else {
-                securityBadge.className = 'badge off';
-                securityBadge.innerHTML = '<i></i> Modo demo';
-                securityBadge.title = 'Las tablas siguen abiertas a la clave pública. Aplica supabase/hardening.sql para activar RLS y sesiones.';
-            }
-
-            await loadData();
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+  <div class="toasts"></div>
+
+  <dialog id="job-dialog">
+    <div class="dialog-body">
+      <div class="window-bar"><div class="traffic"><i></i><i></i><i></i></div><div class="window-title" data-i18n="admin.jobs.new">New job</div><button class="ghost-icon" onclick="jobDialog.close()"><span class="icon" data-icon="x" data-size="16"></span></button></div>
+      <div class="dialog-content">
+        <form class="stack" id="job-form">
+          <input type="hidden" id="job-id">
+          <div class="field"><label data-i18n="admin.jobs.title_field">Job title</label><input class="input" id="job-title" required></div>
+          <div class="field"><label data-i18n="admin.jobs.client">Client (optional)</label><select class="select" id="job-client"><option value="">-</option></select></div>
+          <div class="field"><label data-i18n="admin.jobs.description">Description</label><textarea class="textarea" id="job-desc"></textarea></div>
+          <div class="field"><label data-i18n="admin.jobs.schedule">Schedule</label><input class="input" id="job-sched"></div>
+          <div class="field"><label data-i18n="admin.jobs.rate">Assistant rate (USD)</label><input class="input" id="job-rate" type="number" step="0.01"></div>
+          <div class="field"><label data-i18n="common.status">Status</label><select class="select" id="job-status"><option value="draft">draft</option><option value="open">open</option><option value="paused">paused</option><option value="closed">closed</option></select></div>
+          <div class="dialog-actions"><button class="btn btn-ghost" type="button" onclick="jobDialog.close()" data-i18n="common.cancel">Cancel</button><button class="btn btn-primary" id="job-save"><span class="spinner"></span><span class="btn-label" data-i18n="common.save">Save</span></button></div>
+        </form>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="eng-dialog">
+    <div class="dialog-body">
+      <div class="window-bar"><div class="traffic"><i></i><i></i><i></i></div><div class="window-title" data-i18n="admin.engagements.create">Create placement</div><button class="ghost-icon" onclick="engDialog.close()"><span class="icon" data-icon="x" data-size="16"></span></button></div>
+      <div class="dialog-content">
+        <form class="stack" id="eng-form">
+          <div class="form-grid">
+            <div class="field"><label data-i18n="admin.engagements.client">Client</label><select class="select" id="eng-client" required></select></div>
+            <div class="field"><label data-i18n="admin.engagements.assistant">Assistant</label><select class="select" id="eng-assistant" required></select></div>
+            <div class="field"><label data-i18n="admin.engagements.client_rate">Client rate (USD/h)</label><input class="input" id="eng-cr" type="number" step="0.01" required></div>
+            <div class="field"><label data-i18n="admin.engagements.assistant_rate">Assistant rate (USD/h)</label><input class="input" id="eng-ar" type="number" step="0.01" required></div>
+            <div class="field"><label data-i18n="admin.engagements.start">Start date</label><input class="input" type="date" id="eng-start"></div>
+            <div class="field"><label data-i18n="admin.engagements.end">End date</label><input class="input" type="date" id="eng-end"></div>
+          </div>
+          <div class="dialog-actions"><button class="btn btn-ghost" type="button" onclick="engDialog.close()" data-i18n="common.cancel">Cancel</button><button class="btn btn-primary" id="eng-save"><span class="spinner"></span><span class="btn-label" data-i18n="common.save">Save</span></button></div>
+        </form>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="review-dialog">
+    <div class="dialog-body">
+      <div class="window-bar"><div class="traffic"><i></i><i></i><i></i></div><div class="window-title" id="review-title">Review</div><button class="ghost-icon" onclick="reviewDialog.close()"><span class="icon" data-icon="x" data-size="16"></span></button></div>
+      <div class="dialog-content">
+        <form class="stack" id="review-form">
+          <input type="hidden" id="review-type">
+          <input type="hidden" id="review-id">
+          <div class="field"><label data-i18n="common.status">Status</label><select class="select" id="review-status"><option value="approved">approved</option><option value="rejected">rejected</option><option value="suspended">suspended</option><option value="pending">pending</option></select></div>
+          <div class="field"><label data-i18n="admin.clients.notes">Internal notes</label><textarea class="textarea" id="review-notes"></textarea></div>
+          <div class="field"><label data-i18n="admin.clients.reset_password">Reset password</label><input class="input" type="password" id="review-pass" placeholder="Leave empty to keep"></div>
+          <div class="dialog-actions"><button class="btn btn-ghost" type="button" onclick="reviewDialog.close()" data-i18n="common.cancel">Cancel</button><button class="btn btn-primary" id="review-save"><span class="spinner"></span><span class="btn-label" data-i18n="common.save">Save</span></button></div>
+        </form>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module">
+    import { api, bootstrap, setLoading, toast, fmtDate, hoursText, money } from './app.js';
+    import { initI18n, bindLanguageControls, t } from './i18n.js';
+    import { initShell, setSection } from './portal.js';
+    import { toCsv, downloadCsv } from './csv.js';
+
+    await bootstrap();
+    await initI18n();
+    bindLanguageControls();
+    const session = await api.session();
+    if (!session || session.role !== 'admin') location.replace('admin-login.html');
+
+    initShell({ session, role: 'admin', activeNav: 'dashboard', onLogout: async () => { await api.logout(); location.replace('admin-login.html'); }});
+
+    const jobDialog = document.getElementById('job-dialog');
+    const engDialog = document.getElementById('eng-dialog');
+    const reviewDialog = document.getElementById('review-dialog');
+    window.jobDialog = jobDialog; window.engDialog = engDialog; window.reviewDialog = reviewDialog;
+
+    document.querySelectorAll('.nav-item[data-section]').forEach(item => {
+      item.addEventListener('click', () => {
+        const section = item.dataset.section;
+        setSection(section);
+        const titles = { dashboard:['admin.dashboard.title','admin.dashboard.subtitle'], clients:['admin.clients.title','admin.clients.subtitle'], assistants:['admin.assistants.title','admin.assistants.subtitle'], jobs:['admin.jobs.title','admin.jobs.subtitle'], applications:['admin.applications.title','admin.applications.subtitle'], engagements:['admin.engagements.title','admin.engagements.subtitle'], time:['admin.time.title','admin.time.subtitle'], billing:['admin.billing.title','admin.billing.subtitle'], settings:['admin.settings.title','admin.settings.subtitle'] };
+        document.getElementById('page-title').dataset.i18n = titles[section][0];
+        document.getElementById('page-subtitle').dataset.i18n = titles[section][1];
+        import('./i18n.js').then(m=>m.applyI18n(document.querySelector('.topbar')));
+        document.querySelector('.sidebar')?.classList.remove('open');
+        document.getElementById('scrim')?.classList.remove('open');
+      });
+    });
+
+    let billingData = [];
+
+    async function load() {
+      try {
+        const [dash, clients, assistants, jobs, apps, engagements, timeData, billing] = await Promise.all([
+          api.adminDashboard(), api.adminClients(), api.adminAssistants(), api.adminJobs(), api.adminApplications(), api.adminEngagements(), api.adminTime(), api.adminBilling()
+        ]);
+
+        document.getElementById('d-pc').textContent = dash.stats.pending_clients;
+        document.getElementById('d-pa').textContent = dash.stats.pending_assistants;
+        document.getElementById('d-h').textContent = (dash.stats.minutes/60).toFixed(2)+' h';
+        document.getElementById('d-m').textContent = money(dash.stats.margin);
+
+        const dc = document.getElementById('d-clients'); dc.innerHTML='';
+        if(!dash.pending_clients.length){ dc.innerHTML='<tr><td colspan="4" class="muted center">-</td></tr>'; }
+        else for(const c of dash.pending_clients){ const tr=document.createElement('tr'); tr.innerHTML='<td>'+c.company+'</td><td>'+c.contact_name+'</td><td>'+c.email+'</td><td><button class="btn btn-sm btn-primary" data-review-client="'+c.id+'">'+t('common.approve')+'</button></td>'; dc.appendChild(tr); }
+        dc.querySelectorAll('[data-review-client]').forEach(b=>b.addEventListener('click',()=>openReview('client',b.dataset.reviewClient)));
+
+        const da = document.getElementById('d-assistants'); da.innerHTML='';
+        if(!dash.pending_assistants.length){ da.innerHTML='<tr><td colspan="4" class="muted center">-</td></tr>'; }
+        else for(const a of dash.pending_assistants){ const tr=document.createElement('tr'); tr.innerHTML='<td>'+a.first_name+'</td><td>'+a.email+'</td><td class="code">'+a.code+'</td><td><button class="btn btn-sm btn-primary" data-review-assistant="'+a.id+'">'+t('common.approve')+'</button></td>'; da.appendChild(tr); }
+        da.querySelectorAll('[data-review-assistant]').forEach(b=>b.addEventListener('click',()=>openReview('assistant',b.dataset.reviewAssistant)));
+
+        const ct = document.getElementById('clients-table'); ct.innerHTML='';
+        for(const c of clients.clients){
+          const tr=document.createElement('tr');
+          tr.innerHTML='<td>'+c.company+'</td><td>'+c.contact_name+'</td><td>'+c.email+'</td><td><span class="badge '+(c.status==='approved'?'ok':c.status==='pending'?'warn':'')+'">'+c.status+'</span></td><td><button class="btn btn-ghost btn-sm" data-edit-client="'+c.id+'">'+t('common.edit')+'</button></td>';
+          ct.appendChild(tr);
         }
-    </script>
+        ct.querySelectorAll('[data-edit-client]').forEach(b=>b.addEventListener('click',()=>openReview('client',b.dataset.editClient)));
+
+        const at2 = document.getElementById('assistants-table'); at2.innerHTML='';
+        for(const a of assistants.assistants){
+          const tr=document.createElement('tr');
+          tr.innerHTML='<td>'+a.first_name+'</td><td>'+a.email+'</td><td><span class="badge '+(a.status==='approved'?'ok':a.status==='pending'?'warn':'')+'">'+a.status+'</span></td><td class="chips">'+(a.skills||[]).slice(0,3).map(s=>'<span class="chip">'+s+'</span>').join('')+'</td><td><button class="btn btn-ghost btn-sm" data-edit-assistant="'+a.id+'">'+t('common.edit')+'</button></td>';
+          at2.appendChild(tr);
+        }
+        at2.querySelectorAll('[data-edit-assistant]').forEach(b=>b.addEventListener('click',()=>openReview('assistant',b.dataset.editAssistant)));
+
+        function fillJobClient(){
+          const s=document.getElementById('job-client');
+          s.innerHTML='<option value="">'+t('admin.jobs.generic')+'</option>';
+          for(const c of clients.clients){ if(c.status!=='approved') continue; const o=document.createElement('option'); o.value=c.id; o.textContent=c.company; s.appendChild(o); }
+        }
+        fillJobClient();
+        const jt = document.getElementById('jobs-table'); jt.innerHTML='';
+        for(const j of jobs.jobs){
+          const tr=document.createElement('tr');
+          tr.innerHTML='<td>'+j.title+'</td><td>'+(j.client_company||t('admin.jobs.generic'))+'</td><td class="mono">'+money(j.rate)+'</td><td><span class="badge">'+j.status+'</span></td><td class="actions"><button class="btn btn-ghost btn-sm" data-job-edit="'+j.id+'">'+t('common.edit')+'</button></td>';
+          jt.appendChild(tr);
+        }
+        jt.querySelectorAll('[data-job-edit]').forEach(b=>{ const j=jobs.jobs.find(x=>x.id===b.dataset.jobEdit); b.addEventListener('click',()=>{ document.getElementById('job-id').value=j.id; document.getElementById('job-title').value=j.title; document.getElementById('job-client').value=j.client_id||''; document.getElementById('job-desc').value=j.description||''; document.getElementById('job-sched').value=j.schedule||''; document.getElementById('job-rate').value=j.rate||0; document.getElementById('job-status').value=j.status; jobDialog.showModal(); }); });
+
+        document.getElementById('job-new').onclick=()=>{ document.getElementById('job-form').reset(); document.getElementById('job-id').value=''; jobDialog.showModal(); };
+        document.getElementById('job-form').onsubmit=async e=>{ e.preventDefault(); const btn=document.getElementById('job-save'); setLoading(btn,true); try{ await api.adminJobSave({ job_id: document.getElementById('job-id').value||null, title: document.getElementById('job-title').value, client_id: document.getElementById('job-client').value||null, description: document.getElementById('job-desc').value, schedule: document.getElementById('job-sched').value, rate: document.getElementById('job-rate').value, status: document.getElementById('job-status').value }); toast(t('admin.jobs.saved'),'ok'); jobDialog.close(); load(); }catch(err){toast(err.message,'err');}finally{setLoading(btn,false);}};
+
+        const sc = document.getElementById('send-client'); sc.innerHTML='';
+        for(const c of clients.clients){ if(c.status!=='approved') continue; const o=document.createElement('option'); o.value=c.id; o.textContent=c.company; sc.appendChild(o); }
+        const apt = document.getElementById('apps-table'); apt.innerHTML='';
+        const selectedApps = [];
+        for(const a of apps.applications){
+          const tr=document.createElement('tr');
+          tr.innerHTML='<td><input type="checkbox" value="'+a.id+'" '+(a.status!=='applied'&&a.status!=='shortlisted'?'disabled':'')+'></td><td><div class="identity"><div class="avatar sm">'+(a.assistant?.first_name||'?')[0]+'</div><div class="meta"><strong>'+a.assistant?.first_name+'</strong><span>'+a.assistant?.code+'</span></div></div></td><td>'+a.job_title+'</td><td><span class="badge">'+a.status+'</span></td><td class="actions"><button class="btn btn-sm btn-ghost" data-app-short="'+a.id+'">'+t('admin.applications.shortlist')+'</button><button class="btn btn-sm btn-ghost" data-app-rej="'+a.id+'">'+t('admin.applications.reject')+'</button></td>';
+          apt.appendChild(tr);
+        }
+        apt.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.addEventListener('change',()=>{ if(cb.checked) selectedApps.push(cb.value); else selectedApps.splice(selectedApps.indexOf(cb.value),1); }));
+        apt.querySelectorAll('[data-app-short]').forEach(b=>b.addEventListener('click',async()=>{ try{ await api.adminApplicationStatus(b.dataset.appShort,'shortlisted'); toast(t('common.success'),'ok'); load(); }catch(e){toast(e.message,'err'); }}));
+        apt.querySelectorAll('[data-app-rej]').forEach(b=>b.addEventListener('click',async()=>{ try{ await api.adminApplicationStatus(b.dataset.appRej,'rejected'); toast(t('common.success'),'ok'); load(); }catch(e){toast(e.message,'err'); }}));
+        document.getElementById('send-candidates').onclick=async()=>{ if(!selectedApps.length) return toast(t('validation.required'),'warn'); try{ const res=await api.adminSendCandidates(selectedApps, sc.value); toast(t('admin.applications.send_ok')+' ('+res.count+')','ok'); load(); }catch(e){toast(e.message,'err'); }};
+
+        function fillEng(){
+          const c=document.getElementById('eng-client'), as=document.getElementById('eng-assistant');
+          c.innerHTML=''; as.innerHTML='';
+          for(const x of clients.clients){ if(x.status!=='approved') continue; const o=document.createElement('option'); o.value=x.id; o.textContent=x.company; c.appendChild(o); }
+          for(const x of assistants.assistants){ if(x.status!=='approved') continue; const o=document.createElement('option'); o.value=x.id; o.textContent=x.first_name; as.appendChild(o); }
+        }
+        fillEng();
+        document.getElementById('eng-new').onclick=()=>engDialog.showModal();
+        document.getElementById('eng-form').onsubmit=async e=>{ e.preventDefault(); const btn=document.getElementById('eng-save'); setLoading(btn,true); try{ const r=await api.adminEngagementCreate({ client_id: document.getElementById('eng-client').value, assistant_id: document.getElementById('eng-assistant').value, client_rate: document.getElementById('eng-cr').value, assistant_rate: document.getElementById('eng-ar').value, start_date: document.getElementById('eng-start').value||null, end_date: document.getElementById('eng-end').value||null }); if(r.capacity_warning) toast(t('admin.engagements.capacity'),'warn'); else toast(t('admin.engagements.saved'),'ok'); engDialog.close(); load(); }catch(err){toast(err.message,'err');}finally{setLoading(btn,false);}};
+
+        const et = document.getElementById('eng-table'); et.innerHTML='';
+        for(const e of engagements.engagements){
+          const tr=document.createElement('tr');
+          tr.innerHTML='<td>'+e.client_company+'</td><td>'+e.assistant?.first_name+'</td><td class="mono">'+money(e.client_rate)+'</td><td class="mono">'+money(e.assistant_rate)+'</td><td class="mono">'+money(e.margin)+'</td><td><span class="badge '+(e.status==='active'?'ok':'')+'">'+e.status+'</span></td><td class="actions">'+(e.status==='active'?'<button class="btn btn-ghost btn-sm" data-end="'+e.id+'">'+t('admin.engagements.end')+'</button>':'')+'</td>';
+          et.appendChild(tr);
+        }
+        et.querySelectorAll('[data-end]').forEach(b=>b.addEventListener('click',async()=>{ try{ await api.adminEngagementEnd(b.dataset.end); toast(t('admin.engagements.ended'),'ok'); load(); }catch(e){toast(e.message,'err'); }}));
+
+        const tt = document.getElementById('time-table'); tt.innerHTML='';
+        if(!timeData.entries.length){ tt.innerHTML='<tr><td colspan="7" class="muted center">'+t('admin.time.no')+'</td></tr>'; }
+        else for(const e of timeData.entries){ const tr=document.createElement('tr'); tr.innerHTML='<td>'+fmtDate(e.date)+'</td><td>'+e.assistant?.first_name+'</td><td>'+e.client_company+'</td><td>'+fmtTime(e.start_time)+'</td><td>'+fmtTime(e.end_time)+'</td><td class="mono">'+(e.minutes/60).toFixed(2)+' h</td><td class="actions"><button class="btn btn-ghost btn-sm" data-time-del="'+e.id+'">'+t('common.delete')+'</button></td>'; tt.appendChild(tr); }
+        tt.querySelectorAll('[data-time-del]').forEach(b=>b.addEventListener('click',async()=>{ const reason=prompt(t('admin.time.reason')); if(!reason) return; try{ await api.adminTimeDelete(b.dataset.timeDel, reason); toast(t('admin.time.deleted'),'ok'); load(); }catch(e){toast(e.message,'err'); }}));
+
+        billingData = billing.rows||[];
+        const bt = document.getElementById('billing-table'); bt.innerHTML='';
+        if(!billingData.length){ bt.innerHTML='<tr><td colspan="8" class="muted center">'+t('admin.billing.no')+'</td></tr>'; }
+        else for(const r of billingData){ const tr=document.createElement('tr'); tr.innerHTML='<td>'+r.client_company+'</td><td>'+r.assistant_name+'</td><td class="mono">'+(r.minutes/60).toFixed(2)+' h</td><td class="mono">'+money(r.client_rate)+'</td><td class="mono">'+money(r.client_amount)+'</td><td class="mono">'+money(r.assistant_rate)+'</td><td class="mono">'+money(r.assistant_pay)+'</td><td class="mono">'+money(r.margin)+'</td>'; bt.appendChild(tr); }
+        document.getElementById('billing-foot').innerHTML='<tr><td colspan="2">'+t('admin.billing.total')+'</td><td class="mono">'+(billing.total_minutes/60).toFixed(2)+' h</td><td></td><td class="mono">'+money(billing.client_amount)+'</td><td></td><td class="mono">'+money(billing.assistant_pay)+'</td><td class="mono">'+money(billing.margin)+'</td></tr>';
+        document.getElementById('billing-csv').onclick=()=>{ const rows=[['Client','Assistant','Hours','ClientRate','ClientAmount','AssistantRate','AssistantPay','Margin']]; for(const r of billingData){ rows.push([r.client_company,r.assistant_name,(r.minutes/60).toFixed(2),r.client_rate,r.client_amount,r.assistant_rate,r.assistant_pay,r.margin]); } downloadCsv('kageon-billing.csv', toCsv(rows)); };
+
+        const settings = await api.adminSettings();
+        document.getElementById('fx-rate').value = settings.fx_rate||18.66;
+        document.getElementById('settings-form').onsubmit=async e=>{ e.preventDefault(); const btn=document.getElementById('fx-save'); setLoading(btn,true); try{ await api.adminSettingsSave(document.getElementById('fx-rate').value); toast(t('admin.settings.saved'),'ok'); load(); }catch(err){toast(err.message,'err');}finally{setLoading(btn,false);} };
+        document.getElementById('pass-form').onsubmit=async e=>{ e.preventDefault(); const btn=document.getElementById('p-change'); setLoading(btn,true); try{ await api.adminChangePassword(document.getElementById('p-current').value, document.getElementById('p-new').value); toast(t('admin.settings.changed'),'ok'); document.getElementById('pass-form').reset(); }catch(err){toast(err.message,'err');}finally{setLoading(btn,false);} };
+
+        function openReview(type,id){
+          document.getElementById('review-type').value=type;
+          document.getElementById('review-id').value=id;
+          document.getElementById('review-title').textContent = type==='client'?t('admin.clients.review_title'):t('admin.assistants.review_title');
+          const list = type==='client'?clients.clients:assistants.assistants;
+          const item = list.find(x=>x.id===id);
+          document.getElementById('review-status').value = item?.status||'pending';
+          document.getElementById('review-notes').value = item?.notes||'';
+          document.getElementById('review-pass').value='';
+          reviewDialog.showModal();
+        }
+        document.getElementById('review-form').onsubmit=async e=>{ e.preventDefault(); const btn=document.getElementById('review-save'); setLoading(btn,true); try{ const type=document.getElementById('review-type').value, id=document.getElementById('review-id').value; if(type==='client'){ await api.adminClientSave({ client_id:id, company:(clients.clients.find(x=>x.id===id)||{}).company, contact_name:(clients.clients.find(x=>x.id===id)||{}).contact_name, status:document.getElementById('review-status').value, notes:document.getElementById('review-notes').value, new_password:document.getElementById('review-pass').value||null }); } else { await api.adminAssistantSave({ assistant_id:id, first_name:(assistants.assistants.find(x=>x.id===id)||{}).first_name, full_name:(assistants.assistants.find(x=>x.id===id)||{}).full_name, status:document.getElementById('review-status').value, notes:document.getElementById('review-notes').value, new_password:document.getElementById('review-pass').value||null }); } toast(t('common.success'),'ok'); reviewDialog.close(); load(); }catch(err){toast(err.message,'err');}finally{setLoading(btn,false);} };
+
+        import('./app.js').then(m=>m.hydrateIcons());
+        import('./portal.js').then(p=>p.applyI18n());
+      } catch(e){ toast(e.message,'err'); }
+    }
+
+    document.getElementById('refresh-btn').addEventListener('click', load);
+    load();
+  </script>
 </body>
-
 </html>
-

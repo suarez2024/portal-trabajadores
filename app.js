@@ -1,27 +1,12 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-export const SUPABASE_URL = 'https://qcqhxtoffjnhvbqltrnu.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjcWh4dG9mZmpuaHZicWx0cm51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2NDkzMzcsImV4cCI6MjEwODIyNTMzN30.0uyZM_wUrIktt0JlqbO9lXipes6yHrj6sSAA3a6pvBM';
+export const SUPABASE_URL = 'https://zduewrigxxnpxuommnfr.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkdWV3cmlneHhucHh1b21tbmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI3OTM2MzIsImV4cCI6MjEwODM2OTYzMn0.V33W2WuexQH85_hRAK_83Ils3SARzcRBrjqbwOz6Qfc';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const LEGACY_ADMIN_USER = 'Admin';
-const LEGACY_ADMIN_PASS = 'Admin2026';
-const SESSION_PREFIX = 'portal_sesion_';
-const SESSION_ROLES = ['admin', 'cliente', 'trabajador'];
-const LEGACY_SESSION_KEY = 'usuario';
-
-function sessionKey(role) {
-  return `${SESSION_PREFIX}${role}`;
-}
-
-function parseSession(raw) {
-  try {
-    return JSON.parse(raw || 'null');
-  } catch {
-    return null;
-  }
-}
+const SESSION_KEY = 'kageon_session';
+const SUPPORTED_ROLES = ['admin', 'client', 'assistant'];
 
 export class AuthError extends Error {
   constructor(message = 'Tu sesión expiró. Vuelve a entrar.') {
@@ -34,16 +19,79 @@ export function authError(message) {
   return new AuthError(message);
 }
 
-function rpcError(data) {
-  if (data?.code === 'auth') return authError(data.error);
-  return new Error(data?.error || 'No se pudo completar la operación.');
+function parseSession(raw) {
+  try {
+    return JSON.parse(raw || 'null');
+  } catch {
+    return null;
+  }
 }
 
-function missingFeatureError(error) {
-  if (error?.code === 'PGRST202' || /could not find the function/i.test(error?.message || '')) {
-    return new Error('Falta aplicar la actualización de Supabase. Ejecutá supabase/hardening.sql y recargá la página.');
+export function getSession(role = null) {
+  const session = sanitizeSession(parseSession(localStorage.getItem(SESSION_KEY)));
+  if (!session?.role || !session?.token || !session?.profile) return null;
+  if (role && session.role !== role) return null;
+  return session;
+}
+
+export function setSession(session) {
+  if (!session?.role || !session?.token) return;
+  localStorage.setItem(SESSION_KEY, JSON.stringify({
+    role: session.role,
+    token: session.token,
+    profile: session.profile
+  }));
+}
+
+export function clearSession() {
+  localStorage.removeItem(SESSION_KEY);
+}
+
+function sanitizeSession(session) {
+  if (!session) return null;
+  return session;
+}
+
+export function requireRole(role, redirect = 'login.html') {
+  const session = getSession(role);
+  if (!session) {
+    clearSession();
+    location.replace(redirect);
+    return null;
   }
-  return null;
+  return session;
+}
+
+export function handleAuthFailure(error, redirect = 'login.html') {
+  if (error?.message === 'AUTH' || error?.name === 'AuthError') {
+    clearSession();
+    location.replace(redirect);
+    return true;
+  }
+  return false;
+}
+
+export function friendlyError(error) {
+  const message = String(error?.message || error || '');
+  if (/AUTH/i.test(message)) return 'Tu sesión expiró. Vuelve a entrar.';
+  if (/FORBIDDEN/i.test(message)) return 'No tienes permiso para hacer esto.';
+  if (/PENDING/i.test(message)) return 'Tu cuenta está pendiente de aprobación.';
+  if (/REJECTED/i.test(message)) return 'Tu cuenta fue rechazada. Contacta a Kageon Global.';
+  if (/SUSPENDED/i.test(message)) return 'Tu cuenta está suspendida. Contacta a Kageon Global.';
+  if (/EMAIL_TAKEN/i.test(message)) return 'Ese correo ya está registrado.';
+  if (/INVALID_CREDENTIALS/i.test(message)) return 'Correo o contraseña incorrectos.';
+  if (/PASSWORD_WEAK/i.test(message)) return 'La contraseña debe tener al menos 8 caracteres.';
+  if (/PASSWORD_MISMATCH|password.*match/i.test(message)) return 'Las contraseñas no coinciden.';
+  if (/INVALID/i.test(message)) return 'Revisa la información e inténtalo de nuevo.';
+  if (/NOT_FOUND/i.test(message)) return 'No encontramos ese registro.';
+  if (/CONFLICT/i.test(message)) return 'La acción entra en conflicto con datos existentes.';
+  if (/JOB_CLOSED/i.test(message)) return 'Esta vacante ya no está abierta.';
+  if (/NO_ENGAGEMENT/i.test(message)) return 'No tienes una asignación activa.';
+  if (/OVERLAP/i.test(message)) return 'Este bloque se cruza con otra entrada del mismo día.';
+  if (/FUTURE_DATE/i.test(message)) return 'No puedes registrar horas en una fecha futura.';
+  if (/INVALID_TIME/i.test(message)) return 'La hora de salida debe ser posterior a la de entrada.';
+  if (/failed to fetch|network|load failed/i.test(message)) return 'Error de conexión. Revisa tu internet.';
+  return message || 'Algo salió mal. Inténtalo de nuevo.';
 }
 
 export function escapeHtml(value) {
@@ -64,8 +112,13 @@ export function money(value) {
   return '$' + numberFormat.format(Number(value) || 0);
 }
 
-export function hours(value) {
-  return (Number(value) || 0).toFixed(2) + ' h';
+export function minutesToHours(value) {
+  return (Number(value) || 0) / 60;
+}
+
+export function hoursText(value) {
+  const hours = minutesToHours(value);
+  return hours.toFixed(2) + ' h';
 }
 
 export function fmtDate(value) {
@@ -93,105 +146,10 @@ export function initials(name) {
   return (parts[0]?.[0] || '?') + (parts[1]?.[0] || '');
 }
 
-export function calcularHoras(entrada, salida, lunch) {
-  if (!entrada || !salida) return 0;
-  const [eh, em] = entrada.split(':').map(Number);
-  const [sh, sm] = salida.split(':').map(Number);
-  if ([eh, em, sh, sm].some(n => Number.isNaN(n))) return 0;
-  let total = (sh * 60 + sm) - (eh * 60 + em);
-  if (total < 0) total += 24 * 60;
-  const effective = total - (Number(lunch) || 0);
-  return Math.max(0, effective / 60);
-}
-
-export function sumHours(jornadas) {
-  return (jornadas || []).reduce((sum, j) => sum + (Number(j.horas_calculadas) || 0), 0);
-}
-
-export function totalPago(jornadas, tarifa) {
-  return sumHours(jornadas) * (Number(tarifa) || 0);
-}
-
-function sanitizeSession(session) {
-  if (!session || !session.usuario) return session;
-  const { password, ...usuario } = session.usuario;
-  return { ...session, usuario };
-}
-
-function migrateLegacySession() {
-  try {
-    const raw = localStorage.getItem(LEGACY_SESSION_KEY);
-    if (!raw) return;
-    const legacy = parseSession(raw);
-    if (legacy?.rol && SESSION_ROLES.includes(legacy.rol) && !localStorage.getItem(sessionKey(legacy.rol))) {
-      localStorage.setItem(sessionKey(legacy.rol), JSON.stringify(sanitizeSession(legacy)));
-    }
-    localStorage.removeItem(LEGACY_SESSION_KEY);
-  } catch {
-    localStorage.removeItem(LEGACY_SESSION_KEY);
-  }
-}
-
-migrateLegacySession();
-
-export function getSession(role) {
-  if (role) {
-    return sanitizeSession(parseSession(localStorage.getItem(sessionKey(role))));
-  }
-  for (const candidate of SESSION_ROLES) {
-    const session = getSession(candidate);
-    if (session) return session;
-  }
-  return null;
-}
-
-export function setSession(session) {
-  const safe = sanitizeSession(session);
-  if (!safe?.rol) return;
-  localStorage.setItem(sessionKey(safe.rol), JSON.stringify(safe));
-  localStorage.removeItem(LEGACY_SESSION_KEY);
-}
-
-export function clearSession(role) {
-  if (role) {
-    localStorage.removeItem(sessionKey(role));
-    return;
-  }
-  SESSION_ROLES.forEach(candidate => localStorage.removeItem(sessionKey(candidate)));
-  localStorage.removeItem(LEGACY_SESSION_KEY);
-}
-
-export function requireRole(role, redirect, requireToken = false) {
-  const session = getSession(role);
-  if (!session || session.rol !== role || (requireToken && !session.token)) {
-    clearSession(role);
-    location.replace(redirect);
-    return null;
-  }
-  return session;
-}
-
-export function handleAuthFailure(error, redirect, role) {
-  if (error?.name === 'AuthError') {
-    clearSession(role);
-    location.replace(redirect);
-    return true;
-  }
-  return false;
-}
-
-export function friendlyError(error) {
-  const message = String(error?.message || error || '');
-  if (/invalid api key/i.test(message)) return 'La conexión con Supabase falló (clave inválida).';
-  if (/failed to fetch|network|load failed/i.test(message)) return 'No se pudo conectar. Revisa tu conexión a internet.';
-  if (/duplicate key|23505|ya está registrado/i.test(message)) return 'Ese email ya está registrado.';
-  if (/violates row-level security|permission denied|401|403/i.test(message)) return 'No tienes permisos para esta acción.';
-  return message || 'Ocurrió un error inesperado.';
-}
-
 const ICONS = {
   users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
   user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  userPlus: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/>',
   clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   wallet: '<path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h16v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7"/><circle cx="17" cy="12" r="1"/>',
   calendar: '<rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/>',
@@ -202,20 +160,20 @@ const ICONS = {
   plus: '<path d="M12 5v14M5 12h14"/>',
   trash: '<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/>',
   pencil: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
-  archive: '<rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v12h14V8"/><path d="M10 12h4"/>',
-  restore: '<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>',
   check: '<path d="M20 6 9 17l-5-5"/>',
   alert: '<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>',
   search: '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
   eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
   eyeOff: '<path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.2"/><path d="M6.2 6.2A17.4 17.4 0 0 0 2 12s3.5 7 10 7a10.7 10.7 0 0 0 4.1-.8"/>',
   menu: '<path d="M3 6h18M3 12h18M3 18h18"/>',
-  refresh: '<path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/>',
+  bell: '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
   settings: '<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M2 14h4M10 8h4M18 16h4"/>',
   shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>',
   sparkles: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><path d="M6.3 6.3l2.4 2.4M15.3 15.3l2.4 2.4M17.7 6.3l-2.4 2.4M8.7 15.3l-2.4 2.4"/>',
   x: '<path d="M18 6 6 18M6 6l12 12"/>',
-  arrowRight: '<path d="M5 12h14M13 6l6 6-6 6"/>'
+  arrowRight: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  send: '<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',
+  fileText: '<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/>'
 };
 
 export function hydrateIcons(root = document) {
@@ -273,567 +231,610 @@ export function toast(message, type = 'ok', timeout = 4200) {
   }, timeout);
 }
 
-function sanitizeUser(row) {
-  if (!row) return null;
-  const { password, ...rest } = row;
-  return rest;
-}
-
-function normalizeTrabajadores(rows = []) {
-  return rows.map(row => {
-    const { password, clientes, ...trabajador } = row;
-    return {
-      ...trabajador,
-      tarifa_hora: Number(trabajador.tarifa_hora) || 0,
-      archivado: trabajador.archivado === true,
-      archivado_en: trabajador.archivado_en ?? null,
-      historico: trabajador.historico === true,
-      cliente_nombre: row.cliente_nombre ?? clientes?.empresa ?? '-'
-    };
-  });
-}
-
-function normalizeJornadas(rows = []) {
-  return rows.map(row => {
-    const nested = row.trabajadores || {};
-    return {
-      id: row.id,
-      trabajador_id: row.trabajador_id,
-      fecha: row.fecha,
-      hora_entrada: row.hora_entrada,
-      hora_salida: row.hora_salida,
-      minutos_lunch: row.minutos_lunch,
-      horas_calculadas: Number(row.horas_calculadas) || 0,
-      notas: row.notas,
-      creado_en: row.creado_en,
-      trabajador_nombre: row.trabajador_nombre ?? nested.nombre ?? '-',
-      tarifa_hora: Number(row.tarifa_hora ?? nested.tarifa_hora) || 0,
-      cliente_id: row.cliente_id ?? nested.cliente_id ?? null,
-      cliente_nombre: row.cliente_nombre ?? nested.clientes?.empresa ?? '-'
-    };
-  });
-}
-
-function normalizeClientes(rows = []) {
-  return rows.map(row => {
-    const { password, ...cliente } = row;
-    return cliente;
-  });
-}
-
-async function assertUniqueEmail(email, exceptTable, exceptId) {
-  const normalized = String(email || '').trim().toLowerCase();
-  const queries = [];
-  if (exceptTable !== 'clientes') {
-    queries.push(supabase.from('clientes').select('id').ilike('email', normalized).limit(1));
+async function rpc(functionName, args = {}) {
+  const { data, error } = await supabase.rpc(functionName, args);
+  if (error) {
+    throw new Error(error.message || friendlyError(error.message));
   }
-  if (exceptTable !== 'trabajadores') {
-    queries.push(supabase.from('trabajadores').select('id').ilike('email', normalized).limit(1));
+  if (data && typeof data === 'object' && data.ok === false) {
+    throw new Error(data.error || 'No se pudo completar la operación.');
   }
-  const results = await Promise.all(queries);
-  const duplicate = results.some(result => (result.data || []).some(row => row.id !== exceptId));
-  if (duplicate) throw new Error('Ese email ya está registrado.');
+  return data;
 }
 
 export const api = {
-  secure: false,
-
-  async init() {
+  async health() {
     try {
-      const { error } = await supabase.rpc('portal_ping');
-      if (!error) {
-        this.secure = true;
-      } else {
-        const missing = error.code === 'PGRST202'
-          || /could not find|does not exist|schema cache/i.test(error.message || '');
-        this.secure = !missing;
-      }
+      return await rpc('portal_health');
     } catch {
-      this.secure = false;
+      return null;
     }
-    return this.secure;
+  },
+
+  async signupClient(payload) {
+    const data = await rpc('portal_signup_client', {
+      p_email: payload.email,
+      p_password: payload.password,
+      p_company: payload.company,
+      p_contact_name: payload.contact_name,
+      p_phone: payload.phone || null,
+      p_country: payload.country || null,
+      p_timezone: payload.timezone || null
+    });
+    return data;
+  },
+
+  async signupAssistant(payload) {
+    const data = await rpc('portal_signup_assistant', {
+      p_email: payload.email,
+      p_password: payload.password,
+      p_first_name: payload.first_name,
+      p_full_name: payload.full_name,
+      p_headline: payload.headline || null,
+      p_skills: payload.skills || [],
+      p_languages: payload.languages || [],
+      p_certifications: payload.certifications || [],
+      p_availability: payload.availability || null,
+      p_photo_url: payload.photo_url || null,
+      p_video_url: payload.video_url || null,
+      p_phone: payload.phone || null,
+      p_country: payload.country || null,
+      p_timezone: payload.timezone || null
+    });
+    return data;
   },
 
   async login(email, password) {
-    const cleanEmail = String(email || '').trim();
-    if (!cleanEmail || !password) {
-      return { ok: false, error: 'Escribe tu email y contraseña.' };
-    }
-
-    if (this.secure) {
-      const { data, error } = await supabase.rpc('portal_login', {
-        p_email: cleanEmail,
-        p_password: password
-      });
-      if (error) throw new Error(friendlyError(error));
-      if (!data?.ok) return { ok: false, error: data?.error || 'Credenciales incorrectas.' };
-      const session = { rol: data.rol, usuario: data.usuario, token: data.token };
+    try {
+      const data = await rpc('portal_login', { p_email: email, p_password: password });
+      const session = { role: data.role, token: data.token, profile: data.profile };
       setSession(session);
       return { ok: true, session };
+    } catch (error) {
+      return { ok: false, error: friendlyError(error) };
     }
-
-    const trabajadores = await supabase
-      .from('trabajadores')
-      .select('*')
-      .ilike('email', cleanEmail)
-      .eq('password', password)
-      .limit(1);
-    if (trabajadores.error) throw new Error(friendlyError(trabajadores.error));
-    const trabajador = trabajadores.data?.[0];
-    if (trabajador) {
-      if (trabajador.activo === false || trabajador.archivado === true) {
-        return { ok: false, error: 'Tu cuenta está desactivada. Contacta al administrador.' };
-      }
-      const session = { rol: 'trabajador', usuario: sanitizeUser(trabajador) };
-      setSession(session);
-      return { ok: true, session };
-    }
-
-    const clientes = await supabase
-      .from('clientes')
-      .select('*')
-      .ilike('email', cleanEmail)
-      .eq('password', password)
-      .limit(1);
-    if (clientes.error) throw new Error(friendlyError(clientes.error));
-    const cliente = clientes.data?.[0];
-    if (cliente) {
-      const session = { rol: 'cliente', usuario: sanitizeUser(cliente) };
-      setSession(session);
-      return { ok: true, session };
-    }
-
-    return { ok: false, error: 'Credenciales incorrectas.' };
   },
 
-  async adminLogin(usuario, password) {
-    const cleanUser = String(usuario || '').trim();
-    if (!cleanUser || !password) {
-      return { ok: false, error: 'Escribe usuario y contraseña.' };
-    }
-
-    if (this.secure) {
-      const { data, error } = await supabase.rpc('portal_admin_login', {
-        p_usuario: cleanUser,
-        p_password: password
-      });
-      if (error) throw new Error(friendlyError(error));
-      if (!data?.ok) return { ok: false, error: data?.error || 'Credenciales incorrectas.' };
-      const session = { rol: 'admin', usuario: data.usuario, token: data.token };
+  async adminLogin(username, password) {
+    try {
+      const data = await rpc('portal_admin_login', { p_username: username, p_password: password });
+      const session = { role: data.role, token: data.token, profile: data.profile };
       setSession(session);
       return { ok: true, session };
+    } catch (error) {
+      return { ok: false, error: friendlyError(error) };
     }
-
-    if (cleanUser === LEGACY_ADMIN_USER && password === LEGACY_ADMIN_PASS) {
-      const session = { rol: 'admin', usuario: { nombre: 'Admin', usuario: cleanUser } };
-      setSession(session);
-      return { ok: true, session };
-    }
-    return { ok: false, error: 'Credenciales incorrectas.' };
   },
 
-  async logout(role) {
-    const session = role ? getSession(role) : getSession();
-    if (this.secure && session?.token) {
+  async logout() {
+    const session = getSession();
+    if (session?.token) {
       try {
-        await supabase.rpc('portal_logout', { p_token: session.token });
-      } catch {
-        /* noop */
-      }
+        await rpc('portal_logout', { p_token: session.token });
+      } catch {}
     }
-    clearSession(role);
+    clearSession();
   },
 
-  async adminData(session) {
-    if (this.secure) {
-      const { data, error } = await supabase.rpc('portal_admin_resumen', { p_token: session.token });
-      if (error) throw new Error(friendlyError(error));
-      if (!data?.ok) throw rpcError(data);
-      return {
-        clientes: normalizeClientes(data.clientes || []),
-        trabajadores: normalizeTrabajadores(data.trabajadores || []),
-        jornadas: normalizeJornadas(data.jornadas || [])
-      };
+  async session() {
+    const session = getSession();
+    if (!session?.token) return null;
+    try {
+      const data = await rpc('portal_session', { p_token: session.token });
+      const nextSession = { role: data.role, token: session.token, profile: data.profile };
+      setSession(nextSession);
+      return nextSession;
+    } catch (error) {
+      if (handleAuthFailure(error)) return null;
+      throw error;
     }
-
-    const [clientes, trabajadores, jornadas] = await Promise.all([
-      supabase.from('clientes').select('*').order('creado_en'),
-      supabase.from('trabajadores').select('*, clientes(empresa)').order('creado_en'),
-      supabase.from('jornadas')
-        .select('*, trabajadores(nombre, tarifa_hora, cliente_id, clientes(empresa))')
-        .order('fecha', { ascending: false })
-    ]);
-    const failure = clientes.error || trabajadores.error || jornadas.error;
-    if (failure) throw new Error(friendlyError(failure));
-
-    return {
-      clientes: normalizeClientes(clientes.data || []),
-      trabajadores: normalizeTrabajadores(trabajadores.data || []),
-      jornadas: normalizeJornadas(jornadas.data || [])
-    };
   },
 
-  async workerData(session) {
-    if (this.secure) {
-      const { data, error } = await supabase.rpc('portal_trabajador_datos', { p_token: session.token });
-      if (error) throw new Error(friendlyError(error));
-      if (!data?.ok) throw rpcError(data);
-      return {
-        usuario: sanitizeUser(data.usuario),
-        jornadas: normalizeJornadas(data.jornadas || [])
-      };
-    }
-
-    const trabajador = await supabase
-      .from('trabajadores')
-      .select('*')
-      .eq('id', session.usuario.id)
-      .maybeSingle();
-    if (trabajador.error) throw new Error(friendlyError(trabajador.error));
-    const worker = trabajador.data;
-    if (!worker) throw authError('Tu cuenta ya no existe.');
-    if (worker.activo === false || worker.archivado === true) throw authError('Tu cuenta está desactivada.');
-
-    const jornadas = await supabase
-      .from('jornadas')
-      .select('*')
-      .eq('trabajador_id', session.usuario.id)
-      .order('fecha', { ascending: false })
-      .order('creado_en', { ascending: false });
-    if (jornadas.error) throw new Error(friendlyError(jornadas.error));
-
-    const rows = (jornadas.data || []).map(j => ({
-      ...j,
-      tarifa_hora: j.tarifa_hora ?? worker.tarifa_hora,
-      cliente_id: j.cliente_id ?? worker.cliente_id
-    }));
-
-    return {
-      usuario: sanitizeUser(worker),
-      jornadas: normalizeJornadas(rows)
-    };
+  async markNotifications(ids = null) {
+    const session = getSession();
+    if (!session?.token) throw authError();
+    return await rpc('portal_mark_notifications', { p_token: session.token, p_ids: ids });
   },
 
-  async clientData(session) {
-    if (this.secure) {
-      const { data, error } = await supabase.rpc('portal_cliente_resumen', { p_token: session.token });
-      if (error) throw new Error(friendlyError(error));
-      if (!data?.ok) throw rpcError(data);
-      return {
-        usuario: sanitizeUser(data.usuario),
-        trabajadores: normalizeTrabajadores(data.trabajadores || []),
-        jornadas: normalizeJornadas(data.jornadas || [])
-      };
+  async clientDashboard() {
+    const session = requireRole('client');
+    try {
+      return await rpc('portal_client_dashboard', { p_token: session.token });
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
     }
-
-    const cliente = await supabase
-      .from('clientes')
-      .select('*')
-      .eq('id', session.usuario.id)
-      .maybeSingle();
-    if (cliente.error) throw new Error(friendlyError(cliente.error));
-    if (!cliente.data) throw authError('Tu cuenta ya no existe.');
-
-    const trabajadores = await supabase
-      .from('trabajadores')
-      .select('*, clientes(empresa)')
-      .eq('cliente_id', session.usuario.id)
-      .order('nombre');
-    if (trabajadores.error) throw new Error(friendlyError(trabajadores.error));
-
-    const ids = (trabajadores.data || []).map(t => t.id);
-    let jornadasData = [];
-    if (ids.length) {
-      const jornadas = await supabase
-        .from('jornadas')
-        .select('*')
-        .in('trabajador_id', ids)
-        .order('fecha', { ascending: false });
-      if (jornadas.error) throw new Error(friendlyError(jornadas.error));
-      jornadasData = jornadas.data || [];
-    }
-
-    const workersById = new Map((trabajadores.data || []).map(t => [t.id, t]));
-    const rows = jornadasData.map(j => {
-      const worker = workersById.get(j.trabajador_id);
-      return {
-        ...j,
-        tarifa_hora: j.tarifa_hora ?? worker?.tarifa_hora,
-        cliente_id: j.cliente_id ?? worker?.cliente_id
-      };
-    });
-
-    return {
-      usuario: sanitizeUser(cliente.data),
-      trabajadores: normalizeTrabajadores(trabajadores.data || []),
-      jornadas: normalizeJornadas(rows)
-    };
   },
 
-  async createCliente(payload, session) {
-    if (this.secure) {
-      const { data, error } = await supabase.rpc('portal_admin_crear_cliente', {
+  async clientCandidates() {
+    const session = requireRole('client');
+    try {
+      return await rpc('portal_client_candidates', { p_token: session.token });
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async clientSelectCandidate(applicationId) {
+    const session = requireRole('client');
+    try {
+      return await rpc('portal_client_select_candidate', { p_token: session.token, p_application_id: applicationId });
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async clientEngagements() {
+    const session = requireRole('client');
+    try {
+      return await rpc('portal_client_engagements', { p_token: session.token });
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async clientTime(from = null, to = null) {
+    const session = requireRole('client');
+    try {
+      return await rpc('portal_client_time', { p_token: session.token, p_from: from, p_to: to });
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async clientStatements(from = null, to = null) {
+    const session = requireRole('client');
+    try {
+      return await rpc('portal_client_statements', { p_token: session.token, p_from: from, p_to: to });
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async clientProfile() {
+    const session = requireRole('client');
+    try {
+      return await rpc('portal_client_profile', { p_token: session.token });
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async clientUpdateProfile(payload) {
+    const session = requireRole('client');
+    try {
+      return await rpc('portal_client_update_profile', {
         p_token: session.token,
-        p_nombre: payload.nombre,
-        p_empresa: payload.empresa,
-        p_email: payload.email,
-        p_password: payload.password
+        p_company: payload.company,
+        p_contact_name: payload.contact_name,
+        p_phone: payload.phone || null,
+        p_country: payload.country || null,
+        p_timezone: payload.timezone || null
       });
-      if (error) throw new Error(friendlyError(error));
-      if (!data?.ok) throw rpcError(data);
-      return data.cliente;
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
     }
-
-    await assertUniqueEmail(payload.email);
-    const { data, error } = await supabase
-      .from('clientes')
-      .insert([{
-        nombre: payload.nombre,
-        empresa: payload.empresa,
-        email: String(payload.email).trim().toLowerCase(),
-        password: payload.password
-      }])
-      .select()
-      .single();
-    if (error) throw new Error(friendlyError(error));
-    return normalizeClientes([data])[0];
   },
 
-  async createTrabajador(payload, session) {
-    if (this.secure) {
-      const { data, error } = await supabase.rpc('portal_admin_crear_trabajador', {
+  async assistantDashboard() {
+    const session = requireRole('assistant');
+    try {
+      return await rpc('portal_assistant_dashboard', { p_token: session.token });
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async assistantProfile() {
+    const session = requireRole('assistant');
+    try {
+      return await rpc('portal_assistant_profile', { p_token: session.token });
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async assistantUpdateProfile(payload) {
+    const session = requireRole('assistant');
+    try {
+      return await rpc('portal_assistant_update_profile', {
         p_token: session.token,
-        p_nombre: payload.nombre,
-        p_email: payload.email,
-        p_password: payload.password,
-        p_tarifa: payload.tarifa_hora,
-        p_cliente_id: payload.cliente_id
+        p_first_name: payload.first_name,
+        p_full_name: payload.full_name,
+        p_headline: payload.headline || null,
+        p_skills: payload.skills || [],
+        p_languages: payload.languages || [],
+        p_certifications: payload.certifications || [],
+        p_availability: payload.availability || null,
+        p_photo_url: payload.photo_url || null,
+        p_video_url: payload.video_url || null,
+        p_phone: payload.phone || null,
+        p_country: payload.country || null,
+        p_timezone: payload.timezone || null
       });
-      if (error) throw new Error(friendlyError(error));
-      if (!data?.ok) throw rpcError(data);
-      return data.trabajador;
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
     }
-
-    await assertUniqueEmail(payload.email);
-    const { data, error } = await supabase
-      .from('trabajadores')
-      .insert([{
-        nombre: payload.nombre,
-        email: String(payload.email).trim().toLowerCase(),
-        password: payload.password,
-        tarifa_hora: payload.tarifa_hora,
-        cliente_id: payload.cliente_id,
-        activo: true
-      }])
-      .select('*, clientes(empresa)')
-      .single();
-    if (error) throw new Error(friendlyError(error));
-    return normalizeTrabajadores([data])[0];
   },
 
-  async setTrabajadorActivo(id, activo, session) {
-    if (this.secure) {
-      const { data, error } = await supabase.rpc('portal_admin_set_activo', {
+  async assistantJobs() {
+    const session = requireRole('assistant');
+    try {
+      return await rpc('portal_assistant_jobs', { p_token: session.token });
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async assistantApply(jobId, note = null) {
+    const session = requireRole('assistant');
+    try {
+      return await rpc('portal_assistant_apply', { p_token: session.token, p_job_id: jobId, p_note: note });
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async assistantApplications() {
+    const session = requireRole('assistant');
+    try {
+      return await rpc('portal_assistant_applications', { p_token: session.token });
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async assistantTime(from = null, to = null) {
+    const session = requireRole('assistant');
+    try {
+      return await rpc('portal_assistant_time', { p_token: session.token, p_from: from, p_to: to });
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async assistantAddTime(payload) {
+    const session = requireRole('assistant');
+    try {
+      return await rpc('portal_assistant_add_time', {
         p_token: session.token,
-        p_trabajador_id: id,
-        p_activo: activo
+        p_date: payload.date,
+        p_start: payload.start,
+        p_end: payload.end,
+        p_engagement_id: payload.engagement_id || null
       });
-      if (error) throw new Error(friendlyError(error));
-      if (!data?.ok) throw rpcError(data);
-      return;
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
     }
-    const { error } = await supabase.from('trabajadores').update({ activo }).eq('id', id);
-    if (error) throw new Error(friendlyError(error));
   },
 
-  async updateCliente(payload, session) {
-    if (this.secure) {
-      const { data, error } = await supabase.rpc('portal_admin_actualizar_cliente', {
+  async assistantDeleteTime(entryId) {
+    const session = requireRole('assistant');
+    try {
+      return await rpc('portal_assistant_delete_time', { p_token: session.token, p_entry_id: entryId });
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async assistantIgnoreMissing(engagementId, date) {
+    const session = requireRole('assistant');
+    try {
+      return await rpc('portal_assistant_ignore_missing', { p_token: session.token, p_engagement_id: engagementId, p_date: date });
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async assistantEarnings(from = null, to = null) {
+    const session = requireRole('assistant');
+    try {
+      return await rpc('portal_assistant_earnings', { p_token: session.token, p_from: from, p_to: to });
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async adminDashboard() {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_dashboard', { p_token: session.token });
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async adminClients() {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_clients', { p_token: session.token });
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async adminClientSave(payload) {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_client_save', {
         p_token: session.token,
-        p_cliente_id: payload.id,
-        p_nombre: payload.nombre,
-        p_empresa: payload.empresa,
-        p_email: payload.email,
-        p_password: payload.password || null
+        p_client_id: payload.client_id,
+        p_company: payload.company,
+        p_contact_name: payload.contact_name,
+        p_phone: payload.phone || null,
+        p_country: payload.country || null,
+        p_timezone: payload.timezone || null,
+        p_status: payload.status || null,
+        p_notes: payload.notes || null,
+        p_new_password: payload.new_password || null
       });
-      if (error) throw missingFeatureError(error) || new Error(friendlyError(error));
-      if (!data?.ok) throw rpcError(data);
-      return normalizeClientes([data.cliente])[0];
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
     }
-
-    const email = String(payload.email || '').trim().toLowerCase();
-    await assertUniqueEmail(email, 'clientes', payload.id);
-    const update = {
-      nombre: payload.nombre,
-      empresa: payload.empresa,
-      email
-    };
-    if (payload.password) {
-      if (String(payload.password).length < 6) {
-        throw new Error('La contraseña debe tener al menos 6 caracteres.');
-      }
-      update.password = payload.password;
-    }
-    const { data, error } = await supabase
-      .from('clientes')
-      .update(update)
-      .eq('id', payload.id)
-      .select()
-      .single();
-    if (error) throw new Error(friendlyError(error));
-    return normalizeClientes([data])[0];
   },
 
-  async updateTrabajador(payload, session) {
-    if (this.secure) {
-      const { data, error } = await supabase.rpc('portal_admin_actualizar_trabajador', {
+  async adminAssistants() {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_assistants', { p_token: session.token });
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async adminAssistantSave(payload) {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_assistant_save', {
         p_token: session.token,
-        p_trabajador_id: payload.id,
-        p_nombre: payload.nombre,
-        p_email: payload.email,
-        p_tarifa: payload.tarifa_hora,
-        p_cliente_id: payload.cliente_id,
-        p_password: payload.password || null
+        p_assistant_id: payload.assistant_id,
+        p_first_name: payload.first_name,
+        p_full_name: payload.full_name,
+        p_headline: payload.headline || null,
+        p_phone: payload.phone || null,
+        p_country: payload.country || null,
+        p_timezone: payload.timezone || null,
+        p_status: payload.status || null,
+        p_notes: payload.notes || null,
+        p_new_password: payload.new_password || null
       });
-      if (error) throw missingFeatureError(error) || new Error(friendlyError(error));
-      if (!data?.ok) throw rpcError(data);
-      return normalizeTrabajadores([data.trabajador])[0];
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
     }
-
-    const email = String(payload.email || '').trim().toLowerCase();
-    await assertUniqueEmail(email, 'trabajadores', payload.id);
-    const update = {
-      nombre: payload.nombre,
-      email,
-      tarifa_hora: payload.tarifa_hora,
-      cliente_id: payload.cliente_id
-    };
-    if (payload.password) {
-      if (String(payload.password).length < 6) {
-        throw new Error('La contraseña debe tener al menos 6 caracteres.');
-      }
-      update.password = payload.password;
-    }
-    const { data, error } = await supabase
-      .from('trabajadores')
-      .update(update)
-      .eq('id', payload.id)
-      .select('*, clientes(empresa)')
-      .single();
-    if (error) throw new Error(friendlyError(error));
-    return normalizeTrabajadores([data])[0];
   },
 
-  async deleteCliente(id, session) {
-    if (this.secure) {
-      const { data, error } = await supabase.rpc('portal_admin_borrar_cliente', {
+  async adminJobs() {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_jobs', { p_token: session.token });
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async adminJobSave(payload) {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_job_save', {
         p_token: session.token,
-        p_cliente_id: id
+        p_job_id: payload.job_id || null,
+        p_title: payload.title,
+        p_client_id: payload.client_id || null,
+        p_description: payload.description || null,
+        p_schedule: payload.schedule || null,
+        p_rate: payload.rate || 0,
+        p_status: payload.status || 'draft'
       });
-      if (error) throw missingFeatureError(error) || new Error(friendlyError(error));
-      if (!data?.ok) throw rpcError(data);
-      return;
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
     }
-
-    const workers = await supabase
-      .from('trabajadores')
-      .select('id', { count: 'exact', head: true })
-      .eq('cliente_id', id);
-    if (workers.error) throw new Error(friendlyError(workers.error));
-    const count = workers.count || 0;
-    if (count > 0) {
-      throw new Error(`No se puede eliminar: tiene ${count} ${count === 1 ? 'trabajador' : 'trabajadores'}. Reasígnalos a otro cliente primero.`);
-    }
-    const { error } = await supabase.from('clientes').delete().eq('id', id);
-    if (error) throw new Error(friendlyError(error));
   },
 
-  async resetDatabase(confirmacion, session) {
-    if (!this.secure) {
-      throw new Error('Aplicá la actualización de Supabase para reiniciar los datos.');
+  async adminJobStatus(jobId, status) {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_job_status', { p_token: session.token, p_job_id: jobId, p_status: status });
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
     }
-    const { data, error } = await supabase.rpc('portal_admin_reiniciar_datos', {
-      p_token: session.token,
-      p_confirmacion: confirmacion
-    });
-    if (error) throw missingFeatureError(error) || new Error(friendlyError(error));
-    if (!data?.ok) throw rpcError(data);
   },
 
-  async archiveTrabajador(id, session) {
-    if (!this.secure) {
-      throw new Error('Aplicá la migración de Supabase para archivar trabajadores.');
+  async adminApplications() {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_applications', { p_token: session.token });
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
     }
-    const { data, error } = await supabase.rpc('portal_admin_archivar_trabajador', {
-      p_token: session.token,
-      p_trabajador_id: id
-    });
-    if (error) throw missingFeatureError(error) || new Error(friendlyError(error));
-    if (!data?.ok) throw rpcError(data);
   },
 
-  async restoreTrabajador(id, session) {
-    if (!this.secure) {
-      throw new Error('Aplicá la migración de Supabase para restaurar trabajadores.');
+  async adminApplicationStatus(applicationId, status) {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_application_status', { p_token: session.token, p_application_id: applicationId, p_status: status });
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
     }
-    const { data, error } = await supabase.rpc('portal_admin_restaurar_trabajador', {
-      p_token: session.token,
-      p_trabajador_id: id
-    });
-    if (error) throw missingFeatureError(error) || new Error(friendlyError(error));
-    if (!data?.ok) throw rpcError(data);
   },
 
-  async createJornada(payload, session) {
-    if (this.secure) {
-      const { data, error } = await supabase.rpc('portal_trabajador_crear_jornada', {
+  async adminSendCandidates(applicationIds, clientId) {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_send_candidates', { p_token: session.token, p_application_ids: applicationIds, p_client_id: clientId });
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async adminEngagements() {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_engagements', { p_token: session.token });
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async adminEngagementCreate(payload) {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_engagement_create', {
         p_token: session.token,
-        p_fecha: payload.fecha,
-        p_entrada: payload.hora_entrada,
-        p_salida: payload.hora_salida,
-        p_lunch: payload.minutos_lunch,
-        p_notas: payload.notas
+        p_client_id: payload.client_id,
+        p_assistant_id: payload.assistant_id,
+        p_client_rate: payload.client_rate,
+        p_assistant_rate: payload.assistant_rate,
+        p_work_days: payload.work_days || [1,2,3,4,5],
+        p_start_date: payload.start_date || null,
+        p_end_date: payload.end_date || null,
+        p_job_id: payload.job_id || null,
+        p_application_id: payload.application_id || null
       });
-      if (error) throw new Error(friendlyError(error));
-      if (!data?.ok) throw rpcError(data);
-      return data.jornada;
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
     }
-
-    const horasCalculadas = calcularHoras(payload.hora_entrada, payload.hora_salida, payload.minutos_lunch);
-    const { data, error } = await supabase
-      .from('jornadas')
-      .insert([{
-        trabajador_id: session.usuario.id,
-        fecha: payload.fecha,
-        hora_entrada: payload.hora_entrada,
-        hora_salida: payload.hora_salida,
-        minutos_lunch: payload.minutos_lunch,
-        horas_calculadas: horasCalculadas,
-        notas: payload.notas || null
-      }])
-      .select()
-      .single();
-    if (error) throw new Error(friendlyError(error));
-    return normalizeJornadas([data])[0];
   },
 
-  async deleteJornada(id, session, asAdmin = false) {
-    if (this.secure) {
-      const fn = asAdmin ? 'portal_admin_borrar_jornada' : 'portal_trabajador_borrar_jornada';
-      const { data, error } = await supabase.rpc(fn, { p_token: session.token, p_jornada_id: id });
-      if (error) throw new Error(friendlyError(error));
-      if (!data?.ok) throw rpcError(data);
-      return;
+  async adminEngagementEnd(engagementId, endDate = null) {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_engagement_end', { p_token: session.token, p_engagement_id: engagementId, p_end_date: endDate });
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
     }
-    let query = supabase.from('jornadas').delete().eq('id', id);
-    if (!asAdmin) query = query.eq('trabajador_id', session.usuario.id);
-    const { error } = await query;
+  },
+
+  async adminTime(from = null, to = null, assistantId = null) {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_time', { p_token: session.token, p_from: from, p_to: to, p_assistant_id: assistantId });
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async adminTimeUpdate(payload) {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_time_update', {
+        p_token: session.token,
+        p_entry_id: payload.entry_id,
+        p_date: payload.date,
+        p_start: payload.start,
+        p_end: payload.end,
+        p_reason: payload.reason
+      });
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async adminTimeDelete(entryId, reason) {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_time_delete', { p_token: session.token, p_entry_id: entryId, p_reason: reason });
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async adminBilling(from = null, to = null) {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_billing', { p_token: session.token, p_from: from, p_to: to });
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async adminSettings() {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_settings', { p_token: session.token });
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async adminSettingsSave(fxRate, timezone = null) {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_settings_save', { p_token: session.token, p_fx_rate: fxRate, p_timezone: timezone });
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async adminChangePassword(currentPassword, newPassword) {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_change_password', { p_token: session.token, p_current_password: currentPassword, p_new_password: newPassword });
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async uploadAvatar(file) {
+    const session = getSession();
+    if (!session) throw authError();
+    if (!file) throw new Error('Selecciona una imagen.');
+    if (file.size > 2 * 1024 * 1024) throw new Error('La foto debe pesar 2 MB o menos.');
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('Solo se permiten imágenes JPG, PNG o WebP.');
+    const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+    const name = `${crypto.randomUUID()}.${ext}`;
+    const path = `avatars/${name}`;
+    const { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: false, contentType: file.type });
     if (error) throw new Error(friendlyError(error));
+    const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+    return data.publicUrl;
   }
 };
 
 export async function bootstrap() {
   hydrateIcons();
-  await api.init();
-  return api.secure;
+  try {
+    await rpc('portal_health');
+    return true;
+  } catch {
+    return false;
+  }
 }

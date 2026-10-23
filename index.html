@@ -1,146 +1,184 @@
 <!DOCTYPE html>
-<html lang="es">
-
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#e9edf6">
-    <title>Portal de Trabajadores</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0A1A2F">
+  <title>Kageon Global</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
+<body class="landing">
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">KG</span>
+        <span>Kageon Global<small>VIRTUAL ASSISTANT STAFFING</small></span>
+      </a>
+      <nav class="site-nav">
+        <a href="#how" data-i18n="landing.nav.hire">Hire talent</a>
+        <a href="signup-assistant.html" data-i18n="landing.nav.apply">Apply as assistant</a>
+        <a href="login.html" data-i18n="landing.nav.login">Log in</a>
+      </nav>
+      <div class="site-actions">
+        <div class="lang-switch">
+          <button type="button" data-lang="en" data-i18n="common.english">English</button>
+          <button type="button" data-lang="es" data-i18n="common.spanish">Spanish</button>
+        </div>
+        <a class="btn btn-ghost btn-sm" href="login.html" data-i18n="landing.nav.login">Log in</a>
+        <a class="btn btn-primary btn-sm" href="signup-client.html" data-i18n="landing.hero.cta_hire">Hire a virtual assistant</a>
+      </div>
+    </div>
+  </header>
 
-<body>
-    <main class="auth-shell page-enter">
-        <section class="auth-brand">
-            <span class="badge-app">
-                <span class="icon" data-icon="sparkles" data-size="16"></span>
-                Portal de Trabajadores
-            </span>
-            <h1>Horas claras.<br><span class="gradient-text">Pagos simples.</span></h1>
-            <p class="lead">Registra tus jornadas, calcula las horas efectivas y sabe exactamente cuánto pagar. Sin hojas de cálculo ni papeleo.</p>
-            <ul class="feature-list">
-                <li><span class="dot"><span class="icon" data-icon="clock" data-size="16"></span></span> Entrada, salida y lunch registrados a mano</li>
-                <li><span class="dot"><span class="icon" data-icon="wallet" data-size="16"></span></span> Totales automáticos por trabajador</li>
-                <li><span class="dot"><span class="icon" data-icon="shield" data-size="16"></span></span> Cada cuenta ve solo su información</li>
-            </ul>
-        </section>
-
-        <section class="auth-card-wrap">
-            <div class="window">
-                <div class="window-bar">
-                    <div class="traffic"><i></i><i></i><i></i></div>
-                    <div class="window-title">Iniciar sesión</div>
-                    <span style="width:52px"></span>
-                </div>
-                <div class="window-body">
-                    <header class="auth-head">
-                        <div class="app-icon"><span class="icon" data-icon="clock" data-size="26"></span></div>
-                        <h2>Bienvenido</h2>
-                        <p>Entra con tu cuenta de trabajador o cliente.</p>
-                    </header>
-
-                    <div class="session-choice hidden" id="session-choice">
-                        <span>Tienes más de una sesión abierta en este navegador.</span>
-                        <div class="session-choice-actions">
-                            <button class="btn btn-sm" id="continue-worker" type="button">Continuar como trabajador</button>
-                            <button class="btn btn-sm" id="continue-client" type="button">Continuar como cliente</button>
-                        </div>
-                    </div>
-
-                    <form id="login-form" novalidate>
-                        <div class="field">
-                            <label for="email">Email</label>
-                            <input class="input" id="email" name="email" type="email" autocomplete="username" placeholder="tu@email.com" required>
-                        </div>
-                        <div class="field">
-                            <label for="password">Contraseña</label>
-                            <div class="input-wrap">
-                                <input class="input" id="password" name="password" type="password" autocomplete="current-password" placeholder="********" required>
-                                <button class="ghost-icon" type="button" id="toggle-pass" aria-label="Mostrar contraseña">
-                                    <span class="icon" data-icon="eye" data-size="18"></span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="hint hidden" id="form-error" role="alert">
-                            <span class="icon" data-icon="alert" data-size="16"></span>
-                            <span id="form-error-text"></span>
-                        </div>
-
-                        <button class="btn btn-primary btn-block" id="submit-btn" type="submit">
-                            <span class="spinner"></span>
-                            <span class="btn-label">Entrar</span>
-                            <span class="icon" data-icon="arrowRight" data-size="16"></span>
-                        </button>
-                    </form>
-
-                    <p class="auth-switch">¿Eres el administrador? <a href="admin-login.html">Acceso administrador</a></p>
-                </div>
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <span class="eyebrow">
+            <span class="icon" data-icon="sparkles" data-size="16"></span>
+            <span data-i18n="landing.hero.badge">Kageon Global</span>
+          </span>
+          <h1><span data-i18n="landing.hero.title">Hire vetted virtual assistants without the hiring headache.</span></h1>
+          <p class="lead" data-i18n="landing.hero.text">Tell us what you need, review a short list of pre-screened assistants, and start working with the right person in days, not weeks.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary btn-lg" href="signup-client.html">
+              <span data-i18n="landing.hero.cta_hire">Hire a virtual assistant</span>
+              <span class="icon" data-icon="arrowRight" data-size="16"></span>
+            </a>
+            <a class="btn btn-ghost btn-lg" href="signup-assistant.html" data-i18n="landing.hero.cta_apply">Apply as a virtual assistant</a>
+          </div>
+          <div class="hero-note">
+            <span><span class="icon" data-icon="check" data-size="16"></span><span data-i18n="landing.clients.b1">Pre-screened assistants</span></span>
+            <span><span class="icon" data-icon="check" data-size="16"></span><span data-i18n="landing.clients.b2">One hourly rate per assistant</span></span>
+            <span><span class="icon" data-icon="check" data-size="16"></span><span data-i18n="landing.clients.b3">Daily hours and monthly statements</span></span>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="mock">
+            <div class="mock-top">
+              <div class="brand">
+                <span class="brand-mark">KG</span>
+                <span>Kageon Global<small>PORTAL</small></span>
+              </div>
+              <span class="badge blue">Live</span>
             </div>
-            <p class="foot-note">Portal de Trabajadores - 2026</p>
-        </section>
-    </main>
+            <div class="mock-body">
+              <div class="mock-row">
+                <div class="row">
+                  <div class="avatar sm">AL</div>
+                  <div>
+                    <strong>Ana Lopez</strong>
+                    <p class="tiny muted">Executive Assistant</p>
+                  </div>
+                </div>
+                <span class="badge ok">Approved</span>
+              </div>
+              <div class="mock-row">
+                <span class="muted small">Hours this week</span>
+                <strong>32.50 h</strong>
+              </div>
+              <div class="mock-bar blue" style="width:82%"></div>
+              <div class="mock-stat">
+                <div><strong>$650.00</strong><span>Client</span></div>
+                <div><strong>$390.00</strong><span>Assistant</span></div>
+                <div><strong>$260.00</strong><span>Margin</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <script type="module">
-        import { api, bootstrap, getSession, setLoading, toast, hydrateIcons } from './app.js';
+    <section class="section" id="how">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow" data-i18n="landing.how.title">How it works</span>
+          <h2 data-i18n="landing.how.subtitle">Simple for clients. Simple for assistants.</h2>
+        </div>
+        <div class="steps">
+          <article class="step">
+            <div class="step-num">1</div>
+            <h3 data-i18n="landing.how.client.step1">Request a role</h3>
+            <p data-i18n="landing.how.client.step1_text">Tell us the skills, schedule and budget you need.</p>
+          </article>
+          <article class="step">
+            <div class="step-num">2</div>
+            <h3 data-i18n="landing.how.client.step2">Review candidates</h3>
+            <p data-i18n="landing.how.client.step2_text">Get a short list of assistants with video, skills and availability.</p>
+          </article>
+          <article class="step">
+            <div class="step-num">3</div>
+            <h3 data-i18n="landing.how.client.step3">Start working</h3>
+            <p data-i18n="landing.how.client.step3_text">Choose your assistant and track hours and costs in one place.</p>
+          </article>
+        </div>
+      </div>
+    </section>
 
-        await bootstrap();
+    <section class="section alt">
+      <div class="container columns">
+        <article class="feature-panel">
+          <h3 data-i18n="landing.clients.title">Built for busy teams</h3>
+          <p data-i18n="landing.clients.text">Stop spending weeks screening candidates. Kageon Global sends you a curated short list and handles the rest.</p>
+          <ul class="feature-list">
+            <li><span class="tick"><span class="icon" data-icon="check" data-size="14"></span></span><span data-i18n="landing.clients.b1">Pre-screened assistants</span></li>
+            <li><span class="tick"><span class="icon" data-icon="check" data-size="14"></span></span><span data-i18n="landing.clients.b2">One hourly rate per assistant</span></li>
+            <li><span class="tick"><span class="icon" data-icon="check" data-size="14"></span></span><span data-i18n="landing.clients.b3">Daily hours and monthly statements</span></li>
+          </ul>
+          <div class="row" style="margin-top:18px">
+            <a class="btn btn-primary" href="signup-client.html" data-i18n="landing.cta.client">Create a client account</a>
+          </div>
+        </article>
+        <article class="feature-panel dark">
+          <h3 data-i18n="landing.assistants.title">Work from anywhere</h3>
+          <p data-i18n="landing.assistants.text">Build a professional profile, apply to open roles and keep a clear record of your hours.</p>
+          <ul class="feature-list">
+            <li><span class="tick"><span class="icon" data-icon="check" data-size="14"></span></span><span data-i18n="landing.assistants.b1">Open registration</span></li>
+            <li><span class="tick"><span class="icon" data-icon="check" data-size="14"></span></span><span data-i18n="landing.assistants.b2">Public profile with video and skills</span></li>
+            <li><span class="tick"><span class="icon" data-icon="check" data-size="14"></span></span><span data-i18n="landing.assistants.b3">Transparent hourly pay</span></li>
+          </ul>
+          <div class="row" style="margin-top:18px">
+            <a class="btn btn-soft" href="signup-assistant.html" data-i18n="landing.cta.assistant">Create an assistant account</a>
+          </div>
+        </article>
+      </div>
+    </section>
 
-        const workerSession = getSession('trabajador');
-        const clientSession = getSession('cliente');
+    <section class="cta-band">
+      <div class="container">
+        <div class="cta-inner">
+          <div>
+            <h2 data-i18n="landing.cta.title">Ready to get started?</h2>
+            <p data-i18n="landing.cta.text">Create your account in minutes.</p>
+          </div>
+          <div class="row wrap">
+            <a class="btn btn-soft" href="signup-client.html" data-i18n="landing.cta.client">Create a client account</a>
+            <a class="btn" style="--btn-bg:transparent;--btn-fg:#fff;--btn-border:rgba(255,255,255,.4)" href="signup-assistant.html" data-i18n="landing.cta.assistant">Create an assistant account</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-        if (workerSession && clientSession) {
-            document.getElementById('session-choice').classList.remove('hidden');
-            document.getElementById('continue-worker').addEventListener('click', () => location.replace('trabajador.html'));
-            document.getElementById('continue-client').addEventListener('click', () => location.replace('cliente.html'));
-        } else if (workerSession) {
-            location.replace('trabajador.html');
-        } else if (clientSession) {
-            location.replace('cliente.html');
-        }
+  <footer class="site-footer">
+    <div class="container">
+      <div class="row">
+        <a class="brand" href="index.html">
+          <span class="brand-mark">KG</span>
+          <span>Kageon Global<small>VIRTUAL ASSISTANT STAFFING</small></span>
+        </a>
+        <p data-i18n="landing.footer.tagline">Virtual assistant staffing for growing teams.</p>
+      </div>
+      <p>2026 Kageon Global. <span data-i18n="landing.footer.rights">All rights reserved.</span></p>
+    </div>
+  </footer>
 
-        const form = document.getElementById('login-form');
-        const email = document.getElementById('email');
-        const password = document.getElementById('password');
-        const errorBox = document.getElementById('form-error');
-        const errorText = document.getElementById('form-error-text');
-        const button = document.getElementById('submit-btn');
-        const toggle = document.getElementById('toggle-pass');
-
-        toggle.addEventListener('click', () => {
-            const hidden = password.type === 'password';
-            password.type = hidden ? 'text' : 'password';
-            toggle.querySelector('[data-icon]').setAttribute('data-icon', hidden ? 'eyeOff' : 'eye');
-            toggle.setAttribute('aria-label', hidden ? 'Ocultar contraseña' : 'Mostrar contraseña');
-            hydrateIcons(toggle);
-        });
-
-        function showError(message) {
-            errorText.textContent = message;
-            errorBox.classList.remove('hidden');
-        }
-
-        form.addEventListener('submit', async event => {
-            event.preventDefault();
-            errorBox.classList.add('hidden');
-            setLoading(button, true);
-            try {
-                const result = await api.login(email.value, password.value);
-                if (!result.ok) {
-                    showError(result.error);
-                    password.select();
-                    return;
-                }
-                toast('Sesión iniciada. Redirigiendo...', 'ok', 1600);
-                const target = result.session.rol === 'admin' ? 'admin.html' : result.session.rol === 'trabajador' ? 'trabajador.html' : 'cliente.html';
-                setTimeout(() => location.replace(target), 320);
-            } catch (error) {
-                showError(error.message || 'No se pudo iniciar sesión.');
-            } finally {
-                setLoading(button, false);
-            }
-        });
-    </script>
+  <script type="module">
+    import { hydrateIcons } from './app.js';
+    import { initI18n, bindLanguageControls } from './i18n.js';
+    hydrateIcons();
+    await initI18n();
+    bindLanguageControls();
+  </script>
 </body>
-
 </html>

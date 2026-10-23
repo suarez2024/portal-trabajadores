@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0A1A2F">
+  <title data-i18n="auth.signup.assistant.title">Create your assistant profile</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="auth-shell">
+    <section class="auth-brand">
+      <div>
+        <a class="brand on-dark" href="index.html">
+          <span class="brand-mark">KG</span>
+          <span>Kageon Global<small>VIRTUAL ASSISTANT STAFFING</small></span>
+        </a>
+        <h1><span data-i18n="landing.hero.cta_apply">Apply as a virtual assistant</span></h1>
+        <p class="lead" data-i18n="auth.signup.assistant.subtitle">Show clients what you can do. We review every profile before it goes live.</p>
+        <ul class="auth-features">
+          <li><span class="mark"><span class="icon" data-icon="user" data-size="16"></span></span><span data-i18n="landing.assistants.b2">Public profile with video and skills</span></li>
+          <li><span class="mark"><span class="icon" data-icon="briefcase" data-size="16"></span></span><span data-i18n="assistant.jobs.title">Job board</span></li>
+          <li><span class="mark"><span class="icon" data-icon="wallet" data-size="16"></span></span><span data-i18n="landing.assistants.b3">Transparent hourly pay</span></li>
+        </ul>
+      </div>
+      <div class="lang-switch on-dark">
+        <button type="button" data-lang="en" data-i18n="common.english">English</button>
+        <button type="button" data-lang="es" data-i18n="common.spanish">Spanish</button>
+      </div>
+    </section>
+    <section class="auth-card-wrap">
+      <div class="auth-card" style="width:min(560px,100%)">
+        <div class="auth-topbar">
+          <a class="row" href="index.html">
+            <span class="icon" data-icon="arrowRight" data-size="16" style="transform:rotate(180deg)"></span>
+            <span class="small muted" data-i18n="portal.back_home">Back to home</span>
+          </a>
+          <div class="lang-switch">
+            <button type="button" data-lang="en" data-i18n="common.english">English</button>
+            <button type="button" data-lang="es" data-i18n="common.spanish">Spanish</button>
+          </div>
+        </div>
+        <header class="auth-head">
+          <h2 data-i18n="auth.signup.assistant.title">Create your assistant profile</h2>
+          <p data-i18n="auth.signup.assistant.subtitle">Show clients what you can do. We review every profile before it goes live.</p>
+        </header>
+        <form class="auth-form" id="signup-form" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label for="first_name" data-i18n="auth.signup.assistant.first_name">First name</label>
+              <input class="input" id="first_name" required>
+            </div>
+            <div class="field">
+              <label for="full_name" data-i18n="auth.signup.assistant.full_name">Full name</label>
+              <input class="input" id="full_name" required>
+            </div>
+            <div class="field full">
+              <label for="headline" data-i18n="auth.signup.assistant.headline">Professional headline</label>
+              <input class="input" id="headline" data-i18n-placeholder="auth.placeholder.headline">
+            </div>
+            <div class="field full">
+              <label for="email" data-i18n="auth.login.email">Email</label>
+              <input class="input" id="email" type="email" autocomplete="email" required data-i18n-placeholder="auth.placeholder.email">
+            </div>
+            <div class="field full">
+              <label for="password" data-i18n="auth.login.password">Password</label>
+              <div class="input-wrap">
+                <input class="input" id="password" type="password" autocomplete="new-password" minlength="8" required data-i18n-placeholder="auth.placeholder.password">
+                <button class="ghost-icon" type="button" id="toggle-pass" aria-label="Show password">
+                  <span class="icon" data-icon="eye" data-size="18"></span>
+                </button>
+              </div>
+            </div>
+            <div class="field full">
+              <label data-i18n="auth.signup.assistant.skills">Skills</label>
+              <div class="chip-input">
+                <input class="input" id="skill-input" data-i18n-placeholder="auth.placeholder.skill">
+                <button class="btn btn-soft btn-sm" type="button" id="add-skill" data-i18n="auth.signup.add">Add</button>
+              </div>
+              <div class="chips" id="skills-chips"></div>
+            </div>
+            <div class="field full">
+              <label data-i18n="auth.signup.assistant.languages">Languages</label>
+              <div class="chip-input">
+                <input class="input" id="language-input" data-i18n-placeholder="auth.placeholder.language">
+                <button class="btn btn-soft btn-sm" type="button" id="add-language" data-i18n="auth.signup.add">Add</button>
+              </div>
+              <div class="chips" id="languages-chips"></div>
+            </div>
+            <div class="field full">
+              <label data-i18n="auth.signup.assistant.certifications">Certifications</label>
+              <div class="chip-input">
+                <input class="input" id="cert-input" data-i18n-placeholder="auth.placeholder.certification">
+                <button class="btn btn-soft btn-sm" type="button" id="add-cert" data-i18n="auth.signup.add">Add</button>
+              </div>
+              <div class="chips" id="certs-chips"></div>
+            </div>
+            <div class="field">
+              <label for="availability" data-i18n="auth.signup.assistant.availability">Availability</label>
+              <input class="input" id="availability" data-i18n-placeholder="auth.placeholder.availability">
+            </div>
+            <div class="field">
+              <label for="country" data-i18n="common.country">Country</label>
+              <input class="input" id="country" data-i18n-placeholder="auth.placeholder.country">
+            </div>
+            <div class="field full">
+              <label for="video" data-i18n="auth.signup.assistant.video">Intro video (YouTube link)</label>
+              <input class="input" id="video" data-i18n-placeholder="auth.placeholder.video">
+              <p class="tiny muted" data-i18n="auth.signup.video_hint">YouTube link only.</p>
+            </div>
+            <div class="field full">
+              <label for="photo" data-i18n="auth.signup.assistant.photo">Profile photo</label>
+              <input class="input" id="photo" type="file" accept="image/jpeg,image/png,image/webp">
+              <p class="tiny muted" data-i18n="auth.signup.photo_hint">JPG, PNG or WebP. Max 2 MB.</p>
+              <div class="row" style="margin-top:10px">
+                <div class="avatar lg" id="photo-preview"><span class="icon" data-icon="user" data-size="28"></span></div>
+                <button class="btn btn-ghost btn-sm" type="button" id="clear-photo" data-i18n="common.delete">Delete</button>
+              </div>
+            </div>
+          </div>
+          <div class="hint hidden" id="form-hint">
+            <span class="icon" data-icon="alert" data-size="16"></span>
+            <span id="form-hint-text"></span>
+          </div>
+          <p class="tiny muted" data-i18n="auth.signup.pending_note">You will be able to log in once your account is approved.</p>
+          <button class="btn btn-primary btn-block" id="submit-btn" type="submit">
+            <span class="spinner"></span>
+            <span class="btn-label" data-i18n="auth.signup.assistant.submit">Create profile</span>
+            <span class="icon" data-icon="arrowRight" data-size="16"></span>
+          </button>
+        </form>
+        <div class="auth-switch">
+          <span data-i18n="auth.signup.assistant.have">Already have an account?</span> <a href="login.html" data-i18n="auth.signup.assistant.login">Log in</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toasts"></div>
+
+  <script type="module">
+    import { api, bootstrap, setLoading, toast, hydrateIcons } from './app.js';
+    import { initI18n, bindLanguageControls, t } from './i18n.js';
+
+    await bootstrap();
+    hydrateIcons();
+    await initI18n();
+    bindLanguageControls();
+
+    const form = document.getElementById('signup-form');
+    const button = document.getElementById('submit-btn');
+    const hint = document.getElementById('form-hint');
+    const hintText = document.getElementById('form-hint-text');
+    const toggle = document.getElementById('toggle-pass');
+    const password = document.getElementById('password');
+
+    toggle.addEventListener('click', () => {
+      const hidden = password.type === 'password';
+      password.type = hidden ? 'text' : 'password';
+      toggle.querySelector('[data-icon]').setAttribute('data-icon', hidden ? 'eyeOff' : 'eye');
+      hydrateIcons(toggle);
+    });
+
+    const skills = [];
+    const languages = [];
+    const certifications = [];
+    const skillInput = document.getElementById('skill-input');
+    const langInput = document.getElementById('language-input');
+    const certInput = document.getElementById('cert-input');
+
+    function addChip(list, input, container) {
+      const value = input.value.trim();
+      if (!value || list.includes(value)) { input.value=''; return; }
+      list.push(value);
+      input.value = '';
+      renderChips(list, container, (idx) => { list.splice(idx,1); renderChips(list,container,arguments.callee); });
+    }
+
+    function renderChips(list, container, removeFn) {
+      container.innerHTML = '';
+      list.forEach((item, idx) => {
+        const chip = document.createElement('span');
+        chip.className = 'chip';
+        chip.innerHTML = `<span>${item}</span><button type="button" aria-label="Remove"><span class="icon" data-icon="x" data-size="14"></span></button>`;
+        chip.querySelector('button').addEventListener('click', () => removeFn(idx));
+        container.appendChild(chip);
+      });
+      hydrateIcons(container);
+    }
+
+    document.getElementById('add-skill').addEventListener('click', () => addChip(skills, skillInput, document.getElementById('skills-chips')));
+    document.getElementById('add-language').addEventListener('click', () => addChip(languages, langInput, document.getElementById('languages-chips')));
+    document.getElementById('add-cert').addEventListener('click', () => addChip(certifications, certInput, document.getElementById('certs-chips')));
+    skillInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addChip(skills, skillInput, document.getElementById('skills-chips')); }});
+    langInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addChip(languages, langInput, document.getElementById('languages-chips')); }});
+    certInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addChip(certifications, certInput, document.getElementById('certs-chips')); }});
+
+    const photoInput = document.getElementById('photo');
+    const photoPreview = document.getElementById('photo-preview');
+    let photoUrl = null;
+
+    photoInput.addEventListener('change', async () => {
+      const file = photoInput.files?.[0];
+      if (!file) return;
+      try {
+        const url = await api.uploadAvatar(file);
+        photoUrl = url;
+        photoPreview.innerHTML = `<img src="${url}" alt="Photo">`;
+      } catch (error) {
+        hintText.textContent = error.message;
+        hint.classList.remove('hidden');
+        hint.classList.add('danger');
+        photoInput.value = '';
+      }
+    });
+
+    document.getElementById('clear-photo').addEventListener('click', () => {
+      photoUrl = null;
+      photoInput.value = '';
+      photoPreview.innerHTML = '<span class="icon" data-icon="user" data-size="28"></span>';
+      hydrateIcons(photoPreview);
+    });
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      hint.classList.add('hidden');
+      hint.classList.remove('danger');
+      if (skills.length === 0) {
+        hintText.textContent = t('validation.skills');
+        hint.classList.remove('hidden');
+        hint.classList.add('danger');
+        return;
+      }
+      const video = document.getElementById('video').value.trim();
+      if (video && !/youtube\.com|youtu\.be/i.test(video)) {
+        hintText.textContent = t('validation.video');
+        hint.classList.remove('hidden');
+        hint.classList.add('danger');
+        return;
+      }
+      setLoading(button, true);
+      try {
+        const payload = {
+          email: document.getElementById('email').value,
+          password: password.value,
+          first_name: document.getElementById('first_name').value,
+          full_name: document.getElementById('full_name').value,
+          headline: document.getElementById('headline').value,
+          skills,
+          languages,
+          certifications,
+          availability: document.getElementById('availability').value,
+          video_url: video || null,
+          photo_url: photoUrl,
+          country: document.getElementById('country').value,
+          timezone: 'UTC'
+        };
+        await api.signupAssistant(payload);
+        toast(t('auth.signup.success.title'), 'ok', 2000);
+        setTimeout(() => location.replace('login.html'), 600);
+      } catch (error) {
+        hintText.textContent = error.message;
+        hint.classList.remove('hidden');
+        hint.classList.add('danger');
+      } finally {
+        setLoading(button, false);
+      }
+    });
+
+    hydrateIcons();
+  </script>
+</body>
+</html>

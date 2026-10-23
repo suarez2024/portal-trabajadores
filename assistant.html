@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0A1A2F">
+  <title data-i18n="assistant.nav.dashboard">Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand on-dark" href="index.html">
+        <span class="brand-mark">KG</span>
+        <span>Kageon Global<small>ASSISTANT PORTAL</small></span>
+      </a>
+      <nav class="nav">
+        <div class="nav-label">Menu</div>
+        <button class="nav-item active" data-nav="dashboard" data-section="dashboard">
+          <span class="icon" data-icon="home" data-size="18"></span>
+          <span data-i18n="assistant.nav.dashboard">Dashboard</span>
+        </button>
+        <button class="nav-item" data-nav="jobs" data-section="jobs">
+          <span class="icon" data-icon="search" data-size="18"></span>
+          <span data-i18n="assistant.nav.jobs">Job board</span>
+        </button>
+        <button class="nav-item" data-nav="applications" data-section="applications">
+          <span class="icon" data-icon="fileText" data-size="18"></span>
+          <span data-i18n="assistant.nav.applications">Applications</span>
+        </button>
+        <button class="nav-item" data-nav="time" data-section="time">
+          <span class="icon" data-icon="clock" data-size="18"></span>
+          <span data-i18n="assistant.nav.time">Time entries</span>
+        </button>
+        <button class="nav-item" data-nav="earnings" data-section="earnings">
+          <span class="icon" data-icon="wallet" data-size="18"></span>
+          <span data-i18n="assistant.nav.earnings">Earnings</span>
+        </button>
+        <button class="nav-item" data-nav="profile" data-section="profile">
+          <span class="icon" data-icon="user" data-size="18"></span>
+          <span data-i18n="assistant.nav.profile">Profile</span>
+        </button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="user-chip">
+          <div class="avatar" id="user-avatar">AS</div>
+          <div class="meta">
+            <strong id="user-name">-</strong>
+            <span id="user-role">Assistant</span>
+          </div>
+        </div>
+        <div class="lang-switch on-dark">
+          <button type="button" data-lang="en" data-i18n="common.english">English</button>
+          <button type="button" data-lang="es" data-i18n="common.spanish">Spanish</button>
+        </div>
+        <button class="btn btn-ghost btn-block" id="logout-btn">
+          <span class="icon" data-icon="logout" data-size="16"></span>
+          <span data-i18n="common.logout">Log out</span>
+        </button>
+      </div>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+    <main class="main">
+      <header class="mobile-bar">
+        <button class="btn btn-ghost btn-icon" id="mobile-toggle"><span class="icon" data-icon="menu" data-size="18"></span></button>
+        <div class="brand"><span class="brand-mark">KG</span><span>Kageon Global</span></div>
+        <div class="lang-switch"><button type="button" data-lang="en">EN</button><button type="button" data-lang="es">ES</button></div>
+      </header>
+      <div class="topbar">
+        <div>
+          <h1 id="page-title" data-i18n="assistant.dashboard.title">Dashboard</h1>
+          <p id="page-subtitle" data-i18n="assistant.dashboard.subtitle">Your hours, assignment and notifications.</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost btn-sm" id="refresh-btn"><span class="icon" data-icon="refresh" data-size="16"></span><span data-i18n="common.refresh">Refresh</span></button>
+        </div>
+      </div>
+      <div class="content">
+        <section class="page-section active" data-section="dashboard">
+          <div class="grid grid-stats">
+            <article class="stat"><span class="stat-label" data-i18n="assistant.dashboard.today">Hours today</span><span class="stat-value" id="stat-today">0.00 h</span></article>
+            <article class="stat"><span class="stat-label" data-i18n="assistant.dashboard.week">Hours this week</span><span class="stat-value" id="stat-week">0.00 h</span></article>
+            <article class="stat"><span class="stat-label" data-i18n="assistant.dashboard.month">Hours this month</span><span class="stat-value" id="stat-month">0.00 h</span></article>
+            <article class="stat accent"><span class="stat-label" data-i18n="assistant.dashboard.assignment">Active assignment</span><span class="stat-value" id="stat-assignment">-</span></article>
+          </div>
+          <div class="two-col">
+            <div class="card">
+              <div class="card-head"><div><h2 data-i18n="assistant.dashboard.assignment">Active assignment</h2><p data-i18n="assistant.dashboard.client">Client</p></div></div>
+              <div class="card-body" id="assignment-body"></div>
+            </div>
+            <div class="stack">
+              <div class="card">
+                <div class="card-head"><div><h2 data-i18n="assistant.dashboard.missing_title">Missing hours</h2><p data-i18n="assistant.dashboard.missing_text">You have days without hours reported more than 15 days ago.</p></div></div>
+                <div class="card-body stack-sm" id="missing-list"></div>
+              </div>
+              <div class="card">
+                <div class="card-head"><div><h2 data-i18n="assistant.dashboard.notifications">Notifications</h2></div><button class="btn btn-ghost btn-sm" id="mark-read"><span data-i18n="portal.mark_read">Mark all as read</span></button></div>
+                <div class="card-body stack-sm" id="notifications-list"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="page-section" data-section="jobs">
+          <div class="card">
+            <div class="card-head"><div><h2 data-i18n="assistant.jobs.title">Job board</h2><p data-i18n="assistant.jobs.subtitle">Open roles that match your profile.</p></div></div>
+            <div class="card-body stack" id="jobs-list"></div>
+          </div>
+        </section>
+
+        <section class="page-section" data-section="applications">
+          <div class="card">
+            <div class="card-head"><div><h2 data-i18n="assistant.applications.title">Applications</h2><p data-i18n="assistant.applications.subtitle">Track the roles you applied to.</p></div></div>
+            <div class="table-wrap"><table class="data"><thead><tr><th data-i18n="assistant.applications.job">Job</th><th data-i18n="admin.jobs.client">Client</th><th data-i18n="assistant.applications.status">Status</th><th data-i18n="assistant.applications.applied_on">Applied on</th></tr></thead><tbody id="applications-table"></tbody></table></div>
+          </div>
+        </section>
+
+        <section class="page-section" data-section="time">
+          <div class="grid grid-2">
+            <div class="card">
+              <div class="card-head"><div><h2 data-i18n="assistant.time.title">Time entries</h2><p data-i18n="assistant.time.subtitle">Log your hours day by day.</p></div></div>
+              <div class="card-body">
+                <form class="stack" id="time-form">
+                  <div class="form-grid">
+                    <div class="field full"><label data-i18n="assistant.time.date">Date</label><input class="input" type="date" id="time-date" required></div>
+                    <div class="field"><label data-i18n="assistant.time.start">Start</label><input class="input" type="time" id="time-start" required></div>
+                    <div class="field"><label data-i18n="assistant.time.end">End</label><input class="input" type="time" id="time-end" required></div>
+                  </div>
+                  <button class="btn btn-primary" id="time-add"><span class="spinner"></span><span class="btn-label" data-i18n="assistant.time.add">Add entry</span></button>
+                </form>
+                <p class="tiny muted" data-i18n="assistant.time.late">Late entries are allowed. Days older than 15 days appear in your notifications.</p>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head"><div><h2 data-i18n="assistant.time.entries">Entries</h2><p><span data-i18n="assistant.time.total">Total</span>: <span id="time-total">0.00 h</span></p></div></div>
+              <div class="table-wrap"><table class="data"><thead><tr><th data-i18n="common.date">Date</th><th data-i18n="assistant.time.start">Start</th><th data-i18n="assistant.time.end">End</th><th data-i18n="common.hours">Hours</th><th data-i18n="common.actions">Actions</th></tr></thead><tbody id="time-table"></tbody></table></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="page-section" data-section="earnings">
+          <div class="card">
+            <div class="card-head"><div><h2 data-i18n="assistant.earnings.title">Earnings</h2><p data-i18n="assistant.earnings.subtitle">Your hours and estimated pay.</p></div><button class="btn btn-ghost btn-sm" id="download-earnings"><span class="icon" data-icon="fileText" data-size="16"></span><span data-i18n="assistant.earnings.download">Download CSV</span></button></div>
+            <div class="card-body"><p class="small muted"><span data-i18n="assistant.earnings.fx">Estimated at {rate} MXN per USD.</span></p></div>
+            <div class="table-wrap"><table class="data"><thead><tr><th data-i18n="common.date">Date</th><th data-i18n="assistant.dashboard.client">Client</th><th data-i18n="common.hours">Hours</th><th data-i18n="common.rate">Rate</th><th data-i18n="assistant.earnings.usd">Pay (USD)</th><th data-i18n="assistant.earnings.mxn">Estimated pay (MXN)</th></tr></thead><tbody id="earnings-table"></tbody><tfoot id="earnings-foot"></tfoot></table></div>
+          </div>
+        </section>
+
+        <section class="page-section" data-section="profile">
+          <div class="two-col">
+            <div class="card">
+              <div class="card-head"><div><h2 data-i18n="assistant.profile.public">Public profile</h2><p data-i18n="assistant.profile.public_note">Clients only see your first name, photo, video, skills, languages, certifications and availability.</p></div></div>
+              <div class="card-body">
+                <form class="stack" id="profile-form">
+                  <div class="form-grid">
+                    <div class="field"><label data-i18n="assistant.profile.first_name">First name</label><input class="input" id="p-first" required></div>
+                    <div class="field"><label data-i18n="assistant.profile.full_name">Full name</label><input class="input" id="p-full" required></div>
+                    <div class="field full"><label data-i18n="assistant.profile.headline">Headline</label><input class="input" id="p-headline"></div>
+                    <div class="field full"><label data-i18n="assistant.profile.skills">Skills</label><div class="chip-input"><input class="input" id="p-skill"><button class="btn btn-soft btn-sm" type="button" id="p-add-skill" data-i18n="auth.signup.add">Add</button></div><div class="chips" id="p-skills"></div></div>
+                    <div class="field full"><label data-i18n="assistant.profile.languages">Languages</label><div class="chip-input"><input class="input" id="p-lang"><button class="btn btn-soft btn-sm" type="button" id="p-add-lang" data-i18n="auth.signup.add">Add</button></div><div class="chips" id="p-langs"></div></div>
+                    <div class="field full"><label data-i18n="assistant.profile.certifications">Certifications</label><div class="chip-input"><input class="input" id="p-cert"><button class="btn btn-soft btn-sm" type="button" id="p-add-cert" data-i18n="auth.signup.add">Add</button></div><div class="chips" id="p-certs"></div></div>
+                    <div class="field full"><label data-i18n="assistant.profile.availability">Availability</label><input class="input" id="p-availability"></div>
+                    <div class="field full"><label data-i18n="assistant.profile.video">Intro video (YouTube)</label><input class="input" id="p-video"></div>
+                    <div class="field full"><label data-i18n="assistant.profile.photo">Profile photo</label><input class="input" type="file" id="p-photo" accept="image/jpeg,image/png,image/webp"><div class="row" style="margin-top:10px"><div class="avatar lg" id="p-photo-preview"><span class="icon" data-icon="user" data-size="28"></span></div></div></div>
+                  </div>
+                  <div class="form-actions"><button class="btn btn-primary" id="p-save"><span class="spinner"></span><span class="btn-label" data-i18n="common.save">Save</span></button></div>
+                </form>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-head"><div><h2 data-i18n="assistant.profile.private">Private information</h2></div></div>
+              <div class="card-body stack-sm">
+                <div class="row-between"><span class="muted" data-i18n="common.email">Email</span><span id="p-email"></span></div>
+                <div class="row-between"><span class="muted" data-i18n="assistant.profile.code">Public ID</span><span class="code" id="p-code"></span></div>
+                <div class="row-between"><span class="muted" data-i18n="assistant.profile.status">Account status</span><span class="badge ok" id="p-status"></span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+  <div class="toasts"></div>
+
+  <script type="module">
+    import { api, bootstrap, setLoading, toast, fmtDate, fmtTime, hoursText, money } from './app.js';
+    import { initI18n, bindLanguageControls, t } from './i18n.js';
+    import { initShell, setSection } from './portal.js';
+    import { toCsv, downloadCsv } from './csv.js';
+
+    await bootstrap();
+    await initI18n();
+    bindLanguageControls();
+    const session = await api.session();
+    if (!session || session.role !== 'assistant') location.replace('login.html');
+
+    initShell({ session, role: 'assistant', activeNav: 'dashboard', onLogout: async () => { await api.logout(); location.replace('login.html'); }});
+
+    document.querySelectorAll('.nav-item[data-section]').forEach(item => {
+      item.addEventListener('click', () => {
+        const section = item.dataset.section;
+        setSection(section);
+        const titles = { dashboard: ['assistant.dashboard.title','assistant.dashboard.subtitle'], jobs: ['assistant.jobs.title','assistant.jobs.subtitle'], applications: ['assistant.applications.title','assistant.applications.subtitle'], time: ['assistant.time.title','assistant.time.subtitle'], earnings: ['assistant.earnings.title','assistant.earnings.subtitle'], profile: ['assistant.profile.title','assistant.profile.subtitle'] };
+        document.getElementById('page-title').dataset.i18n = titles[section][0];
+        document.getElementById('page-subtitle').dataset.i18n = titles[section][1];
+        import('./i18n.js').then(m => m.applyI18n(document.querySelector('.topbar')));
+        document.querySelector('.sidebar')?.classList.remove('open');
+        document.getElementById('scrim')?.classList.remove('open');
+      });
+    });
+
+    const skills = [], languages = [], certifications = [];
+    function chip(inputId, addId, listId, arr) {
+      document.getElementById(addId).addEventListener('click', () => {
+        const v = document.getElementById(inputId).value.trim();
+        if (!v || arr.includes(v)) { document.getElementById(inputId).value=''; return; }
+        arr.push(v); document.getElementById(inputId).value='';
+        render();
+      });
+      function render(){
+        const c = document.getElementById(listId); c.innerHTML='';
+        arr.forEach((x,i)=>{ const s=document.createElement('span'); s.className='chip'; s.innerHTML='<span>'+x+'</span><button type="button"><span class="icon" data-icon="x" data-size="14"></span></button>'; s.querySelector('button').onclick=()=>{arr.splice(i,1);render();}; c.appendChild(s);});
+        import('./app.js').then(m=>m.hydrateIcons(c));
+      }
+      render();
+      return render;
+    }
+    chip('p-skill','p-add-skill','p-skills',skills);
+    chip('p-lang','p-add-lang','p-langs',languages);
+    chip('p-cert','p-add-cert','p-certs',certifications);
+
+    document.getElementById('p-photo').addEventListener('change', async e => {
+      const f = e.target.files?.[0]; if(!f) return;
+      try { const url = await api.uploadAvatar(f); document.getElementById('p-photo-preview').innerHTML='<img src="'+url+'" alt="">'; document.getElementById('p-photo-preview').dataset.url=url; } catch(err){ toast(err.message,'err'); e.target.value=''; }
+    });
+
+    let earningsData = [];
+
+    async function load() {
+      try {
+        const [dash, jobs, apps, timeData, earnings, profile] = await Promise.all([
+          api.assistantDashboard(), api.assistantJobs(), api.assistantApplications(), api.assistantTime(), api.assistantEarnings(), api.assistantProfile()
+        ]);
+
+        document.getElementById('stat-today').textContent = (dash.stats.today_minutes/60).toFixed(2)+' h';
+        document.getElementById('stat-week').textContent = (dash.stats.week_minutes/60).toFixed(2)+' h';
+        document.getElementById('stat-month').textContent = (dash.stats.month_minutes/60).toFixed(2)+' h';
+        document.getElementById('stat-assignment').textContent = dash.assignments.length ? dash.assignments[0].client_company : '-';
+
+        const ab = document.getElementById('assignment-body'); ab.innerHTML='';
+        if(!dash.assignments.length){ ab.innerHTML='<p class="muted">'+t('assistant.dashboard.no_assignment')+'</p>'; }
+        else {
+          const a = dash.assignments[0];
+          ab.innerHTML='<div class="stack-sm"><div class="row-between"><span class="muted">'+t('assistant.dashboard.client')+'</span><strong>'+a.client_company+'</strong></div><div class="row-between"><span class="muted">'+t('assistant.dashboard.rate')+'</span><span class="mono">'+money(a.assistant_rate)+t('common.per_hour')+'</span></div><div class="row-between"><span class="muted">'+t('assistant.dashboard.schedule')+'</span><span>'+(a.work_days||[]).join(',')+'</span></div><div class="row-between"><span class="muted">'+t('assistant.dashboard.since')+'</span><span>'+fmtDate(a.start_date)+'</span></div></div>';
+        }
+
+        const ml = document.getElementById('missing-list'); ml.innerHTML='';
+        if(!dash.missing_days.length){ ml.innerHTML='<p class="muted small">'+t('assistant.dashboard.no_notifications')+'</p>'; }
+        else {
+          for(const m of dash.missing_days.slice(0,5)){
+            const div = document.createElement('div'); div.className='notification';
+            div.innerHTML='<div class="meta"><strong>'+fmtDate(m.date)+'</strong><span>'+m.client_company+'</span></div><button class="btn btn-ghost btn-sm" data-ignore="'+m.engagement_id+'|'+m.date+'">'+t('assistant.dashboard.ignore')+'</button>';
+            ml.appendChild(div);
+          }
+          ml.querySelectorAll('[data-ignore]').forEach(b=>b.addEventListener('click',async()=>{const [e,d]=b.dataset.ignore.split('|'); await api.assistantIgnoreMissing(e,d); toast(t('common.success'),'ok'); load();}));
+        }
+
+        const nl = document.getElementById('notifications-list'); nl.innerHTML='';
+        if(!dash.notifications.length){ nl.innerHTML='<p class="muted small">'+t('assistant.dashboard.no_notifications')+'</p>'; }
+        else {
+          for(const n of dash.notifications.slice(0,6)){
+            const div = document.createElement('div'); div.className='notification';
+            div.innerHTML='<div class="meta"><strong>'+n.kind+'</strong><span>'+fmtDate(n.created_at)+'</span></div>';
+            nl.appendChild(div);
+          }
+        }
+        document.getElementById('mark-read').onclick = async ()=>{ await api.markNotifications(); toast(t('common.success'),'ok'); load(); };
+
+        const jl = document.getElementById('jobs-list'); jl.innerHTML='';
+        if(!jobs.jobs.length){ jl.innerHTML='<div class="empty"><div class="icon"><span class="icon" data-icon="search" data-size="22"></span></div><p>'+t('assistant.jobs.no')+'</p></div>'; }
+        else {
+          for(const j of jobs.jobs){
+            const card = document.createElement('article'); card.className='card';
+            card.innerHTML='<div class="card-head"><div><h3>'+j.title+'</h3><p class="muted">'+(j.client_company||t('admin.jobs.generic'))+' - '+money(j.rate)+t('common.per_hour')+'</p></div>'+(j.application_status?'<span class="badge">'+j.application_status+'</span>':'<button class="btn btn-primary btn-sm" data-apply="'+j.id+'">'+t('assistant.jobs.apply')+'</button>')+'</div><div class="card-body"><p class="small">'+(j.description||'-')+'</p><p class="tiny muted">'+(j.schedule||'-')+'</p></div>';
+            jl.appendChild(card);
+          }
+          jl.querySelectorAll('[data-apply]').forEach(b=>b.addEventListener('click',async()=>{ try{ await api.assistantApply(b.dataset.apply); toast(t('assistant.jobs.apply_ok'),'ok'); load(); }catch(e){ toast(e.message,'err'); }}));
+        }
+
+        const at = document.getElementById('applications-table'); at.innerHTML='';
+        if(!apps.applications.length){ at.innerHTML='<tr><td colspan="4" class="muted center">'+t('assistant.applications.no')+'</td></tr>'; }
+        else {
+          for(const a of apps.applications){
+            const tr=document.createElement('tr');
+            tr.innerHTML='<td><strong>'+a.job_title+'</strong><div class="tiny muted">'+(a.schedule||'')+'</div></td><td>'+(a.client_company||'-')+'</td><td><span class="badge">'+a.status+'</span></td><td>'+fmtDate(a.created_at)+'</td>';
+            at.appendChild(tr);
+          }
+        }
+
+        document.getElementById('time-date').value = (await import('./app.js')).todayISO();
+        document.getElementById('time-total').textContent = (timeData.total_minutes/60).toFixed(2)+' h';
+        const tt = document.getElementById('time-table'); tt.innerHTML='';
+        if(!timeData.entries.length){ tt.innerHTML='<tr><td colspan="5" class="muted center">'+t('assistant.time.no')+'</td></tr>'; }
+        else {
+          for(const e of timeData.entries){
+            const tr=document.createElement('tr');
+            const h = (e.minutes/60).toFixed(2);
+            tr.innerHTML='<td>'+fmtDate(e.date)+'</td><td>'+fmtTime(e.start_time)+'</td><td>'+fmtTime(e.end_time)+'</td><td class="mono">'+h+' h</td><td><button class="btn btn-ghost btn-sm" data-del="'+e.id+'">'+t('common.delete')+'</button></td>';
+            tt.appendChild(tr);
+          }
+          tt.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',async()=>{ try{ await api.assistantDeleteTime(b.dataset.del); toast(t('assistant.time.deleted'),'ok'); load(); }catch(e){ toast(e.message,'err'); }}));
+        }
+        document.getElementById('time-form').onsubmit = async ev=>{
+          ev.preventDefault();
+          const btn=document.getElementById('time-add'); setLoading(btn,true);
+          try{ await api.assistantAddTime({ date: document.getElementById('time-date').value, start: document.getElementById('time-start').value, end: document.getElementById('time-end').value }); toast(t('assistant.time.added'),'ok'); load(); }
+          catch(e){ toast(e.message,'err'); } finally{ setLoading(btn,false); }
+        };
+
+        document.querySelector('.topbar-actions p')?.remove();
+        const fxNote = document.querySelector('[data-i18n="assistant.earnings.fx"]');
+        if(fxNote) fxNote.dataset.i18nParams = JSON.stringify({rate: earnings.fx_rate});
+        earningsData = earnings.rows||[];
+        const et = document.getElementById('earnings-table'); et.innerHTML='';
+        if(!earningsData.length){ et.innerHTML='<tr><td colspan="6" class="muted center">'+t('assistant.earnings.no')+'</td></tr>'; }
+        else {
+          for(const r of earningsData){
+            const tr=document.createElement('tr');
+            tr.innerHTML='<td>'+fmtDate(r.date)+'</td><td>'+r.client_company+'</td><td class="mono">'+(r.minutes/60).toFixed(2)+' h</td><td class="mono">'+money(r.rate)+t('common.per_hour')+'</td><td class="mono">'+money(r.usd)+'</td><td class="mono">'+money(r.mxn)+'</td>';
+            et.appendChild(tr);
+          }
+        }
+        document.getElementById('earnings-foot').innerHTML='<tr><td colspan="2">'+t('common.total')+'</td><td class="mono">'+(earnings.total_minutes/60).toFixed(2)+' h</td><td></td><td class="mono">'+money(earnings.total_usd)+'</td><td class="mono">'+money(earnings.total_mxn)+'</td></tr>';
+        document.getElementById('download-earnings').onclick=()=>{ const rows=[['Date','Client','Hours','Rate','USD','MXN']]; for(const r of earningsData){ rows.push([r.date,r.client_company,(r.minutes/60).toFixed(2),r.rate,r.usd,r.mxn]); } downloadCsv('kageon-earnings.csv', toCsv(rows)); };
+
+        const p = profile.profile;
+        document.getElementById('p-first').value = p.first_name||'';
+        document.getElementById('p-full').value = p.full_name||'';
+        document.getElementById('p-headline').value = p.headline||'';
+        document.getElementById('p-availability').value = p.availability||'';
+        document.getElementById('p-video').value = p.video_url||'';
+        skills.length=0; (p.skills||[]).forEach(s=>skills.push(s));
+        languages.length=0; (p.languages||[]).forEach(s=>languages.push(s));
+        certifications.length=0; (p.certifications||[]).forEach(s=>certifications.push(s));
+        document.querySelectorAll('#p-skills,#p-langs,#p-certs').forEach(c=>{c.innerHTML='';});
+        (p.skills||[]).forEach(x=>{ const s=document.createElement('span'); s.className='chip'; s.innerHTML='<span>'+x+'</span>'; document.getElementById('p-skills').appendChild(s);});
+        (p.languages||[]).forEach(x=>{ const s=document.createElement('span'); s.className='chip'; s.innerHTML='<span>'+x+'</span>'; document.getElementById('p-langs').appendChild(s);});
+        (p.certifications||[]).forEach(x=>{ const s=document.createElement('span'); s.className='chip'; s.innerHTML='<span>'+x+'</span>'; document.getElementById('p-certs').appendChild(s);});
+        import('./app.js').then(m=>m.hydrateIcons(document.querySelector('#profile-form')));
+        if(p.photo_url) document.getElementById('p-photo-preview').innerHTML='<img src="'+p.photo_url+'" alt="">';
+        document.getElementById('p-email').textContent = p.email||'-';
+        document.getElementById('p-code').textContent = p.code||'-';
+        document.getElementById('p-status').textContent = p.status||'-';
+
+        document.getElementById('p-save').onclick = async ev=>{
+          ev.preventDefault(); const btn=document.getElementById('p-save'); setLoading(btn,true);
+          try{
+            await api.assistantUpdateProfile({
+              first_name: document.getElementById('p-first').value,
+              full_name: document.getElementById('p-full').value,
+              headline: document.getElementById('p-headline').value,
+              skills, languages, certifications,
+              availability: document.getElementById('p-availability').value,
+              video_url: document.getElementById('p-video').value,
+              photo_url: document.getElementById('p-photo-preview').dataset.url||p.photo_url||null
+            });
+            toast(t('assistant.profile.saved'),'ok'); load();
+          }catch(e){ toast(e.message,'err'); } finally{ setLoading(btn,false); }
+        };
+
+        import('./app.js').then(m=>m.hydrateIcons());
+        import('./portal.js').then(p=>p.applyI18n());
+      } catch(e){ toast(e.message,'err'); }
+    }
+
+    document.getElementById('refresh-btn').addEventListener('click', load);
+    load();
+  </script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0A1A2F">
+  <title data-i18n="auth.signup.client.title">Create a client account</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="auth-shell">
+    <section class="auth-brand">
+      <div>
+        <a class="brand on-dark" href="index.html">
+          <span class="brand-mark">KG</span>
+          <span>Kageon Global<small>VIRTUAL ASSISTANT STAFFING</small></span>
+        </a>
+        <h1><span data-i18n="landing.hero.cta_hire">Hire a virtual assistant</span></h1>
+        <p class="lead" data-i18n="auth.signup.client.subtitle">Tell us about your company and we will review your account.</p>
+        <ul class="auth-features">
+          <li><span class="mark"><span class="icon" data-icon="users" data-size="16"></span></span><span data-i18n="landing.clients.b1">Pre-screened assistants</span></li>
+          <li><span class="mark"><span class="icon" data-icon="clock" data-size="16"></span></span><span data-i18n="landing.clients.b3">Daily hours and monthly statements</span></li>
+          <li><span class="mark"><span class="icon" data-icon="shield" data-size="16"></span></span><span data-i18n="auth.login.feature3">Private and secure</span></li>
+        </ul>
+      </div>
+      <div class="lang-switch on-dark">
+        <button type="button" data-lang="en" data-i18n="common.english">English</button>
+        <button type="button" data-lang="es" data-i18n="common.spanish">Spanish</button>
+      </div>
+    </section>
+    <section class="auth-card-wrap">
+      <div class="auth-card" style="width:min(460px,100%)">
+        <div class="auth-topbar">
+          <a class="row" href="index.html">
+            <span class="icon" data-icon="arrowRight" data-size="16" style="transform:rotate(180deg)"></span>
+            <span class="small muted" data-i18n="portal.back_home">Back to home</span>
+          </a>
+          <div class="lang-switch">
+            <button type="button" data-lang="en" data-i18n="common.english">English</button>
+            <button type="button" data-lang="es" data-i18n="common.spanish">Spanish</button>
+          </div>
+        </div>
+        <header class="auth-head">
+          <h2 data-i18n="auth.signup.client.title">Create a client account</h2>
+          <p data-i18n="auth.signup.client.subtitle">Tell us about your company and we will review your account.</p>
+        </header>
+        <form class="auth-form" id="signup-form" novalidate>
+          <div class="form-grid">
+            <div class="field full">
+              <label for="company" data-i18n="auth.signup.client.company">Company</label>
+              <input class="input" id="company" required data-i18n-placeholder="auth.placeholder.company">
+            </div>
+            <div class="field full">
+              <label for="contact" data-i18n="auth.signup.client.contact">Contact name</label>
+              <input class="input" id="contact" required data-i18n-placeholder="auth.placeholder.contact">
+            </div>
+            <div class="field full">
+              <label for="email" data-i18n="auth.login.email">Email</label>
+              <input class="input" id="email" type="email" autocomplete="email" required data-i18n-placeholder="auth.placeholder.email">
+            </div>
+            <div class="field full">
+              <label for="phone" data-i18n="common.phone">Phone</label>
+              <input class="input" id="phone" data-i18n-placeholder="auth.placeholder.phone">
+            </div>
+            <div class="field">
+              <label for="country" data-i18n="common.country">Country</label>
+              <input class="input" id="country" data-i18n-placeholder="auth.placeholder.country">
+            </div>
+            <div class="field">
+              <label for="timezone" data-i18n="common.timezone">Timezone</label>
+              <input class="input" id="timezone" value="UTC" data-i18n-placeholder="auth.placeholder.timezone">
+            </div>
+            <div class="field full">
+              <label for="password" data-i18n="auth.login.password">Password</label>
+              <div class="input-wrap">
+                <input class="input" id="password" type="password" autocomplete="new-password" minlength="8" required data-i18n-placeholder="auth.placeholder.password">
+                <button class="ghost-icon" type="button" id="toggle-pass" aria-label="Show password">
+                  <span class="icon" data-icon="eye" data-size="18"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="hint hidden" id="form-hint">
+            <span class="icon" data-icon="alert" data-size="16"></span>
+            <span id="form-hint-text"></span>
+          </div>
+          <p class="tiny muted" data-i18n="auth.signup.pending_note">You will be able to log in once your account is approved.</p>
+          <button class="btn btn-primary btn-block" id="submit-btn" type="submit">
+            <span class="spinner"></span>
+            <span class="btn-label" data-i18n="auth.signup.client.submit">Create account</span>
+            <span class="icon" data-icon="arrowRight" data-size="16"></span>
+          </button>
+        </form>
+        <div class="auth-switch">
+          <span data-i18n="auth.signup.client.have">Already have an account?</span> <a href="login.html" data-i18n="auth.signup.client.login">Log in</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toasts"></div>
+
+  <script type="module">
+    import { api, bootstrap, setLoading, toast, hydrateIcons } from './app.js';
+    import { initI18n, bindLanguageControls, t } from './i18n.js';
+
+    await bootstrap();
+    hydrateIcons();
+    await initI18n();
+    bindLanguageControls();
+
+    const form = document.getElementById('signup-form');
+    const button = document.getElementById('submit-btn');
+    const hint = document.getElementById('form-hint');
+    const hintText = document.getElementById('form-hint-text');
+    const toggle = document.getElementById('toggle-pass');
+    const password = document.getElementById('password');
+
+    toggle.addEventListener('click', () => {
+      const hidden = password.type === 'password';
+      password.type = hidden ? 'text' : 'password';
+      toggle.querySelector('[data-icon]').setAttribute('data-icon', hidden ? 'eyeOff' : 'eye');
+      hydrateIcons(toggle);
+    });
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      hint.classList.add('hidden');
+      setLoading(button, true);
+      try {
+        const payload = {
+          company: document.getElementById('company').value,
+          contact_name: document.getElementById('contact').value,
+          email: document.getElementById('email').value,
+          phone: document.getElementById('phone').value,
+          country: document.getElementById('country').value,
+          timezone: document.getElementById('timezone').value,
+          password: password.value
+        };
+        await api.signupClient(payload);
+        toast(t('auth.signup.success.title'), 'ok', 2000);
+        setTimeout(() => location.replace('login.html'), 600);
+      } catch (error) {
+        hintText.textContent = error.message;
+        hint.classList.remove('hidden');
+        hint.classList.add('danger');
+      } finally {
+        setLoading(button, false);
+      }
+    });
+  </script>
+</body>
+</html>
