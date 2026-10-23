@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kageon Global - Assistant Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <main class="main solo-main page-enter">
+        <header class="topbar">
+            <div style="display:flex;align-items:center;gap:12px">
+                <span class="brand-icon"><span class="icon" data-icon="clock" data-size="20"></span></span>
+                <div>
+                    <h1>Welcome, <span id="user-name">Assistant</span></h1>
+                    <p>Log your hours and check your earnings.</p>
+                </div>
+            </div>
+            <div class="topbar-actions">
+                <span class="badge info"><i></i> Assistant</span>
+                <button class="btn btn-sm" id="logout-btn" type="button">
+                    <span class="icon" data-icon="logout" data-size="16"></span> Logout
+                </button>
+            </div>
+        </header>
+
+        <div class="split">
+            <div class="card">
+                <div class="card-head">
+                    <div>
+                        <h2>Log Work Block</h2>
+                        <p>Add time entries for your day.</p>
+                    </div>
+                </div>
+                <form id="time-form" novalidate>
+                    <div class="field">
+                        <label for="fecha">Date</label>
+                        <input class="input" id="fecha" type="date" required>
+                    </div>
+                    <div class="grid-2">
+                        <div class="field">
+                            <label for="entrada">Start Time</label>
+                            <input class="input" id="entrada" type="time" required>
+                        </div>
+                        <div class="field">
+                            <label for="salida">End Time</label>
+                            <input class="input" id="salida" type="time" required>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label for="notas">Notes (Optional)</label>
+                        <input class="input" id="notas" placeholder="e.g., Morning shift">
+                    </div>
+                    
+                    <button class="btn btn-primary btn-block" id="save-btn" type="submit" style="margin-top:14px">
+                        <span class="spinner"></span>
+                        <span class="btn-label">Add Block</span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-head">
+                    <div>
+                        <h2>My Time Entries</h2>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Start</th>
+                                <th>End</th>
+                                <th>Hours</th>
+                                <th>Pay</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-horas">
+                            <!-- Se llena vía JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="total-strip" style="margin-top:14px">
+                    <span class="lbl">Total Earnings (Estimated)</span>
+                    <span class="val" id="total-pay">$0.00</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { api, bootstrap, requireRole, todayISO } from './app.js';
+
+        await bootstrap();
+        const session = requireRole('assistant', 'index.html');
+
+        if (session) {
+            document.getElementById('user-name').textContent = session.usuario.nombre || 'Assistant';
+            document.getElementById('fecha').value = todayISO();
+            
+            // Simulando datos de la API
+            const mockEntries = [
+                { date: '2026-10-20', start: '08:00', end: '10:00', hours: 2, pay: 16 },
+                { date: '2026-10-20', start: '12:00', end: '15:00', hours: 3, pay: 24 }
+            ];
+
+            const tbody = document.getElementById('tabla-horas');
+            let total = 0;
+            tbody.innerHTML = mockEntries.map(e => {
+                total += e.pay;
+                return `
+                    <tr>
+                        <td>${e.date}</td>
+                        <td>${e.start}</td>
+                        <td>${e.end}</td>
+                        <td>${e.hours} h</td>
+                        <td>$${e.pay.toFixed(2)}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            document.getElementById('total-pay').textContent = '$' + total.toFixed(2);
+
+            document.getElementById('logout-btn').addEventListener('click', async () => {
+                await api.logout('assistant');
+                location.replace('index.html');
+            });
+        }
+    </script>
+</body>
+</html>
