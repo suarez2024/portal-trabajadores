@@ -114,16 +114,82 @@ export function applyI18n(root = document) {
   updateLanguageControls();
 }
 
-function updateLanguageControls() {
-  document.querySelectorAll('[data-lang]').forEach(el => {
-    const isActive = el.getAttribute('data-lang') === current;
-    el.classList.toggle('active', isActive);
-    el.setAttribute('aria-pressed', String(isActive));
+function closeLanguagePicker(picker) {
+  picker.classList.remove('open');
+  picker.querySelector('.lang-picker-button')?.setAttribute('aria-expanded', 'false');
+  const menu = picker.querySelector('.lang-picker-menu');
+  if (menu) menu.hidden = true;
+}
+
+function ensureLanguagePicker() {
+  let picker = document.querySelector('.lang-picker');
+  if (picker) return picker;
+
+  picker = document.createElement('div');
+  picker.className = 'lang-picker';
+  picker.innerHTML = [
+    '<button type="button" class="lang-picker-button" aria-haspopup="listbox" aria-expanded="false">',
+    '<span class="lang-picker-value"></span>',
+    '<span class="lang-picker-caret" aria-hidden="true"></span>',
+    '</button>',
+    '<div class="lang-picker-menu" role="listbox" hidden>',
+    '<button type="button" class="lang-picker-option" role="option"></button>',
+    '</div>'
+  ].join('');
+  document.body.appendChild(picker);
+
+  const button = picker.querySelector('.lang-picker-button');
+  const menu = picker.querySelector('.lang-picker-menu');
+  const option = picker.querySelector('.lang-picker-option');
+
+  button.addEventListener('click', event => {
+    event.stopPropagation();
+    if (menu.hidden) {
+      picker.classList.add('open');
+      button.setAttribute('aria-expanded', 'true');
+      menu.hidden = false;
+      option.focus();
+    } else {
+      closeLanguagePicker(picker);
+    }
   });
 
-  document.querySelectorAll('[data-lang-select]').forEach(el => {
-    el.value = current;
+  option.addEventListener('click', () => {
+    const next = option.getAttribute('data-lang');
+    closeLanguagePicker(picker);
+    if (next) setLanguage(next);
   });
+
+  document.addEventListener('click', event => {
+    if (!picker.contains(event.target)) closeLanguagePicker(picker);
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !menu.hidden) {
+      closeLanguagePicker(picker);
+      button.focus();
+    }
+  });
+
+  return picker;
+}
+
+function updateLanguageControls() {
+  const picker = ensureLanguagePicker();
+  const button = picker.querySelector('.lang-picker-button');
+  const value = picker.querySelector('.lang-picker-value');
+  const menu = picker.querySelector('.lang-picker-menu');
+  const option = picker.querySelector('.lang-picker-option');
+  const other = current === 'es' ? 'en' : 'es';
+
+  value.textContent = current.toUpperCase();
+  option.textContent = other.toUpperCase();
+  option.setAttribute('data-lang', other);
+
+  const label = t('common.language');
+  button.setAttribute('aria-label', label);
+  button.setAttribute('title', label);
+  menu.setAttribute('aria-label', label);
 }
 
 export async function initI18n() {
@@ -158,18 +224,6 @@ export async function setLanguage(lang) {
 }
 
 export function bindLanguageControls() {
-  document.querySelectorAll('[data-lang]').forEach(el => {
-    if (el.dataset.bound === '1') return;
-    el.dataset.bound = '1';
-    el.addEventListener('click', () => setLanguage(el.getAttribute('data-lang')));
-  });
-
-  document.querySelectorAll('[data-lang-select]').forEach(el => {
-    if (el.dataset.bound === '1') return;
-    el.dataset.bound = '1';
-    el.addEventListener('change', () => setLanguage(el.value));
-  });
-
   updateLanguageControls();
 }
 
