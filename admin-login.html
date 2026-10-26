@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0A1A2F">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230A1A2F'/%3E%3Ctext%20x='32'%20y='43'%20font-family='Arial,Helvetica,sans-serif'%20font-size='26'%20font-weight='700'%20fill='%23ffffff'%20text-anchor='middle'%3EKG%3C/text%3E%3C/svg%3E">
+  <title data-i18n="auth.admin.title">Admin access</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="auth-shell">
+    <section class="auth-brand">
+      <div>
+        <a class="brand on-dark" href="index.html">
+          <span class="brand-mark">KG</span>
+          <span>Kageon Global<small>VIRTUAL ASSISTANT STAFFING</small></span>
+        </a>
+        <h1><span data-i18n="auth.admin.title">Admin access</span></h1>
+        <p class="lead" data-i18n="auth.admin.subtitle">Log in to manage clients, assistants and placements.</p>
+      </div>
+      <div class="lang-switch on-dark">
+        <button type="button" data-lang="en" data-i18n="common.english">English</button>
+        <button type="button" data-lang="es" data-i18n="common.spanish">Spanish</button>
+      </div>
+    </section>
+    <section class="auth-card-wrap">
+      <div class="auth-card">
+        <div class="auth-topbar">
+          <a class="row" href="login.html">
+            <span class="icon" data-icon="arrowRight" data-size="16" style="transform:rotate(180deg)"></span>
+            <span class="small muted" data-i18n="auth.admin.back">Back to portal</span>
+          </a>
+          <div class="lang-switch">
+            <button type="button" data-lang="en" data-i18n="common.english">English</button>
+            <button type="button" data-lang="es" data-i18n="common.spanish">Spanish</button>
+          </div>
+        </div>
+        <header class="auth-head">
+          <h2 data-i18n="auth.admin.title">Admin access</h2>
+          <p data-i18n="auth.admin.subtitle">Log in to manage clients, assistants and placements.</p>
+        </header>
+        <form class="auth-form" id="login-form" novalidate>
+          <div class="field">
+            <label for="username" data-i18n="auth.admin.username">Username</label>
+            <input class="input" id="username" autocomplete="username" required data-i18n-placeholder="auth.placeholder.username">
+          </div>
+          <div class="field">
+            <label for="password" data-i18n="auth.login.password">Password</label>
+            <div class="input-wrap">
+              <input class="input" id="password" type="password" autocomplete="current-password" required data-i18n-placeholder="auth.placeholder.password">
+              <button class="ghost-icon" type="button" id="toggle-pass" aria-label="Show password">
+                <span class="icon" data-icon="eye" data-size="18"></span>
+              </button>
+            </div>
+          </div>
+          <div class="hint danger hidden" id="form-error">
+            <span class="icon" data-icon="alert" data-size="16"></span>
+            <span id="form-error-text"></span>
+          </div>
+          <button class="btn btn-dark btn-block" id="submit-btn" type="submit">
+            <span class="spinner"></span>
+            <span class="btn-label" data-i18n="auth.admin.submit">Log in</span>
+            <span class="icon" data-icon="arrowRight" data-size="16"></span>
+          </button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { api, bootstrap, getSession, setLoading, toast, hydrateIcons } from './app.js';
+    import { initI18n, bindLanguageControls, t } from './i18n.js';
+
+    await bootstrap();
+    hydrateIcons();
+    await initI18n();
+    bindLanguageControls();
+
+    if (getSession('admin')) location.replace('admin.html');
+
+    const form = document.getElementById('login-form');
+    const username = document.getElementById('username');
+    const password = document.getElementById('password');
+    const errorBox = document.getElementById('form-error');
+    const errorText = document.getElementById('form-error-text');
+    const button = document.getElementById('submit-btn');
+    const toggle = document.getElementById('toggle-pass');
+
+    toggle.addEventListener('click', () => {
+      const hidden = password.type === 'password';
+      password.type = hidden ? 'text' : 'password';
+      toggle.querySelector('[data-icon]').setAttribute('data-icon', hidden ? 'eyeOff' : 'eye');
+      hydrateIcons(toggle);
+    });
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      errorBox.classList.add('hidden');
+      setLoading(button, true);
+      try {
+        const result = await api.adminLogin(username.value, password.value);
+        if (!result.ok) {
+          errorText.textContent = result.error;
+          errorBox.classList.remove('hidden');
+          return;
+        }
+        toast(t('common.success'), 'ok', 1200);
+        setTimeout(() => location.replace('admin.html'), 250);
+      } catch (error) {
+        errorText.textContent = error.message || t('errors.unknown');
+        errorBox.classList.remove('hidden');
+      } finally {
+        setLoading(button, false);
+      }
+    });
+  </script>
+</body>
+</html>

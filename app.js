@@ -814,8 +814,6 @@ export const api = {
   },
 
   async uploadAvatar(file) {
-    const session = getSession();
-    if (!session) throw authError();
     if (!file) throw new Error('Selecciona una imagen.');
     if (file.size > 2 * 1024 * 1024) throw new Error('La foto debe pesar 2 MB o menos.');
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('Solo se permiten imágenes JPG, PNG o WebP.');
