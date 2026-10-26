@@ -110,12 +110,21 @@
               <p class="tiny muted" data-i18n="auth.signup.video_hint">YouTube link only.</p>
             </div>
             <div class="field full">
-              <label for="photo" data-i18n="auth.signup.assistant.photo">Profile photo</label>
-              <input class="input" id="photo" type="file" accept="image/jpeg,image/png,image/webp">
-              <p class="tiny muted" data-i18n="auth.signup.photo_hint">JPG, PNG or WebP. Max 2 MB.</p>
-              <div class="row" style="margin-top:10px">
-                <div class="avatar lg" id="photo-preview"><span class="icon" data-icon="user" data-size="28"></span></div>
-                <button class="btn btn-ghost btn-sm" type="button" id="clear-photo" data-i18n="common.delete">Delete</button>
+              <span class="label" data-i18n="auth.signup.assistant.photo">Profile photo</span>
+              <div class="photo-upload" id="photo-upload">
+                <div class="avatar xl photo-preview" id="photo-preview"><span class="icon" data-icon="user" data-size="34"></span></div>
+                <div class="photo-upload-body">
+                  <p class="photo-upload-title" data-i18n="auth.signup.photo_title">Add a friendly face</p>
+                  <p class="tiny muted" data-i18n="auth.signup.photo_hint">JPG, PNG or WebP. Max 2 MB.</p>
+                  <div class="photo-upload-actions">
+                    <label class="btn btn-soft btn-sm photo-pick" for="photo">
+                      <span class="icon" data-icon="plus" data-size="16"></span>
+                      <span id="photo-pick-label" data-i18n="auth.signup.photo_pick">Choose image</span>
+                    </label>
+                    <button class="btn btn-ghost btn-sm hidden" type="button" id="clear-photo" data-i18n="common.delete">Delete</button>
+                  </div>
+                  <input class="visually-hidden" id="photo" type="file" accept="image/jpeg,image/png,image/webp">
+                </div>
               </div>
             </div>
           </div>
@@ -198,28 +207,43 @@
 
     const photoInput = document.getElementById('photo');
     const photoPreview = document.getElementById('photo-preview');
+    const photoBox = document.getElementById('photo-upload');
+    const photoPickLabel = document.getElementById('photo-pick-label');
+    const clearPhotoBtn = document.getElementById('clear-photo');
     let photoUrl = null;
+
+    function setPhotoLabel(key) {
+      photoPickLabel.dataset.i18n = key;
+      photoPickLabel.textContent = t(key);
+    }
 
     photoInput.addEventListener('change', async () => {
       const file = photoInput.files?.[0];
       if (!file) return;
+      photoBox.classList.add('is-busy');
       try {
         const url = await api.uploadAvatar(file);
         photoUrl = url;
         photoPreview.innerHTML = `<img src="${url}" alt="Photo">`;
+        clearPhotoBtn.classList.remove('hidden');
+        setPhotoLabel('auth.signup.photo_change');
       } catch (error) {
         hintText.textContent = error.message;
         hint.classList.remove('hidden');
         hint.classList.add('danger');
         photoInput.value = '';
+      } finally {
+        photoBox.classList.remove('is-busy');
       }
     });
 
-    document.getElementById('clear-photo').addEventListener('click', () => {
+    clearPhotoBtn.addEventListener('click', () => {
       photoUrl = null;
       photoInput.value = '';
-      photoPreview.innerHTML = '<span class="icon" data-icon="user" data-size="28"></span>';
+      photoPreview.innerHTML = '<span class="icon" data-icon="user" data-size="34"></span>';
       hydrateIcons(photoPreview);
+      clearPhotoBtn.classList.add('hidden');
+      setPhotoLabel('auth.signup.photo_pick');
     });
 
     form.addEventListener('submit', async event => {

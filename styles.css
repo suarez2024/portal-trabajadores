@@ -708,6 +708,51 @@ dialog.dialog-lg { width: min(820px, calc(100vw - 28px)); }
   .table-wrap { margin: 0 -4px; }
 }
 
+/* Photo uploader */
+.photo-upload {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 1px dashed #C9D6EA;
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, #FFFFFF 0%, #F7F9FD 100%);
+  transition: border-color .2s, box-shadow .2s, background .2s;
+}
+.photo-upload:hover,
+.photo-upload:focus-within {
+  border-color: rgba(37, 99, 235, .45);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, .08);
+  background: #FFFFFF;
+}
+.photo-upload.is-busy { opacity: .6; pointer-events: none; }
+.photo-preview {
+  flex: none;
+  border-radius: 22px;
+  background: #FFFFFF;
+  color: var(--blue-2);
+  box-shadow: inset 0 0 0 1px var(--line), var(--shadow-sm);
+}
+.photo-upload-body { display: grid; gap: 3px; min-width: 0; flex: 1; }
+.photo-upload-title { font-size: .9rem; font-weight: 650; }
+.photo-upload-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
+.photo-pick { cursor: pointer; }
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 560px) {
+  .photo-upload { flex-direction: column; align-items: flex-start; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
 }
