@@ -78,7 +78,7 @@
         <section class="page-section" data-section="assistants">
           <div class="card">
             <div class="card-head"><div><h2 data-i18n="admin.assistants.title">Assistants</h2><p data-i18n="admin.assistants.subtitle">Review profiles and manage assistants.</p></div></div>
-            <div class="table-wrap"><table class="data"><thead><tr><th data-i18n="admin.assistants.first_name">First name</th><th data-i18n="common.email">Email</th><th data-i18n="common.status">Status</th><th data-i18n="admin.assistants.skills">Skills</th><th data-i18n="common.actions">Actions</th></tr></thead><tbody id="assistants-table"></tbody></table></div>
+            <div class="card-body stack" id="assistants-list"></div>
           </div>
         </section>
 
@@ -200,7 +200,7 @@
   </dialog>
 
   <script type="module">
-    import { api, bootstrap, setLoading, toast, fmtDate, fmtTime, hoursText, money } from './app.js';
+    import { api, bootstrap, setLoading, toast, fmtDate, fmtTime, hoursText, money, avatarNode, identityNode, videoFrameNode, youtubeWatchUrl } from './app.js';
     import { initI18n, bindLanguageControls, t } from './i18n.js';
     import { initShell, setSection } from './portal.js';
     import { toCsv, downloadCsv } from './csv.js';
@@ -251,7 +251,7 @@
 
         const da = document.getElementById('d-assistants'); da.innerHTML='';
         if(!dash.pending_assistants.length){ da.innerHTML='<tr><td colspan="4" class="muted center">-</td></tr>'; }
-        else for(const a of dash.pending_assistants){ const tr=document.createElement('tr'); tr.innerHTML='<td>'+a.first_name+'</td><td>'+a.email+'</td><td class="code">'+a.code+'</td><td><button class="btn btn-sm btn-primary" data-review-assistant="'+a.id+'">'+t('common.approve')+'</button></td>'; da.appendChild(tr); }
+        else for(const a of dash.pending_assistants){ const tr=document.createElement('tr'); tr.innerHTML='<td><span data-identity></span></td><td>'+a.email+'</td><td class="code">'+a.code+'</td><td><button class="btn btn-sm btn-primary" data-review-assistant="'+a.id+'">'+t('common.approve')+'</button></td>'; tr.querySelector('[data-identity]').replaceWith(identityNode(a, a.first_name||'-')); da.appendChild(tr); }
         da.querySelectorAll('[data-review-assistant]').forEach(b=>b.addEventListener('click',()=>openReview('assistant',b.dataset.reviewAssistant)));
 
         const ct = document.getElementById('clients-table'); ct.innerHTML='';
@@ -262,13 +262,140 @@
         }
         ct.querySelectorAll('[data-edit-client]').forEach(b=>b.addEventListener('click',()=>openReview('client',b.dataset.editClient)));
 
-        const at2 = document.getElementById('assistants-table'); at2.innerHTML='';
-        for(const a of assistants.assistants){
-          const tr=document.createElement('tr');
-          tr.innerHTML='<td>'+a.first_name+'</td><td>'+a.email+'</td><td><span class="badge '+(a.status==='approved'?'ok':a.status==='pending'?'warn':'')+'">'+a.status+'</span></td><td class="chips">'+(a.skills||[]).slice(0,3).map(s=>'<span class="chip">'+s+'</span>').join('')+'</td><td><button class="btn btn-ghost btn-sm" data-edit-assistant="'+a.id+'">'+t('common.edit')+'</button></td>';
-          at2.appendChild(tr);
+        const at2 = document.getElementById('assistants-list'); at2.innerHTML='';
+        if(!assistants.assistants.length){
+          at2.innerHTML='<div class="empty"><div class="icon"><span class="icon" data-icon="users" data-size="22"></span></div><p>'+t('admin.assistants.no')+'</p></div>';
+        } else {
+          for(const a of assistants.assistants){
+            const card=document.createElement('details');
+            card.className='profile-accordion';
+
+            const summary=document.createElement('summary');
+            summary.appendChild(avatarNode(a, 'profile-thumb'));
+
+            const meta=document.createElement('span');
+            meta.className='profile-summary-meta';
+            const name=document.createElement('strong');
+            name.textContent=a.full_name||a.first_name||'-';
+            const code=document.createElement('span');
+            code.textContent=a.code||a.email||'-';
+            meta.append(name, code);
+            summary.appendChild(meta);
+
+            const badge=document.createElement('span');
+            badge.className='badge '+(a.status==='approved'?'ok':a.status==='pending'?'warn':a.status==='rejected'||a.status==='suspended'?'danger':'');
+            badge.textContent=a.status||'pending';
+            summary.appendChild(badge);
+
+            const chevron=document.createElement('span');
+            chevron.className='profile-chevron';
+            chevron.setAttribute('aria-hidden','true');
+            summary.appendChild(chevron);
+            card.appendChild(summary);
+
+            const detail=document.createElement('div');
+            detail.className='profile-detail';
+
+            const hero=document.createElement('div');
+            hero.className='accordion-hero';
+            hero.appendChild(avatarNode(a, 'xl'));
+
+            const heroMeta=document.createElement('div');
+            heroMeta.className='meta';
+            const heroName=document.createElement('h3');
+            heroName.textContent=a.full_name||a.first_name||'-';
+            const heroHeadline=document.createElement('p');
+            heroHeadline.className='muted';
+            heroHeadline.textContent=a.headline||a.email||'-';
+            const heroContact=document.createElement('p');
+            heroContact.className='small muted';
+            heroContact.textContent=[a.email,a.phone,a.country].filter(Boolean).join(' / ')||'-';
+            heroMeta.append(heroName, heroHeadline, heroContact);
+            hero.appendChild(heroMeta);
+
+            const reviewBtn=document.createElement('button');
+            reviewBtn.className='btn btn-primary';
+            reviewBtn.textContent=t('admin.assistants.review_title');
+            reviewBtn.addEventListener('click',()=>openReview('assistant',a.id));
+            hero.appendChild(reviewBtn);
+            detail.appendChild(hero);
+
+            const body=document.createElement('div');
+            body.className='profile-body';
+
+            const left=document.createElement('div');
+            left.className='stack-sm';
+            const skillsTitle=document.createElement('h4');
+            skillsTitle.textContent=t('admin.assistants.skills');
+            left.appendChild(skillsTitle);
+
+            const skills=document.createElement('div');
+            skills.className='tag-list';
+            for(const skill of a.skills||[]){ const tag=document.createElement('span'); tag.className='tag'; tag.textContent=skill; skills.appendChild(tag); }
+            left.appendChild(skills);
+
+            const appendChips=(label,values)=>{
+              const wrap=document.createElement('div');
+              const strong=document.createElement('strong');
+              strong.className='small';
+              strong.textContent=label;
+              const chips=document.createElement('div');
+              chips.className='chips';
+              for(const value of values||[]){ const chip=document.createElement('span'); chip.className='chip'; chip.textContent=value; chips.appendChild(chip); }
+              wrap.append(strong,chips);
+              left.appendChild(wrap);
+            };
+            appendChips(t('common.languages'),a.languages);
+            appendChips(t('common.certifications'),a.certifications);
+
+            const availability=document.createElement('div');
+            const availabilityLabel=document.createElement('strong');
+            availabilityLabel.className='small';
+            availabilityLabel.textContent=t('common.availability');
+            const availabilityText=document.createElement('p');
+            availabilityText.className='small muted';
+            availabilityText.textContent=a.availability||'-';
+            availability.append(availabilityLabel,availabilityText);
+            left.appendChild(availability);
+            body.appendChild(left);
+
+            const right=document.createElement('div');
+            right.className='stack-sm';
+            const videoTitle=document.createElement('h4');
+            videoTitle.textContent=t('admin.assistants.video');
+            right.appendChild(videoTitle);
+
+            const frame=videoFrameNode(a.video_url, `${a.first_name||'Assistant'} - ${t('admin.assistants.video')}`);
+            if(frame){
+              right.appendChild(frame);
+              const watchUrl=youtubeWatchUrl(a.video_url);
+              if(watchUrl){
+                const link=document.createElement('a');
+                link.className='video-link';
+                link.href=watchUrl;
+                link.target='_blank';
+                link.rel='noopener noreferrer';
+                link.textContent=t('common.watch_youtube');
+                right.appendChild(link);
+              }
+            } else {
+              const empty=document.createElement('div');
+              empty.className='video-empty';
+              empty.innerHTML='<span class="icon" data-icon="video" data-size="22"></span>';
+              right.appendChild(empty);
+            }
+            body.appendChild(right);
+            detail.appendChild(body);
+            card.appendChild(detail);
+
+            card.addEventListener('toggle',()=>{
+              if(!card.open) return;
+              at2.querySelectorAll('details[open]').forEach(other=>{ if(other!==card) other.open=false; });
+            });
+
+            at2.appendChild(card);
+          }
         }
-        at2.querySelectorAll('[data-edit-assistant]').forEach(b=>b.addEventListener('click',()=>openReview('assistant',b.dataset.editAssistant)));
 
         function fillJobClient(){
           const s=document.getElementById('job-client');
@@ -293,7 +420,8 @@
         const selectedApps = [];
         for(const a of apps.applications){
           const tr=document.createElement('tr');
-          tr.innerHTML='<td><input type="checkbox" value="'+a.id+'" '+(a.status!=='applied'&&a.status!=='shortlisted'?'disabled':'')+'></td><td><div class="identity"><div class="avatar sm">'+(a.assistant?.first_name||'?')[0]+'</div><div class="meta"><strong>'+a.assistant?.first_name+'</strong><span>'+a.assistant?.code+'</span></div></div></td><td>'+a.job_title+'</td><td><span class="badge">'+a.status+'</span></td><td class="actions"><button class="btn btn-sm btn-ghost" data-app-short="'+a.id+'">'+t('admin.applications.shortlist')+'</button><button class="btn btn-sm btn-ghost" data-app-rej="'+a.id+'">'+t('admin.applications.reject')+'</button></td>';
+          tr.innerHTML='<td><input type="checkbox" value="'+a.id+'" '+(a.status!=='applied'&&a.status!=='shortlisted'?'disabled':'')+'></td><td><span data-identity></span></td><td>'+a.job_title+'</td><td><span class="badge">'+a.status+'</span></td><td class="actions"><button class="btn btn-sm btn-ghost" data-app-short="'+a.id+'">'+t('admin.applications.shortlist')+'</button><button class="btn btn-sm btn-ghost" data-app-rej="'+a.id+'">'+t('admin.applications.reject')+'</button></td>';
+          tr.querySelector('[data-identity]').replaceWith(identityNode(a.assistant, a.assistant?.first_name||'-', a.assistant?.code||''));
           apt.appendChild(tr);
         }
         apt.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.addEventListener('change',()=>{ if(cb.checked) selectedApps.push(cb.value); else selectedApps.splice(selectedApps.indexOf(cb.value),1); }));
@@ -314,20 +442,21 @@
         const et = document.getElementById('eng-table'); et.innerHTML='';
         for(const e of engagements.engagements){
           const tr=document.createElement('tr');
-          tr.innerHTML='<td>'+e.client_company+'</td><td>'+e.assistant?.first_name+'</td><td class="mono">'+money(e.client_rate)+'</td><td class="mono">'+money(e.assistant_rate)+'</td><td class="mono">'+money(e.margin)+'</td><td><span class="badge '+(e.status==='active'?'ok':'')+'">'+e.status+'</span></td><td class="actions">'+(e.status==='active'?'<button class="btn btn-ghost btn-sm" data-end="'+e.id+'">'+t('admin.engagements.end')+'</button>':'')+'</td>';
+          tr.innerHTML='<td>'+e.client_company+'</td><td><span data-identity></span></td><td class="mono">'+money(e.client_rate)+'</td><td class="mono">'+money(e.assistant_rate)+'</td><td class="mono">'+money(e.margin)+'</td><td><span class="badge '+(e.status==='active'?'ok':'')+'">'+e.status+'</span></td><td class="actions">'+(e.status==='active'?'<button class="btn btn-ghost btn-sm" data-end="'+e.id+'">'+t('admin.engagements.end')+'</button>':'')+'</td>';
+          tr.querySelector('[data-identity]').replaceWith(identityNode(e.assistant, e.assistant?.first_name||'-', e.job_title||''));
           et.appendChild(tr);
         }
         et.querySelectorAll('[data-end]').forEach(b=>b.addEventListener('click',async()=>{ try{ await api.adminEngagementEnd(b.dataset.end); toast(t('admin.engagements.ended'),'ok'); load(); }catch(e){toast(e.message,'err'); }}));
 
         const tt = document.getElementById('time-table'); tt.innerHTML='';
         if(!timeData.entries.length){ tt.innerHTML='<tr><td colspan="7" class="muted center">'+t('admin.time.no')+'</td></tr>'; }
-        else for(const e of timeData.entries){ const tr=document.createElement('tr'); tr.innerHTML='<td>'+fmtDate(e.date)+'</td><td>'+e.assistant?.first_name+'</td><td>'+e.client_company+'</td><td>'+fmtTime(e.start_time)+'</td><td>'+fmtTime(e.end_time)+'</td><td class="mono">'+(e.minutes/60).toFixed(2)+' h</td><td class="actions"><button class="btn btn-ghost btn-sm" data-time-del="'+e.id+'">'+t('common.delete')+'</button></td>'; tt.appendChild(tr); }
+        else for(const e of timeData.entries){ const tr=document.createElement('tr'); tr.innerHTML='<td>'+fmtDate(e.date)+'</td><td><span data-identity></span></td><td>'+e.client_company+'</td><td>'+fmtTime(e.start_time)+'</td><td>'+fmtTime(e.end_time)+'</td><td class="mono">'+(e.minutes/60).toFixed(2)+' h</td><td class="actions"><button class="btn btn-ghost btn-sm" data-time-del="'+e.id+'">'+t('common.delete')+'</button></td>'; tr.querySelector('[data-identity]').replaceWith(identityNode(e.assistant, e.assistant?.first_name||'-', e.job_title||'')); tt.appendChild(tr); }
         tt.querySelectorAll('[data-time-del]').forEach(b=>b.addEventListener('click',async()=>{ const reason=prompt(t('admin.time.reason')); if(!reason) return; try{ await api.adminTimeDelete(b.dataset.timeDel, reason); toast(t('admin.time.deleted'),'ok'); load(); }catch(e){toast(e.message,'err'); }}));
 
         billingData = billing.rows||[];
         const bt = document.getElementById('billing-table'); bt.innerHTML='';
         if(!billingData.length){ bt.innerHTML='<tr><td colspan="8" class="muted center">'+t('admin.billing.no')+'</td></tr>'; }
-        else for(const r of billingData){ const tr=document.createElement('tr'); tr.innerHTML='<td>'+r.client_company+'</td><td>'+r.assistant_name+'</td><td class="mono">'+(r.minutes/60).toFixed(2)+' h</td><td class="mono">'+money(r.client_rate)+'</td><td class="mono">'+money(r.client_amount)+'</td><td class="mono">'+money(r.assistant_rate)+'</td><td class="mono">'+money(r.assistant_pay)+'</td><td class="mono">'+money(r.margin)+'</td>'; bt.appendChild(tr); }
+        else for(const r of billingData){ const tr=document.createElement('tr'); tr.innerHTML='<td>'+r.client_company+'</td><td><span data-identity></span></td><td class="mono">'+(r.minutes/60).toFixed(2)+' h</td><td class="mono">'+money(r.client_rate)+'</td><td class="mono">'+money(r.client_amount)+'</td><td class="mono">'+money(r.assistant_rate)+'</td><td class="mono">'+money(r.assistant_pay)+'</td><td class="mono">'+money(r.margin)+'</td>'; tr.querySelector('[data-identity]').replaceWith(identityNode(r, r.assistant_name||'-', r.job_title||'')); bt.appendChild(tr); }
         document.getElementById('billing-foot').innerHTML='<tr><td colspan="2">'+t('admin.billing.total')+'</td><td class="mono">'+(billing.total_minutes/60).toFixed(2)+' h</td><td></td><td class="mono">'+money(billing.client_amount)+'</td><td></td><td class="mono">'+money(billing.assistant_pay)+'</td><td class="mono">'+money(billing.margin)+'</td></tr>';
         document.getElementById('billing-csv').onclick=()=>{ const rows=[['Client','Assistant','Hours','ClientRate','ClientAmount','AssistantRate','AssistantPay','Margin']]; for(const r of billingData){ rows.push([r.client_company,r.assistant_name,(r.minutes/60).toFixed(2),r.client_rate,r.client_amount,r.assistant_rate,r.assistant_pay,r.margin]); } downloadCsv('kageon-billing.csv', toCsv(rows)); };
 

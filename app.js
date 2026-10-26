@@ -146,6 +146,107 @@ export function initials(name) {
   return (parts[0]?.[0] || '?') + (parts[1]?.[0] || '');
 }
 
+export function avatarNode(person, className = '') {
+  const el = document.createElement('span');
+  el.className = ['avatar', className].filter(Boolean).join(' ');
+  const name = String(person?.first_name || person?.assistant_name || person?.full_name || '').trim();
+  const fallback = initials(name);
+
+  const showFallback = () => {
+    el.textContent = fallback;
+  };
+
+  const url = String(person?.photo_url || '').trim();
+  if (!url) {
+    showFallback();
+    return el;
+  }
+
+  const img = document.createElement('img');
+  img.src = url;
+  img.alt = name || 'Profile photo';
+  img.loading = 'lazy';
+  img.decoding = 'async';
+  img.addEventListener('error', showFallback, { once: true });
+  el.appendChild(img);
+  return el;
+}
+
+export function identityNode(person, label, detail, className = 'sm') {
+  const wrap = document.createElement('div');
+  wrap.className = 'identity';
+  wrap.appendChild(avatarNode(person, className));
+
+  const meta = document.createElement('div');
+  meta.className = 'meta';
+  const strong = document.createElement('strong');
+  strong.textContent = label || person?.first_name || person?.assistant_name || '-';
+  meta.appendChild(strong);
+
+  if (detail) {
+    const span = document.createElement('span');
+    span.textContent = detail;
+    meta.appendChild(span);
+  }
+
+  wrap.appendChild(meta);
+  return wrap;
+}
+
+export function youtubeVideoId(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+
+  let url;
+  try {
+    url = new URL(raw);
+  } catch {
+    return '';
+  }
+  if (!/^https?:$/.test(url.protocol)) return '';
+
+  const host = url.hostname.replace(/^www\./, '').replace(/^m\./, '');
+  let id = '';
+
+  if (host === 'youtu.be') {
+    id = url.pathname.split('/').filter(Boolean)[0] || '';
+  } else if (host === 'youtube.com' || host === 'youtube-nocookie.com') {
+    const parts = url.pathname.split('/').filter(Boolean);
+    if (parts[0] === 'watch') id = url.searchParams.get('v') || '';
+    else if (['embed', 'shorts', 'live', 'v'].includes(parts[0])) id = parts[1] || '';
+  }
+
+  return /^[A-Za-z0-9_-]{11}$/.test(id) ? id : '';
+}
+
+export function youtubeEmbedUrl(value) {
+  const id = youtubeVideoId(value);
+  return id ? `https://www.youtube-nocookie.com/embed/${id}?rel=0&playsinline=1` : '';
+}
+
+export function youtubeWatchUrl(value) {
+  const id = youtubeVideoId(value);
+  return id ? `https://www.youtube.com/watch?v=${id}` : '';
+}
+
+export function videoFrameNode(value, title = 'YouTube video') {
+  const src = youtubeEmbedUrl(value);
+  if (!src) return null;
+
+  const frame = document.createElement('div');
+  frame.className = 'video-frame';
+
+  const iframe = document.createElement('iframe');
+  iframe.src = src;
+  iframe.title = title;
+  iframe.loading = 'lazy';
+  iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+  iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+  iframe.allowFullscreen = true;
+  frame.appendChild(iframe);
+  return frame;
+}
+
 const ICONS = {
   users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
   user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',

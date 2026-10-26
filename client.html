@@ -143,7 +143,7 @@
   <div class="toasts"></div>
 
   <script type="module">
-    import { api, bootstrap, setLoading, toast, fmtDate, fmtTime, hoursText, money } from './app.js';
+    import { api, bootstrap, setLoading, toast, fmtDate, fmtTime, hoursText, money, avatarNode, identityNode, videoFrameNode, youtubeWatchUrl } from './app.js';
     import { initI18n, bindLanguageControls, t } from './i18n.js';
     import { initShell, setSection } from './portal.js';
     import { toCsv, downloadCsv } from './csv.js';
@@ -194,7 +194,8 @@
         } else {
           for (const e of dash.assistants) {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td><div class="identity"><div class="avatar sm">${(e.assistant?.first_name||'?')[0]}</div><div class="meta"><strong>${e.assistant?.first_name||'-'}</strong><span>${e.job_title||'-'}</span></div></div></td><td class="mono">${e.assistant?.first_name||'-'}</td><td class="mono">${money(e.client_rate)}${t('common.per_hour')}</td><td>${(e.work_days||[]).join(',')}</td><td>${fmtDate(e.start_date)}</td><td><span class="badge ok">${e.status}</span></td>`;
+            tr.innerHTML = `<td><span data-identity></span></td><td class="mono">${e.assistant?.first_name||'-'}</td><td class="mono">${money(e.client_rate)}${t('common.per_hour')}</td><td>${(e.work_days||[]).join(',')}</td><td>${fmtDate(e.start_date)}</td><td><span class="badge ok">${e.status}</span></td>`;
+            tr.querySelector('[data-identity]').replaceWith(identityNode(e.assistant, e.assistant?.first_name || '-', e.job_title || '-'));
             dashTbody.appendChild(tr);
           }
         }
@@ -204,10 +205,148 @@
         if (!candidates.candidates.length) {
           candList.innerHTML = '<div class="empty"><div class="icon"><span class="icon" data-icon="users" data-size="22"></span></div><p>' + t('client.candidates.no') + '</p></div>';
         } else {
+          const multipleCandidates = candidates.candidates.length > 1;
           for (const c of candidates.candidates) {
-            const card = document.createElement('article');
-            card.className = 'candidate';
-            card.innerHTML = `<div class="candidate-head"><div class="avatar xl">${(c.assistant?.first_name||'?')[0]}</div><div class="meta"><h3>${c.assistant?.first_name||'-'}</h3><p class="muted">${c.job_title||'-'}</p><div class="row wrap"><span class="badge blue">${t('client.candidates.sent')}</span></div></div><button class="btn btn-primary" data-select="${c.id}">${t('client.candidates.select')}</button></div><div class="candidate-body"><div class="stack-sm"><h4>${t('assistant.profile.public')}</h4><div class="tag-list">${(c.assistant?.skills||[]).map(s=>'<span class="tag">'+s+'</span>').join('')}</div><div><strong class="small">${t('common.languages')}</strong><div class="chips">${(c.assistant?.languages||[]).map(s=>'<span class="chip">'+s+'</span>').join('')}</div></div><div><strong class="small">${t('common.certifications')}</strong><div class="chips">${(c.assistant?.certifications||[]).map(s=>'<span class="chip">'+s+'</span>').join('')}</div></div><div><strong class="small">${t('common.availability')}</strong><p class="small muted">${c.assistant?.availability||'-'}</p></div></div><div class="stack-sm"><h4>${t('client.candidates.video')}</h4>${c.assistant?.video_url?'<div class="video-frame"><iframe src="'+c.assistant.video_url.replace('watch?v=','embed/').replace('youtu.be/','www.youtube.com/embed/')+'" allowfullscreen></iframe></div>':'<div class="video-empty"><span class="icon" data-icon="video" data-size="22"></span></div>'}</div></div>`;
+            const assistant = c.assistant || {};
+            const isSelected = c.status === 'selected';
+            const card = document.createElement('details');
+            card.className = 'profile-accordion';
+            if (!multipleCandidates) card.open = true;
+
+            const summary = document.createElement('summary');
+            summary.appendChild(avatarNode(assistant, 'profile-thumb'));
+
+            const summaryMeta = document.createElement('span');
+            summaryMeta.className = 'profile-summary-meta';
+            const summaryName = document.createElement('strong');
+            summaryName.textContent = assistant.first_name || '-';
+            const summaryRole = document.createElement('span');
+            summaryRole.textContent = c.job_title || assistant.headline || '-';
+            summaryMeta.append(summaryName, summaryRole);
+            summary.appendChild(summaryMeta);
+
+            const summaryBadge = document.createElement('span');
+            summaryBadge.className = 'badge ' + (isSelected ? 'ok' : 'blue');
+            summaryBadge.textContent = t(isSelected ? 'client.candidates.selected' : 'client.candidates.sent_short');
+            summary.appendChild(summaryBadge);
+
+            const chevron = document.createElement('span');
+            chevron.className = 'profile-chevron';
+            chevron.setAttribute('aria-hidden', 'true');
+            summary.appendChild(chevron);
+            card.appendChild(summary);
+
+            const detail = document.createElement('div');
+            detail.className = 'profile-detail';
+
+            const hero = document.createElement('div');
+            hero.className = 'accordion-hero';
+            hero.appendChild(avatarNode(assistant, 'xl'));
+
+            const heroMeta = document.createElement('div');
+            heroMeta.className = 'meta';
+            const heroName = document.createElement('h3');
+            heroName.textContent = assistant.first_name || '-';
+            const heroRole = document.createElement('p');
+            heroRole.className = 'muted';
+            heroRole.textContent = c.job_title || assistant.headline || '-';
+            heroMeta.append(heroName, heroRole);
+            hero.appendChild(heroMeta);
+
+            if (!isSelected) {
+              const selectBtn = document.createElement('button');
+              selectBtn.className = 'btn btn-primary';
+              selectBtn.dataset.select = c.id;
+              selectBtn.textContent = t('client.candidates.select');
+              hero.appendChild(selectBtn);
+            }
+            detail.appendChild(hero);
+
+            const body = document.createElement('div');
+            body.className = 'profile-body';
+
+            const left = document.createElement('div');
+            left.className = 'stack-sm';
+            const publicTitle = document.createElement('h4');
+            publicTitle.textContent = t('assistant.profile.public');
+            left.appendChild(publicTitle);
+
+            const skills = document.createElement('div');
+            skills.className = 'tag-list';
+            for (const skill of assistant.skills || []) {
+              const tag = document.createElement('span');
+              tag.className = 'tag';
+              tag.textContent = skill;
+              skills.appendChild(tag);
+            }
+            left.appendChild(skills);
+
+            const appendChips = (label, values) => {
+              const wrap = document.createElement('div');
+              const strong = document.createElement('strong');
+              strong.className = 'small';
+              strong.textContent = label;
+              const chips = document.createElement('div');
+              chips.className = 'chips';
+              for (const value of values || []) {
+                const chip = document.createElement('span');
+                chip.className = 'chip';
+                chip.textContent = value;
+                chips.appendChild(chip);
+              }
+              wrap.append(strong, chips);
+              left.appendChild(wrap);
+            };
+            appendChips(t('common.languages'), assistant.languages);
+            appendChips(t('common.certifications'), assistant.certifications);
+
+            const availability = document.createElement('div');
+            const availabilityLabel = document.createElement('strong');
+            availabilityLabel.className = 'small';
+            availabilityLabel.textContent = t('common.availability');
+            const availabilityText = document.createElement('p');
+            availabilityText.className = 'small muted';
+            availabilityText.textContent = assistant.availability || '-';
+            availability.append(availabilityLabel, availabilityText);
+            left.appendChild(availability);
+            body.appendChild(left);
+
+            const right = document.createElement('div');
+            right.className = 'stack-sm';
+            const videoTitle = document.createElement('h4');
+            videoTitle.textContent = t('client.candidates.video');
+            right.appendChild(videoTitle);
+
+            const frame = videoFrameNode(assistant.video_url, `${assistant.first_name || 'Assistant'} - ${t('client.candidates.video')}`);
+            if (frame) {
+              right.appendChild(frame);
+              const watchUrl = youtubeWatchUrl(assistant.video_url);
+              if (watchUrl) {
+                const link = document.createElement('a');
+                link.className = 'video-link';
+                link.href = watchUrl;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.textContent = t('common.watch_youtube');
+                right.appendChild(link);
+              }
+            } else {
+              const empty = document.createElement('div');
+              empty.className = 'video-empty';
+              empty.innerHTML = '<span class="icon" data-icon="video" data-size="22"></span>';
+              right.appendChild(empty);
+            }
+            body.appendChild(right);
+            detail.appendChild(body);
+            card.appendChild(detail);
+
+            card.addEventListener('toggle', () => {
+              if (!card.open) return;
+              candList.querySelectorAll('details[open]').forEach(other => {
+                if (other !== card) other.open = false;
+              });
+            });
+
             candList.appendChild(card);
           }
           candList.querySelectorAll('[data-select]').forEach(btn => {
@@ -228,7 +367,8 @@
         } else {
           for (const e of engagements.engagements) {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td><div class="identity"><div class="avatar sm">${(e.assistant?.first_name||'?')[0]}</div><div class="meta"><strong>${e.assistant?.first_name||'-'}</strong><span>${e.job_title||'-'}</span></div></div></td><td class="mono">${money(e.client_rate)}${t('common.per_hour')}</td><td>${(e.work_days||[]).join(',')}</td><td>${fmtDate(e.start_date)}</td><td><span class="badge ${e.status==='active'?'ok':''}">${e.status}</span></td>`;
+            tr.innerHTML = `<td><span data-identity></span></td><td class="mono">${money(e.client_rate)}${t('common.per_hour')}</td><td>${(e.work_days||[]).join(',')}</td><td>${fmtDate(e.start_date)}</td><td><span class="badge ${e.status==='active'?'ok':''}">${e.status}</span></td>`;
+            tr.querySelector('[data-identity]').replaceWith(identityNode(e.assistant, e.assistant?.first_name || '-', e.job_title || '-'));
             engTbody.appendChild(tr);
           }
         }
@@ -240,7 +380,8 @@
         } else {
           for (const entry of time.entries) {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${fmtDate(entry.date)}</td><td>${entry.assistant?.first_name||'-'}</td><td class="mono">${entry.minutes}</td><td>${fmtTime(entry.start_time)} - ${fmtTime(entry.end_time)}</td>`;
+            tr.innerHTML = `<td>${fmtDate(entry.date)}</td><td><span data-identity></span></td><td class="mono">${entry.minutes}</td><td>${fmtTime(entry.start_time)} - ${fmtTime(entry.end_time)}</td>`;
+            tr.querySelector('[data-identity]').replaceWith(identityNode(entry.assistant, entry.assistant?.first_name || '-', entry.job_title || '-'));
             hoursTbody.appendChild(tr);
           }
         }
@@ -253,7 +394,8 @@
         } else {
           for (const row of statementsData) {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td><div class="identity"><div class="avatar sm">${(row.assistant_name||'?')[0]}</div><div class="meta"><strong>${row.assistant_name||'-'}</strong><span>${row.job_title||'-'}</span></div></div></td><td class="mono">${(row.minutes/60).toFixed(2)} h</td><td class="mono">${money(row.client_rate)}${t('common.per_hour')}</td><td class="mono">${money(row.amount)}</td>`;
+            tr.innerHTML = `<td><span data-identity></span></td><td class="mono">${(row.minutes/60).toFixed(2)} h</td><td class="mono">${money(row.client_rate)}${t('common.per_hour')}</td><td class="mono">${money(row.amount)}</td>`;
+            tr.querySelector('[data-identity]').replaceWith(identityNode(row, row.assistant_name || '-', row.job_title || '-'));
             stTbody.appendChild(tr);
           }
         }
