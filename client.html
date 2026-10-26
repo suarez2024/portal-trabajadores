@@ -122,6 +122,22 @@
               <div class="card-head"><div><h2 data-i18n="client.profile.title">Profile</h2><p data-i18n="client.profile.subtitle">Your company and contact information.</p></div></div>
               <div class="card-body">
                 <form class="stack" id="profile-form">
+                  <div class="field full">
+                    <span class="label" data-i18n="common.profile_photo">Profile photo</span>
+                    <div class="photo-upload" id="c-photo-upload">
+                      <div class="avatar xl photo-preview" id="c-photo-preview"><span class="icon" data-icon="user" data-size="34"></span></div>
+                      <div class="photo-upload-body">
+                        <p class="photo-upload-title" data-i18n="common.photo_title">Add a friendly face</p>
+                        <p class="tiny muted" data-i18n="common.photo_hint">JPG, PNG or WebP. Max 2 MB.</p>
+                        <p class="tiny muted" data-i18n="common.photo_auto">Saved automatically.</p>
+                        <div class="photo-upload-actions">
+                          <label class="btn btn-soft btn-sm photo-pick" for="c-photo"><span class="icon" data-icon="plus" data-size="16"></span><span id="c-photo-label" data-i18n="auth.signup.photo_pick">Choose image</span></label>
+                          <button class="btn btn-ghost btn-sm hidden" type="button" id="c-photo-clear" data-i18n="common.delete">Delete</button>
+                        </div>
+                        <input class="visually-hidden" id="c-photo" type="file" accept="image/jpeg,image/png,image/webp">
+                      </div>
+                    </div>
+                  </div>
                   <div class="form-grid">
                     <div class="field full"><label data-i18n="client.profile.company">Company</label><input class="input" id="profile-company" required></div>
                     <div class="field full"><label data-i18n="client.profile.contact">Contact name</label><input class="input" id="profile-contact" required></div>
@@ -143,9 +159,10 @@
   <div class="toasts"></div>
 
   <script type="module">
-    import { api, bootstrap, setLoading, toast, fmtDate, fmtTime, hoursText, money, avatarNode, identityNode, videoFrameNode, youtubeWatchUrl } from './app.js';
+    import { api, bootstrap, setLoading, setSession, toast, fmtDate, fmtTime, hoursText, money, avatarNode, identityNode, videoFrameNode, youtubeWatchUrl } from './app.js';
     import { initI18n, bindLanguageControls, t } from './i18n.js';
-    import { initShell, setSection } from './portal.js';
+    import { initShell, setSection, updateUserAvatar } from './portal.js';
+    import { bindProfilePhoto } from './profile-photo.js';
     import { toCsv, downloadCsv } from './csv.js';
 
     await bootstrap();
@@ -155,6 +172,22 @@
     if (!session || session.role !== 'client') location.replace('login.html');
 
     initShell({ session, role: 'client', activeNav: 'dashboard', onLogout: async () => { await api.logout(); location.replace('login.html'); }});
+
+    function rememberPhoto(url) {
+      session.profile.photo_url = url;
+      setSession(session);
+      updateUserAvatar(session.profile);
+    }
+
+    const photoUploader = bindProfilePhoto({
+      input: document.getElementById('c-photo'),
+      preview: document.getElementById('c-photo-preview'),
+      box: document.getElementById('c-photo-upload'),
+      clear: document.getElementById('c-photo-clear'),
+      label: document.getElementById('c-photo-label'),
+      savePhoto: url => api.clientUpdatePhoto(url),
+      onUpdated: rememberPhoto
+    });
 
     document.querySelectorAll('.nav-item[data-section]').forEach(item => {
       item.addEventListener('click', () => {
@@ -408,6 +441,7 @@
         document.getElementById('profile-phone').value = profile.profile?.phone || '';
         document.getElementById('profile-country').value = profile.profile?.country || '';
         document.getElementById('profile-timezone').value = profile.profile?.timezone || '';
+        photoUploader.setUrl(profile.profile?.photo_url || '');
 
         import('./app.js').then(m => m.hydrateIcons());
         import('./portal.js').then(p => p.applyI18n());

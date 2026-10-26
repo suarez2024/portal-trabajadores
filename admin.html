@@ -119,24 +119,45 @@
         </section>
 
         <section class="page-section" data-section="settings">
-          <div class="two-col">
+          <div class="stack">
             <div class="card">
-              <div class="card-head"><div><h2 data-i18n="admin.settings.title">Settings</h2><p data-i18n="admin.settings.subtitle">Global portal settings.</p></div></div>
-              <div class="card-body">
-                <form class="stack" id="settings-form">
-                  <div class="field"><label data-i18n="admin.settings.fx">USD to MXN rate</label><input class="input" id="fx-rate" type="number" step="0.01"><p class="tiny muted" data-i18n="admin.settings.fx_note">Used to show assistants an estimated pay in Mexican pesos.</p></div>
-                  <div class="form-actions"><button class="btn btn-primary" id="fx-save"><span class="spinner"></span><span class="btn-label" data-i18n="common.save">Save</span></button></div>
-                </form>
+              <div class="card-head"><div><h2 data-i18n="admin.settings.profile">Admin profile</h2><p data-i18n="admin.settings.profile_note">Your name and profile photo.</p></div></div>
+              <div class="card-body stack-sm">
+                <p class="small muted"><span data-i18n="common.name">Name</span>: <strong id="admin-username">-</strong></p>
+                <div class="photo-upload" id="a-photo-upload">
+                  <div class="avatar xl photo-preview" id="a-photo-preview"><span class="icon" data-icon="user" data-size="34"></span></div>
+                  <div class="photo-upload-body">
+                    <p class="photo-upload-title" data-i18n="common.photo_title">Add a friendly face</p>
+                    <p class="tiny muted" data-i18n="common.photo_hint">JPG, PNG or WebP. Max 2 MB.</p>
+                    <p class="tiny muted" data-i18n="common.photo_auto">Saved automatically.</p>
+                    <div class="photo-upload-actions">
+                      <label class="btn btn-soft btn-sm photo-pick" for="a-photo"><span class="icon" data-icon="plus" data-size="16"></span><span id="a-photo-label" data-i18n="auth.signup.photo_pick">Choose image</span></label>
+                      <button class="btn btn-ghost btn-sm hidden" type="button" id="a-photo-clear" data-i18n="common.delete">Delete</button>
+                    </div>
+                    <input class="visually-hidden" id="a-photo" type="file" accept="image/jpeg,image/png,image/webp">
+                  </div>
+                </div>
               </div>
             </div>
-            <div class="card">
-              <div class="card-head"><div><h2 data-i18n="admin.settings.password">Change admin password</h2><p data-i18n="admin.settings.password_note">Use at least 8 characters.</p></div></div>
-              <div class="card-body">
-                <form class="stack" id="pass-form">
-                  <div class="field"><label data-i18n="common.current_password">Current password</label><input class="input" type="password" id="p-current" required></div>
-                  <div class="field"><label data-i18n="common.new_password">New password</label><input class="input" type="password" id="p-new" required></div>
-                  <div class="form-actions"><button class="btn btn-primary" id="p-change"><span class="spinner"></span><span class="btn-label" data-i18n="common.save">Save</span></button></div>
-                </form>
+            <div class="two-col">
+              <div class="card">
+                <div class="card-head"><div><h2 data-i18n="admin.settings.title">Settings</h2><p data-i18n="admin.settings.subtitle">Global portal settings.</p></div></div>
+                <div class="card-body">
+                  <form class="stack" id="settings-form">
+                    <div class="field"><label data-i18n="admin.settings.fx">USD to MXN rate</label><input class="input" id="fx-rate" type="number" step="0.01"><p class="tiny muted" data-i18n="admin.settings.fx_note">Used to show assistants an estimated pay in Mexican pesos.</p></div>
+                    <div class="form-actions"><button class="btn btn-primary" id="fx-save"><span class="spinner"></span><span class="btn-label" data-i18n="common.save">Save</span></button></div>
+                  </form>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-head"><div><h2 data-i18n="admin.settings.password">Change admin password</h2><p data-i18n="admin.settings.password_note">Use at least 8 characters.</p></div></div>
+                <div class="card-body">
+                  <form class="stack" id="pass-form">
+                    <div class="field"><label data-i18n="common.current_password">Current password</label><input class="input" type="password" id="p-current" required></div>
+                    <div class="field"><label data-i18n="common.new_password">New password</label><input class="input" type="password" id="p-new" required></div>
+                    <div class="form-actions"><button class="btn btn-primary" id="p-change"><span class="spinner"></span><span class="btn-label" data-i18n="common.save">Save</span></button></div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
@@ -200,9 +221,10 @@
   </dialog>
 
   <script type="module">
-    import { api, bootstrap, setLoading, toast, fmtDate, fmtTime, hoursText, money, avatarNode, identityNode, videoFrameNode, youtubeWatchUrl } from './app.js';
+    import { api, bootstrap, setLoading, setSession, toast, fmtDate, fmtTime, hoursText, money, avatarNode, identityNode, videoFrameNode, youtubeWatchUrl } from './app.js';
     import { initI18n, bindLanguageControls, t } from './i18n.js';
-    import { initShell, setSection } from './portal.js';
+    import { initShell, setSection, updateUserAvatar } from './portal.js';
+    import { bindProfilePhoto } from './profile-photo.js';
     import { toCsv, downloadCsv } from './csv.js';
 
     await bootstrap();
@@ -212,6 +234,22 @@
     if (!session || session.role !== 'admin') location.replace('admin-login.html');
 
     initShell({ session, role: 'admin', activeNav: 'dashboard', onLogout: async () => { await api.logout(); location.replace('admin-login.html'); }});
+
+    function rememberPhoto(url) {
+      session.profile.photo_url = url;
+      setSession(session);
+      updateUserAvatar(session.profile);
+    }
+
+    const photoUploader = bindProfilePhoto({
+      input: document.getElementById('a-photo'),
+      preview: document.getElementById('a-photo-preview'),
+      box: document.getElementById('a-photo-upload'),
+      clear: document.getElementById('a-photo-clear'),
+      label: document.getElementById('a-photo-label'),
+      savePhoto: url => api.adminUpdatePhoto(url),
+      onUpdated: rememberPhoto
+    });
 
     const jobDialog = document.getElementById('job-dialog');
     const engDialog = document.getElementById('eng-dialog');
@@ -462,6 +500,8 @@
 
         const settings = await api.adminSettings();
         document.getElementById('fx-rate').value = settings.fx_rate||18.66;
+        document.getElementById('admin-username').textContent = settings.profile?.username || '-';
+        photoUploader.setUrl(settings.profile?.photo_url || '');
         document.getElementById('settings-form').onsubmit=async e=>{ e.preventDefault(); const btn=document.getElementById('fx-save'); setLoading(btn,true); try{ await api.adminSettingsSave(document.getElementById('fx-rate').value); toast(t('admin.settings.saved'),'ok'); load(); }catch(err){toast(err.message,'err');}finally{setLoading(btn,false);} };
         document.getElementById('pass-form').onsubmit=async e=>{ e.preventDefault(); const btn=document.getElementById('p-change'); setLoading(btn,true); try{ await api.adminChangePassword(document.getElementById('p-current').value, document.getElementById('p-new').value); toast(t('admin.settings.changed'),'ok'); document.getElementById('pass-form').reset(); }catch(err){toast(err.message,'err');}finally{setLoading(btn,false);} };
 

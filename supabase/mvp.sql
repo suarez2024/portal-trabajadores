@@ -41,6 +41,7 @@ create table if not exists public.admins (
   id uuid primary key default gen_random_uuid(),
   username text not null,
   password_hash text not null,
+  photo_url text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   last_login_at timestamptz
@@ -75,6 +76,7 @@ create table if not exists public.clients (
   phone text,
   country text,
   timezone text,
+  photo_url text,
   status text not null default 'pending' check (status in ('pending', 'approved', 'rejected', 'suspended')),
   notes text,
   created_at timestamptz not null default now(),
@@ -269,6 +271,7 @@ as $$
     'phone', c.phone,
     'country', c.country,
     'timezone', c.timezone,
+    'photo_url', c.photo_url,
     'status', c.status,
     'created_at', c.created_at
   );
@@ -329,7 +332,8 @@ set search_path = public
 as $$
   select jsonb_build_object(
     'id', a.id,
-    'username', a.username
+    'username', a.username,
+    'photo_url', a.photo_url
   );
 $$;
 
@@ -3216,6 +3220,87 @@ begin
 end;
 $$;
 
+create or replace function public.portal_client_update_photo(p_token text, p_photo_url text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+declare
+  v_session public.sessions;
+  v_client public.clients;
+begin
+  v_session := public._portal_auth(p_token, 'client');
+
+  update public.clients
+  set photo_url = nullif(trim(coalesce(p_photo_url, '')), ''),
+      updated_at = now()
+  where id = v_session.user_id
+  returning * into v_client;
+
+  perform public._portal_audit(
+    'client', v_session.user_id, 'profile.photo', 'clients', v_session.user_id,
+    jsonb_build_object('photo_url', v_client.photo_url)
+  );
+
+  return jsonb_build_object('ok', true, 'profile', public._portal_client_json(v_client));
+end;
+$$;
+
+create or replace function public.portal_assistant_update_photo(p_token text, p_photo_url text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+declare
+  v_session public.sessions;
+  v_assistant public.assistants;
+begin
+  v_session := public._portal_auth(p_token, 'assistant');
+
+  update public.assistants
+  set photo_url = nullif(trim(coalesce(p_photo_url, '')), ''),
+      updated_at = now()
+  where id = v_session.user_id
+  returning * into v_assistant;
+
+  perform public._portal_audit(
+    'assistant', v_session.user_id, 'profile.photo', 'assistants', v_session.user_id,
+    jsonb_build_object('photo_url', v_assistant.photo_url)
+  );
+
+  return jsonb_build_object('ok', true, 'profile', public._portal_assistant_json(v_assistant));
+end;
+$$;
+
+create or replace function public.portal_admin_update_photo(p_token text, p_photo_url text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+declare
+  v_session public.sessions;
+  v_admin public.admins;
+begin
+  v_session := public._portal_auth(p_token, 'admin');
+
+  update public.admins
+  set photo_url = nullif(trim(coalesce(p_photo_url, '')), ''),
+      updated_at = now()
+  where id = v_session.user_id
+  returning * into v_admin;
+
+  perform public._portal_audit(
+    'admin', v_session.user_id, 'profile.photo', 'admins', v_session.user_id,
+    jsonb_build_object('photo_url', v_admin.photo_url)
+  );
+
+  return jsonb_build_object('ok', true, 'profile', public._portal_admin_json(v_admin));
+end;
+$$;
+
 do $$
 begin
   if to_regclass('storage.objects') is not null then
@@ -3284,6 +3369,7 @@ grant execute on function public.portal_mark_notifications(text, uuid[]) to anon
 
 grant execute on function public.portal_client_profile(text) to anon;
 grant execute on function public.portal_client_update_profile(text, text, text, text, text, text) to anon;
+grant execute on function public.portal_client_update_photo(text, text) to anon;
 grant execute on function public.portal_client_dashboard(text) to anon;
 grant execute on function public.portal_client_candidates(text) to anon;
 grant execute on function public.portal_client_select_candidate(text, uuid) to anon;
@@ -3293,6 +3379,7 @@ grant execute on function public.portal_client_statements(text, date, date) to a
 
 grant execute on function public.portal_assistant_profile(text) to anon;
 grant execute on function public.portal_assistant_update_profile(text, text, text, text, text[], text[], text[], text, text, text, text, text, text) to anon;
+grant execute on function public.portal_assistant_update_photo(text, text) to anon;
 grant execute on function public.portal_assistant_dashboard(text) to anon;
 grant execute on function public.portal_assistant_jobs(text) to anon;
 grant execute on function public.portal_assistant_apply(text, uuid, text) to anon;
@@ -3324,3 +3411,4 @@ grant execute on function public.portal_admin_billing(text, date, date) to anon;
 grant execute on function public.portal_admin_settings(text) to anon;
 grant execute on function public.portal_admin_settings_save(text, numeric, text) to anon;
 grant execute on function public.portal_admin_change_password(text, text, text) to anon;
+grant execute on function public.portal_admin_update_photo(text, text) to anon;

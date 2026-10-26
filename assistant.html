@@ -157,7 +157,22 @@
                     <div class="field full"><label data-i18n="assistant.profile.certifications">Certifications</label><div class="chip-input"><input class="input" id="p-cert"><button class="btn btn-soft btn-sm" type="button" id="p-add-cert" data-i18n="auth.signup.add">Add</button></div><div class="chips" id="p-certs"></div></div>
                     <div class="field full"><label data-i18n="assistant.profile.availability">Availability</label><input class="input" id="p-availability"></div>
                     <div class="field full"><label data-i18n="assistant.profile.video">Intro video (YouTube)</label><input class="input" id="p-video"></div>
-                    <div class="field full"><label data-i18n="assistant.profile.photo">Profile photo</label><input class="input" type="file" id="p-photo" accept="image/jpeg,image/png,image/webp"><div class="row" style="margin-top:10px"><div class="avatar lg" id="p-photo-preview"><span class="icon" data-icon="user" data-size="28"></span></div></div></div>
+                    <div class="field full">
+                      <span class="label" data-i18n="common.profile_photo">Profile photo</span>
+                      <div class="photo-upload" id="p-photo-upload">
+                        <div class="avatar xl photo-preview" id="p-photo-preview"><span class="icon" data-icon="user" data-size="34"></span></div>
+                        <div class="photo-upload-body">
+                          <p class="photo-upload-title" data-i18n="common.photo_title">Add a friendly face</p>
+                          <p class="tiny muted" data-i18n="common.photo_hint">JPG, PNG or WebP. Max 2 MB.</p>
+                          <p class="tiny muted" data-i18n="common.photo_auto">Saved automatically.</p>
+                          <div class="photo-upload-actions">
+                            <label class="btn btn-soft btn-sm photo-pick" for="p-photo"><span class="icon" data-icon="plus" data-size="16"></span><span id="p-photo-label" data-i18n="auth.signup.photo_pick">Choose image</span></label>
+                            <button class="btn btn-ghost btn-sm hidden" type="button" id="p-photo-clear" data-i18n="common.delete">Delete</button>
+                          </div>
+                          <input class="visually-hidden" id="p-photo" type="file" accept="image/jpeg,image/png,image/webp">
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   <div class="form-actions"><button class="btn btn-primary" id="p-save"><span class="spinner"></span><span class="btn-label" data-i18n="common.save">Save</span></button></div>
                 </form>
@@ -179,9 +194,10 @@
   <div class="toasts"></div>
 
   <script type="module">
-    import { api, bootstrap, setLoading, toast, fmtDate, fmtTime, hoursText, money } from './app.js';
+    import { api, bootstrap, setLoading, setSession, toast, fmtDate, fmtTime, hoursText, money } from './app.js';
     import { initI18n, bindLanguageControls, t } from './i18n.js';
-    import { initShell, setSection } from './portal.js';
+    import { initShell, setSection, updateUserAvatar } from './portal.js';
+    import { bindProfilePhoto } from './profile-photo.js';
     import { toCsv, downloadCsv } from './csv.js';
 
     await bootstrap();
@@ -225,9 +241,20 @@
     chip('p-lang','p-add-lang','p-langs',languages);
     chip('p-cert','p-add-cert','p-certs',certifications);
 
-    document.getElementById('p-photo').addEventListener('change', async e => {
-      const f = e.target.files?.[0]; if(!f) return;
-      try { const url = await api.uploadAvatar(f); document.getElementById('p-photo-preview').innerHTML='<img src="'+url+'" alt="">'; document.getElementById('p-photo-preview').dataset.url=url; } catch(err){ toast(err.message,'err'); e.target.value=''; }
+    function rememberPhoto(url) {
+      session.profile.photo_url = url;
+      setSession(session);
+      updateUserAvatar(session.profile);
+    }
+
+    const photoUploader = bindProfilePhoto({
+      input: document.getElementById('p-photo'),
+      preview: document.getElementById('p-photo-preview'),
+      box: document.getElementById('p-photo-upload'),
+      clear: document.getElementById('p-photo-clear'),
+      label: document.getElementById('p-photo-label'),
+      savePhoto: url => api.assistantUpdatePhoto(url),
+      onUpdated: rememberPhoto
     });
 
     let earningsData = [];
@@ -343,13 +370,15 @@
         (p.languages||[]).forEach(x=>{ const s=document.createElement('span'); s.className='chip'; s.innerHTML='<span>'+x+'</span>'; document.getElementById('p-langs').appendChild(s);});
         (p.certifications||[]).forEach(x=>{ const s=document.createElement('span'); s.className='chip'; s.innerHTML='<span>'+x+'</span>'; document.getElementById('p-certs').appendChild(s);});
         import('./app.js').then(m=>m.hydrateIcons(document.querySelector('#profile-form')));
-        if(p.photo_url) document.getElementById('p-photo-preview').innerHTML='<img src="'+p.photo_url+'" alt="">';
+        photoUploader.setUrl(p.photo_url || '');
         document.getElementById('p-email').textContent = p.email||'-';
         document.getElementById('p-code').textContent = p.code||'-';
         document.getElementById('p-status').textContent = p.status||'-';
 
         document.getElementById('p-save').onclick = async ev=>{
-          ev.preventDefault(); const btn=document.getElementById('p-save'); setLoading(btn,true);
+          ev.preventDefault();
+          if (photoUploader.isBusy()) return toast(t('common.photo_uploading'),'warn');
+          const btn=document.getElementById('p-save'); setLoading(btn,true);
           try{
             await api.assistantUpdateProfile({
               first_name: document.getElementById('p-first').value,
@@ -358,7 +387,7 @@
               skills, languages, certifications,
               availability: document.getElementById('p-availability').value,
               video_url: document.getElementById('p-video').value,
-              photo_url: document.getElementById('p-photo-preview').dataset.url||p.photo_url||null
+              photo_url: photoUploader.getUrl() || null
             });
             toast(t('assistant.profile.saved'),'ok'); load();
           }catch(e){ toast(e.message,'err'); } finally{ setLoading(btn,false); }

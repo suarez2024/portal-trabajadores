@@ -1,6 +1,20 @@
 import { hydrateIcons, setLoading, toast, initials, fmtDate, fmtTime, hoursText, money } from './app.js';
 import { applyI18n, t } from './i18n.js';
 
+export function updateUserAvatar(profile) {
+  const avatarEl = document.getElementById('user-avatar');
+  if (!avatarEl || !profile) return;
+  const name = profile.company || profile.full_name || profile.first_name || profile.contact_name || profile.username || '';
+  avatarEl.textContent = initials(name);
+  const url = String(profile.photo_url || '').trim();
+  if (!url) return;
+  const img = document.createElement('img');
+  img.src = url;
+  img.alt = '';
+  img.addEventListener('error', () => { avatarEl.textContent = initials(name); }, { once: true });
+  avatarEl.replaceChildren(img);
+}
+
 export function initShell({ session, role, activeNav, onLogout }) {
   hydrateIcons();
   applyI18n();
@@ -27,18 +41,11 @@ export function initShell({ session, role, activeNav, onLogout }) {
   if (session?.profile) {
     const nameEl = document.getElementById('user-name');
     const roleEl = document.getElementById('user-role');
-    const avatarEl = document.getElementById('user-avatar');
     if (nameEl) {
       nameEl.textContent = session.profile.company || session.profile.full_name || session.profile.first_name || session.profile.contact_name || session.profile.username || '-';
     }
     if (roleEl) roleEl.textContent = t(role === 'admin' ? 'portal.role_admin' : role === 'client' ? 'portal.role_client' : 'portal.role_assistant');
-    if (avatarEl) {
-      const name = nameEl?.textContent || '';
-      avatarEl.textContent = initials(name);
-      if (session.profile.photo_url) {
-        avatarEl.innerHTML = `<img src="${session.profile.photo_url}" alt="">`;
-      }
-    }
+    updateUserAvatar(session.profile);
   }
 
   logoutBtn?.addEventListener('click', async () => {

@@ -203,6 +203,7 @@
     const photoPickLabel = document.getElementById('photo-pick-label');
     const clearPhotoBtn = document.getElementById('clear-photo');
     let photoUrl = null;
+    let photoUploading = false;
 
     function setPhotoLabel(key) {
       photoPickLabel.dataset.i18n = key;
@@ -211,7 +212,10 @@
 
     photoInput.addEventListener('change', async () => {
       const file = photoInput.files?.[0];
-      if (!file) return;
+      if (!file || photoUploading) return;
+      photoUploading = true;
+      photoInput.disabled = true;
+      clearPhotoBtn.disabled = true;
       photoBox.classList.add('is-busy');
       try {
         const url = await api.uploadAvatar(file);
@@ -225,6 +229,9 @@
         hint.classList.add('danger');
         photoInput.value = '';
       } finally {
+        photoUploading = false;
+        photoInput.disabled = false;
+        clearPhotoBtn.disabled = false;
         photoBox.classList.remove('is-busy');
       }
     });
@@ -242,6 +249,12 @@
       event.preventDefault();
       hint.classList.add('hidden');
       hint.classList.remove('danger');
+      if (photoUploading) {
+        hintText.textContent = t('common.photo_uploading');
+        hint.classList.remove('hidden');
+        hint.classList.add('danger');
+        return;
+      }
       if (skills.length === 0) {
         hintText.textContent = t('validation.skills');
         hint.classList.remove('hidden');

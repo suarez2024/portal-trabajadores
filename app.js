@@ -524,6 +524,16 @@ export const api = {
     }
   },
 
+  async clientUpdatePhoto(photoUrl) {
+    const session = requireRole('client');
+    try {
+      return await rpc('portal_client_update_photo', { p_token: session.token, p_photo_url: photoUrl || null });
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
   async assistantDashboard() {
     const session = requireRole('assistant');
     try {
@@ -562,6 +572,16 @@ export const api = {
         p_country: payload.country || null,
         p_timezone: payload.timezone || null
       });
+    } catch (error) {
+      if (handleAuthFailure(error, 'login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async assistantUpdatePhoto(photoUrl) {
+    const session = requireRole('assistant');
+    try {
+      return await rpc('portal_assistant_update_photo', { p_token: session.token, p_photo_url: photoUrl || null });
     } catch (error) {
       if (handleAuthFailure(error, 'login.html')) throw error;
       throw new Error(friendlyError(error));
@@ -908,6 +928,16 @@ export const api = {
     const session = requireRole('admin', 'admin-login.html');
     try {
       return await rpc('portal_admin_change_password', { p_token: session.token, p_current_password: currentPassword, p_new_password: newPassword });
+    } catch (error) {
+      if (handleAuthFailure(error, 'admin-login.html')) throw error;
+      throw new Error(friendlyError(error));
+    }
+  },
+
+  async adminUpdatePhoto(photoUrl) {
+    const session = requireRole('admin', 'admin-login.html');
+    try {
+      return await rpc('portal_admin_update_photo', { p_token: session.token, p_photo_url: photoUrl || null });
     } catch (error) {
       if (handleAuthFailure(error, 'admin-login.html')) throw error;
       throw new Error(friendlyError(error));
